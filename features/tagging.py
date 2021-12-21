@@ -1,6 +1,6 @@
+import json
 
 from settings import bot, chat_id, THIS_FOLDER
-import json
 from inline_keyboards.keyboards import tagmarkup, tagAllConfirm_markup
 
 with open(THIS_FOLDER+'/db/'+'taglist.json', encoding='utf-8') as json_file:
@@ -24,7 +24,6 @@ def Command_Tagging(message):
         bot.pin_chat_message(tagging['message']['chat_id'], tagging['message']['message_id'], disable_notification=True)
 
 def get_tag_list_text(tagging_type):
-
     if tagging_type=='pending':
         lst='Нажми на кнопку ниже если хочешь, чтобы тебя тегнули когда что-то произойдет\n'
     elif tagging_type=='expired':
@@ -44,7 +43,6 @@ def Command_TagAll(message):
             else: bot.send_message(message.chat.id, 'Список пуст')
     else:
         bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAECEnJgUnBCmjZlYOPmFzt_i8Nj1P2kBgACswADZBZ0FwyaDMdVELOaHgQ', reply_to_message_id=message.message_id)
-    
 
 def tagalldef():
 
@@ -76,9 +74,6 @@ def tag_list_clear():
     else:
         return 'Список пуст'
 
-
-
-
 @bot.callback_query_handler(lambda query: query.data=='addme')
 def Tagging_AddMe(query): 
         user_id=query.from_user.id
@@ -100,9 +95,6 @@ def Tagging_DelMe(query):
                 bot.edit_message_text(chat_id=tagging['message']['chat_id'], message_id=tagging['message']['message_id'], text=get_tag_list_text('pending'),reply_markup=tagmarkup)
         else:
             bot.answer_callback_query(callback_query_id=query.id, text='Тебя нет в списке')
-
-
-
 
 @bot.callback_query_handler(lambda query: query.data=='yes sure')
 def Tagging_DelMe_Sure(query):                 
