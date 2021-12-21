@@ -2,10 +2,9 @@ import telebot
 import pytz
 import os
 
-
+#bot settings
 version='1.9.1 - Snapshot 1'
 github_link='https://github.com/zerothreebot/03bot'
-admins=[393483876]
 chat_id=-1001390129037
 
 
