@@ -1,1 +1,1 @@
-main: python gmail.py $PORT
+main: python main.py $PORT

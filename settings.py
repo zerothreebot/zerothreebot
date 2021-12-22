@@ -3,7 +3,7 @@ import pytz
 import os
 
 #bot settings
-version='1.9.1 - Snapshot 3'
+version='1.9.1 - Snapshot 3.5'
 github_link='https://github.com/zerothreebot/03bot'
 chat_id=-1001390129037
 
