@@ -54,6 +54,4 @@ def job():
             else:
                 bot.send_message(chat_id=chat_id, text=message_text)
         
-
-
 schedule.every(60).seconds.do(job)
