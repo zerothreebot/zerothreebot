@@ -84,13 +84,30 @@ def version_def(message):
 def startbot(): # Starts bot
     bot.polling(none_stop=True, interval=0)
 
-# Outputs bot crash error
+
+
+
+from features.gmail import *
+import time
+import threading
+from threading import Thread
+import traceback
+
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
     if __name__ == '__main__':
-        my_thread = Thread(target=startbot, args=())
+        my_thread = threading.Thread(target=startbot, args=())
         my_thread.start()
-
-except Exception as e:
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+except Exception as e: 
     var = traceback.format_exc()
     print(var)
+
+
+
+
+
+
+
