@@ -68,7 +68,10 @@ def job():
                     else:
                         lst.append(InputMediaDocument(file))
                     k+=1
-                    os.remove(att.filename)
+                    if os.environ.get('server', None)=="heroku":
+                        os.remove(att.filename)
+                    else:
+                        print("Deleting file skipped")
                     
                 bot.send_media_group(chat_id=393483876, media=lst)
             else:
