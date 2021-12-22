@@ -32,7 +32,7 @@ def replacequotes(message):
 def messageFromFormatting(author):
     message_text=""
     if author in dict:
-        message_text+="<b>"+author+"</b> "
+        message_text+="<b>"+dict[author]+"</b> "
     message_text+="<pre>"+author+"</pre>\n"
 
 
