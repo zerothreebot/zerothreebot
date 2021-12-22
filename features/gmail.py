@@ -15,7 +15,7 @@ dict = {
     'repetalesia@gmail.com':'Леся Репета (ТЙ,МА)',
     'back2void@gmail.com':'Рысин (АтаП)',
 }
-
+print()
 def message_processing(message):
     output=""
     for line in message.splitlines():
@@ -46,7 +46,7 @@ def job():
     with MailBox(gmail_host).login(username, app_password, 'INBOX') as mailbox:
         for msg in mailbox.fetch(criteria = "UNSEEN"):
             print("Found unread message: ",msg.subject)
-            message_text="<pre>"+msg.from_+"</pre>\n"
+            message_text=messageFromFormatting(msg.from_)
             message_text+="<b>"+msg.subject+"</b>\n\n"
             message_text+=replacequotes(message_processing(msg.text))+"\n\n"
 
