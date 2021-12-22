@@ -10,6 +10,7 @@ gmail_host='imap.gmail.com'
 
 
 dict = {
+    'riabchun.andrii@gmail.com':'Боб',
     'matankpi@gmail.com':'Бакун (ТЙ,МА)',
     'dobrovska.liudmyla@lll.kpi.ua':'Добровская Людмила (Модели)',
     'repetalesia@gmail.com':'Леся Репета (ТЙ,МА)',
