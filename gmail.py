@@ -62,23 +62,18 @@ def job():
                     namelist.append(att.filename)
                     with open(att.filename, 'wb') as f:
                         f.write(att.payload)
-                    #with open(THIS_FOLDER+"/"+att.filename, 'rb') as f:
-                        #file = f
                     file = open(att.filename,"rb")
                     if k==len(msg.attachments)-1:
                         lst.append(InputMediaDocument(file,caption=message_text, parse_mode="HTML"))
                     else:
                         lst.append(InputMediaDocument(file))
                     k+=1
-                    
+                    os.remove(att.filename)
                     
                 bot.send_media_group(chat_id=393483876, media=lst)
             else:
                 bot.send_message(chat_id=393483876, text=message_text)
-
-    for i in namelist:
-        print("-------------------", i)
-        os.remove(i)
+        
 
 
 def startbot():
