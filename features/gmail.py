@@ -8,6 +8,14 @@ username=os.environ.get('email', None)
 app_password=os.environ.get('password', None)
 gmail_host='imap.gmail.com'
 
+
+dict = {
+    'matankpi@gmail.com':'Бакун (ТЙ,МА)',
+    'dobrovska.liudmyla@lll.kpi.ua':'Добровская Людмила (Модели)',
+    'repetalesia@gmail.com':'Леся Репета (ТЙ,МА)',
+    'back2void@gmail.com':'Рысин (АтаП)',
+}
+
 def message_processing(message):
     output=""
     for line in message.splitlines():
@@ -20,6 +28,16 @@ def message_processing(message):
 
 def replacequotes(message):
     return message.replace("<","").replace(">","")
+
+def messageFromFormatting(author):
+    message_text=""
+    if author in dict:
+        message_text+="<b>"+author+"</b> "
+    message_text+="<pre>"+author+"</pre>\n"
+
+
+
+    return message_text
 
 from imap_tools import MailBox
 def job():
