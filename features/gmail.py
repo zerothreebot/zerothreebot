@@ -51,12 +51,21 @@ class Email:
 
     def messageRemoveReplies(self, message):
         output=""
+        open_exist=False
         for line in message.splitlines():
-            if line.find("> пише:")==-1:
-                print(line)
-                output+=line+'\n'
-            else:
-                break
+
+            for i in emails_list.keys():
+                if line.find(i)!=-1:
+                    return output
+
+            output+=line+'\n'
+            if line.find(">")!=-1:
+                if open_exist==True:
+                    open_exist=False
+                else:
+                    break
+            if line.find("<")!=-1:
+                open_exist=True
         return output
 
     def messageRemoveQuotes(self, message):
