@@ -94,8 +94,8 @@ def job():
 
             email = Email(msg)
             if email.attachmentsCounter!=0:
-                bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments)
+                bot.pin_chat_message(chat_id = chat_id, message_id=bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments).message_id)
             else:
-                bot.send_message(chat_id=chat_id, text=email.messageText)
+                bot.pin_chat_message(chat_id = chat_id, message_id=bot.send_message(chat_id=chat_id, text=email.messageText).message_id)
         
 schedule.every(5).seconds.do(job)
