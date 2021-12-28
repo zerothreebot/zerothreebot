@@ -98,4 +98,4 @@ def job():
             else:
                 bot.send_message(chat_id=chat_id, text=email.messageText)
         
-schedule.every(60).seconds.do(job)
+schedule.every(5).seconds.do(job)

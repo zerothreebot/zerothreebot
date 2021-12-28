@@ -100,7 +100,7 @@ try:
         my_thread.start()
     while True:
         schedule.run_pending()
-        time.sleep(60)
+        time.sleep(5)
 except Exception as e: 
     var = traceback.format_exc()
     print(var)
