@@ -1,15 +1,24 @@
 # 03Bot
-Бот-помощник для группы БС-03
+Students' bot helper
 
 ## main.py
 Main Python bot file
 
-## settings.py
-Tokens, admin list, time zone, etc.
+## .env - Bot Settings
+  ```
+  token=YOURBOTTOKEN
+  server=local or heroku (needet to avoid some errors on local running)
+  email=YOURGMAIL
+  password=YOURAPPPASSWORD
+  chatid=YOURCHATID
+  timezone=YOURTIMEZONE (Europe/Kiev)
+  checkgmailevery=CHECK GMAIL EVERY X SECONDS (ex. 5)
+  ```
 
 ## Procfile
-Heroku Server dyno initialisation
-
+  ```
+  main: python main.py $PORT
+  ```
 ## requirements.txt
 List of modules this program needs
   ```
