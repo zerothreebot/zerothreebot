@@ -2,14 +2,14 @@ import telebot
 import pytz
 import os
 
-#bot settings
-version='1.9.1 - Release'
+#configure bot in your .env file
+version='1.9.2 - Snapshot 1'
 github_link='https://github.com/zerothreebot/03bot'
-chat_id=-1001390129037
+chat_id=int(os.environ.get('chatid', None))
 
-
+checkgmailevery = int(os.environ.get("checkgmailevery", None))
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 token = os.environ.get('token', None)
 bot = telebot.TeleBot(token, parse_mode='HTML')
-timezone='Europe/Kiev'
+timezone=os.environ.get('timezone', None)
 tz=pytz.timezone(timezone)

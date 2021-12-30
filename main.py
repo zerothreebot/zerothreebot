@@ -3,7 +3,7 @@ from threading import Thread
 import traceback
 
 from inline_keyboards.keyboards import *
-from settings import bot, version, github_link
+from settings import bot, version, github_link, checkgmailevery
 from features.tagging import *
 from features.timetable import *
 
@@ -92,7 +92,8 @@ import time
 import threading
 from threading import Thread
 import traceback
-
+import schedule
+schedule.every(checkgmailevery).seconds.do(job)
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
     if __name__ == '__main__':
@@ -100,7 +101,8 @@ try:
         my_thread.start()
     while True:
         schedule.run_pending()
-        time.sleep(5)
+        time.sleep(checkgmailevery)
+        
 except Exception as e: 
     var = traceback.format_exc()
     print(var)
