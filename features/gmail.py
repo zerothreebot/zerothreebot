@@ -72,9 +72,9 @@ class Email:
 
     def messageFromFormatting(self):
         message_text="👤"
-        if self.from_ in emails_list:
-            message_text+=emails_list[self.from_]
-        message_text+="  <code>"+self.from_+"</code>"
+        #if self.from_ in emails_list:
+        message_text+='Бакун (ТЙ,МА)'
+        message_text+="  <code>matankpi@gmail.com</code>"
         return message_text
 
     def messageTextMaker(self):
