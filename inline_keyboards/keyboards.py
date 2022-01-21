@@ -38,8 +38,8 @@ def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None): #Стр�
 marks_markup = types.InlineKeyboardMarkup()
 marks_markup.row_width=5
 marks_markup.add(     
-                    types.InlineKeyboardButton(text='Нечіткі Моделі', url='https://docs.google.com/spreadsheets/d/1pN64quj_L-SY-2HTCzrzcqTtIaIIY-CSuBvKIH5Lax8/edit#gid=1077712196'),
-                    types.InlineKeyboardButton(text='Методи обчислень', url='https://docs.google.com/spreadsheets/d/1gDCYbUQAU8dHNPQmZjbIq-U5Qs0gPLUM/edit#gid=1777962498'),
+                    types.InlineKeyboardButton(text='Семестровые оценки', url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),
+                
     )
 
 
