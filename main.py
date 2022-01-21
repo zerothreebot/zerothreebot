@@ -14,7 +14,7 @@ def Command_Start(message):
 
 @bot.message_handler(commands=['marks']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
-    bot.send_message(chat_id=message.chat.id, text='<pre>Выбeри предмет</pre>', reply_markup=marks_markup)
+    bot.send_message(chat_id=message.chat.id, text='<pre>КПИ ФБМИ 122 2021-2022 БС</pre>', reply_markup=marks_markup)
 
 @bot.message_handler(commands=['timetable']) # Shows lessons timetable
 def Command_Timetable(message):
