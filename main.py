@@ -61,8 +61,10 @@ from features.db import db_object
 def addhomework(message):
     db_object.execute("SELECT group_id, name, surname FROM users")
     result = db_object.fetchall()
+    #print(result)
     output=''
     for i in result:
+        #print(i)
         output+=str(i[0])+' - '+i[1]+' '+i[2]+'\n'
 
     bot.send_message(message.chat.id, output)
@@ -76,7 +78,7 @@ def menu(message):
     id=message.from_user.id
     db_object.execute(f"SELECT id, group_id, name, surname FROM users where id = {id}")
     result = db_object.fetchone()
-    print(result)
+    #print(result)
     if not result:
         bot.send_message(message.chat.id, 'Тебя нет в БД')
     else:
