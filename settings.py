@@ -3,7 +3,7 @@ import pytz
 import os
 
 #configure bot in your .env file
-version='1.9.2 - Snapshot 1'
+version='2.0.0 - Snapshot 1'
 github_link='https://github.com/zerothreebot/03bot'
 chat_id=int(os.environ.get('chatid', None))
 

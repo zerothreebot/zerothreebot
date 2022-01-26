@@ -56,15 +56,37 @@ def Day_NextDay(query):
 def Day_PrevDay(query):    
         bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output(getdayofweek(),0), reply_markup=nextday_markup,disable_web_page_preview=True, parse_mode='HTML')
 #
-
+from features.db import db_object
 @bot.message_handler(commands=['list']) # Outputs list of people in the group
 def addhomework(message):
-    bot.send_message(message.chat.id, '1 - Балас Ілля\n2 - Буднік Юлія\n3 - Гашимов Рінат\n4 - Гончарук Владислав\n5 - Гуріна Софія\n6 - Джима Данило\n7 - Затуловський Георгій\n8 - Кабала Ілля\n9 - Каширін Антон\n10 - Литвин Дарія\n11 - Матвієнко Артем\n12 - Нечай Оксана\n13 - Рябчун Андрій\n14 - Сердаковська Марія-Ангєліка\n15 - Сидоренко Андрій\n16 - Ситник Максим\n17 - Талалаєв Єгор\n18 - Терещенко Данило\n19 - Товстенко Олександра\n20 - Федорійчук Владислава\n21 - Ходарченко Артем\n22 - Чермошенцева Анастасія\n23 - Шевченко Олександр\n24 - Шекун Даниїл\n')
+    db_object.execute("SELECT group_id, name, surname FROM users")
+    result = db_object.fetchall()
+    output=''
+    for i in result:
+        output+=str(i[0])+' - '+i[1]+' '+i[2]+'\n'
+
+    bot.send_message(message.chat.id, output)
 
 with open(THIS_FOLDER+'/db/'+'lessons.json', encoding='utf-8') as json_file:
     lessons = json.load(json_file)
 
 # Homework notification sketch
+@bot.message_handler(commands=['menu'])
+def menu(message):
+    id=message.from_user.id
+    db_object.execute(f"SELECT id, group_id, name, surname FROM users where id = {id}")
+    result = db_object.fetchone()
+    print(result)
+    if not result:
+        bot.send_message(message.chat.id, 'Тебя нет в БД')
+    else:
+        output='Вот что я нашел в базе данных:\n\n'
+        output+='Ты - '+result[2]+' '+result[3]+'\n'
+        output+='Твой номер в списке: '+str(result[1])+'\n'
+        output+='Твой Telegram ID: <pre>'+str(result[0])+'</pre>'
+        bot.send_message(message.chat.id, output)
+
+
 @bot.message_handler(commands=['addhw'])
 def addhomework(message):
     bot.send_message(message.chat.id, 'Выбери предмет:', reply_markup=lessons_markup)
