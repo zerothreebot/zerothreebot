@@ -6,7 +6,6 @@ import os
 version='2.0.0 - Snapshot 2'
 github_link='https://github.com/zerothreebot/03bot'
 chat_id=int(os.environ.get('chatid', None))
-admins=int(os.environ.get('admins', None))
 checkgmailevery = int(os.environ.get("checkgmailevery", None))
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 token = os.environ.get('token', None)
