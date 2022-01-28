@@ -1,3 +1,4 @@
+from distutils.command.build import build
 import json
 from threading import Thread
 import traceback
@@ -70,6 +71,10 @@ def addhomework(message):
 
     bot.send_message(message.chat.id, output)
 
+@bot.message_handler(commands=['version']) # Outputs bot version
+def version_def(message):
+    bot.send_message(message.chat.id, version+"\n"+github_link)
+
 
 # Homework notification sketch
 @bot.message_handler(commands=['menu'])
@@ -91,28 +96,6 @@ def menu(message):
         output+='Твой Telegram ID: '+str(user[0])+'\n'
         bot.send_message(message.chat.id, output)
 
-
-@bot.message_handler(commands=['hwadd'])
-def addhomework(message):
-    bot.send_message(message.chat.id, 'Выбери предмет:', reply_markup=lessons_markup)
-@bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
-def Videopad_Query(query):
-    lesson_number=int(query.data.split(' ')[1])
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Реплайни на это сообщение дату дедлайна в виде 29-01-2050: '+lessons[lesson_number]+' ID: '+str(lesson_number))
-@bot.message_handler(commands=['hw'])
-def addhomework(message):
-    
-    tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
-    todays_date=datetime.date.today()
-    output='Вот текущие таски:\n'
-    
-    for i in tasks:
-        difference=i[1]-todays_date
-        if difference.total_seconds()>=-86400:
-            output+='Предмет: '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
-
-    bot.send_message(message.chat.id, output)
-
 @bot.message_handler(commands=['hwall'])
 def addhomework(message):
     tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
@@ -126,10 +109,10 @@ def addhomework(message):
 
 @bot.message_handler(commands=['hwinfo'])
 def addhomework(message):
-    try:
+    #try:
         id=message.text.split(' ')[1]
 
-
+        
         task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task, files', where_column='id', where_value=id)
 
         if task!=None:
@@ -143,40 +126,164 @@ def addhomework(message):
             output+='Дата создания: '+str(task[2])+'\n'
             output+='Дедлайн: '+str(task[3])+'\n'
             output+='Задание: '+task[4]+'\n'
-            output+='Файлы: '+task[5]+'\n'
+            output+='Файлы: '+str(task[5])+'\n'
             bot.send_message(message.chat.id, output)   
         else:
             bot.send_message(message.chat.id, 'Такое задание не найдено')
-    except:
-        bot.send_message(message.chat.id, 'Введи ID\n\n/hwinfo ID')  
+    #except:
+        #bot.send_message(message.chat.id, 'Введи ID\n\n/hwinfo ID')  
+@bot.message_handler(commands=['hw'])
+def addhomework(message):
     
-      
-#
+    tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
+    todays_date=datetime.date.today()
+    output='Вот текущие таски:\n'
+    lst=[]
+    for i in tasks:
+        difference=i[1]-todays_date
+        if difference.total_seconds()>=-86400:
+            output+='#'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
+            lst.append(types.InlineKeyboardButton(text='#'+str(i[2]), callback_data='watchtask '+str(i[2])))
 
-@bot.message_handler(commands=['version']) # Outputs bot version
-def version_def(message):
-    bot.send_message(message.chat.id, version+"\n"+github_link)
+    bot.send_message(message.chat.id, output, reply_markup=types.InlineKeyboardMarkup(build_menu(lst, 4)))
+   
 
-@bot.message_handler(func=lambda m: True) # Shows today's lessons with 'tomorrow's lessons show' button
+@bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
+def Videopad_Query(query):
+    id=int(query.data.split(' ')[1])
+    task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task, files', where_column='id', where_value=id)
+
+    user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=task[0])
+    name=user[0]+' '+user[1]
+
+    output=''
+    output+='ID: '+str(id)+'\n'
+    output+='Предмет: '+lessons[task[1]]+'\n'
+    output+='Создано: '+name+'\n'
+    output+='Дедлайн: '+str(task[3])+'\n'
+    output+='Задание: '+task[4]+'\n'
+    if len(task[5])==0:
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output)
+    else:
+        documentsContainer=[]
+        k=0
+        attachmentsCounter=len(task[5])
+        for i in task[5]:
+            print(k,attachmentsCounter-1)
+            if k==attachmentsCounter-1:
+                documentsContainer.append(InputMediaDocument(i, caption=output))
+            else:
+                documentsContainer.append(InputMediaDocument(i))
+            k+=1
+
+
+        bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+        bot.send_media_group(chat_id=query.message.chat.id, media=documentsContainer)
+
+
+
+
+
+
+
+
+
+
+user_current_action={}
+tasks_by_user={}      
+@bot.message_handler(commands=['hwadd'])
+def addhomework(message):
+    user_current_action[message.from_user.id]='addhw step 1'
+    bot.send_message(message.chat.id, 'Выбери предмет:', reply_markup=lessons_markup)
+
+
+@bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
+def Videopad_Query(query):
+    user_current_action[query.from_user.id]='addhw step 2'
+    lesson_number=int(query.data.split(' ')[1])
+    tasks_by_user[query.from_user.id]={}
+    tasks_by_user[query.from_user.id]['lesson_id']=lesson_number
+
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=lessons[lesson_number]+'\nРеплайни на это сообщение дату дедлайна в виде ДД-ММ-ГГГГ: ')
+
+
+@bot.message_handler(commands=['print'])
+def prrrrint(message):
+    print(user_current_action, tasks_by_user)
+    
+from datetime import date
+@bot.message_handler(commands=['finish'])
+def prrrrint(message):
+    user_id=message.from_user.id
+    action=int(user_current_action[user_id].split(' ')[2])
+    if action==4:
+        date_=tasks_by_user[user_id]['date'].split('-')
+        day=int(date_[0])
+        month=int(date_[1])
+        year=int(date_[2])
+        add_task(user_id, tasks_by_user[user_id]['lesson_id'], date(year, month, day), tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
+        del tasks_by_user[user_id]
+        del user_current_action[user_id]
+
+
+@bot.message_handler(func=lambda m: True) 
 def All(message):
-    if message.reply_to_message!=None and message.reply_to_message.from_user.username=='zerothree_bot':
-        bot_text=message.reply_to_message.text
-        text=message.text
-        if 'Реплайни' in bot_text:
-            if len(text)==10:
-                date=text.split('-')
-                id=int(bot_text[bot_text.find('ID:')+4:])
-                
-                day=date[0]
-                month=date[1]
-                year=date[2]
+    user_id=message.from_user.id
+    if user_id in tasks_by_user:
+        action=int(user_current_action[user_id].split(' ')[2])
+        if action==2:
+            text=message.text
+            try:
+                date_=text.split('-')
+                day=int(date_[0])
+                month=int(date_[1])
+                year=int(date_[2])
+                fail=False
+            
+                date_assigned=date(year, month, day)
+                todays_date=datetime.date.today()
+                difference=date_assigned-todays_date
+                if difference.total_seconds()<=-86400:
+                    fail=True
+                    print(difference.total_seconds())
+            except:
+                fail=True
 
-                bot.send_message(message.chat.id, 'Предмет: '+lessons[id]+'\n'+'Day: '+day+'\n'+'Month: '+month+'\n'+'Year: '+year+'\n')
+            
+
+            if fail == False:
+                user_current_action[user_id]='addhw step 3'
+                tasks_by_user[user_id]['date']=text
+
+                bot.send_message(message.chat.id, 'Lesson: '+str(tasks_by_user[user_id]['lesson_id'])+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Реплайни на это сообщение описание задания')
 
             else:
-                bot.send_message(message.chat.id, 'Bad')
+                bot.send_message(message.chat.id, 'Неверный формат или дата находится в прошлом. Попробуй ещё раз. Формат ДД-ММ-ГГГГ')
+            
+        elif action==3:
+            text=message.text
+            user_current_action[user_id]='addhw step 4'
+            tasks_by_user[user_id]['task']=text
+            tasks_by_user[user_id]['files']=[]
+            bot.send_message(message.chat.id, 'Lesson: '+str(tasks_by_user[user_id]['lesson_id'])+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Task: '+tasks_by_user[user_id]['task']+'\n'+'Вышли материалы задания в виде файлов, а затем нажми /finish')
 
-            bot.delete_message(message.chat.id,message.reply_to_message.message_id)
+@bot.message_handler(content_types=['document'])
+def function_name(message):
+    user_id=message.from_user.id
+    if user_id in tasks_by_user:
+        action=int(user_current_action[user_id].split(' ')[2])
+        if action==4:
+            if len(tasks_by_user[user_id]['files'])<10:
+                id=message.document.file_id
+                tasks_by_user[user_id]['files'].append(id)
+                print(id)
+                bot.send_document(message.chat.id, document=id, caption='123')
+            else:
+                bot.send_message(message.chat.id, 'лимит')
+
+
+
+        
     
 def startbot(): # Starts bot
     bot.polling(none_stop=True, interval=0)
