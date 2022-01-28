@@ -75,50 +75,51 @@ def addhomework(message):
 @bot.message_handler(commands=['menu'])
 def menu(message):
     id=message.from_user.id
-    db_object.execute(f"SELECT id, group_id, name, surname FROM users where id = {id}")
-    result = db_object.fetchone()
-    #print(result)
-    if not result:
+    user = fetch('users', fetchone=True, rows='id, group_id, name, surname, contract', where_column='id', where_value=id)
+    if not user:
         bot.send_message(message.chat.id, 'Тебя нет в БД')
     else:
         output='Вот что я нашел в базе данных:\n\n'
-        output+='Ты - '+result[2]+' '+result[3]+'\n'
-        output+='Твой номер в списке: '+str(result[1])+'\n'
-        output+='Твой Telegram ID: <pre>'+str(result[0])+'</pre>'
+        output+='Ты - '+user[2]+' '+user[3]+'\n'
+        output+='Твой номер в списке: '+str(user[1])+'\n'
+        output+='Форма обучения: '
+        if user[4]==False:
+            output+='Бюджет'+'\n'
+        else:
+            output+='Контракт'+'\n'
+
+        output+='Твой Telegram ID: '+str(user[0])+'\n'
         bot.send_message(message.chat.id, output)
 
 
-@bot.message_handler(commands=['addhw'])
+@bot.message_handler(commands=['hwadd'])
 def addhomework(message):
     bot.send_message(message.chat.id, 'Выбери предмет:', reply_markup=lessons_markup)
 @bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
 def Videopad_Query(query):
     lesson_number=int(query.data.split(' ')[1])
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Реплайни на это сообщение дату дедлайна в виде 29-01-2050: '+lessons[lesson_number])
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Реплайни на это сообщение дату дедлайна в виде 29-01-2050: '+lessons[lesson_number]+' ID: '+str(lesson_number))
 @bot.message_handler(commands=['hw'])
 def addhomework(message):
-    tasks=fetch_tasks()
-    assign_date=datetime.date.today()
-
-
+    
+    tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
+    todays_date=datetime.date.today()
     output='Вот текущие таски:\n'
     
     for i in tasks:
-        difference=i[2]-assign_date
-        if difference.total_seconds()>0:
-            output+='Предмет: '+lessons[i[1]]+'. Дедлайн: '+str(i[2])+'\n'
+        difference=i[1]-todays_date
+        if difference.total_seconds()>=-86400:
+            output+='Предмет: '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
 
-    print(tasks)
     bot.send_message(message.chat.id, output)
 
-@bot.message_handler(commands=['allhw'])
+@bot.message_handler(commands=['hwall'])
 def addhomework(message):
-    tasks=fetch_tasks()
-
+    tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
 
     output='Вот все таски:\n'
     for i in tasks:
-        output+='Предмет: '+lessons[i[1]]+'. Дедлайн: '+str(i[2])+'. ID: '+str(i[7])+'\n'
+        output+='Предмет: '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'. ID: '+str(i[2])+'\n'
     
     output+='\n/hwinfo ID'
     bot.send_message(message.chat.id, output)    
@@ -127,10 +128,14 @@ def addhomework(message):
 def addhomework(message):
     try:
         id=message.text.split(' ')[1]
-        task = fetch_task(id)
+
+
+        task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task, files', where_column='id', where_value=id)
+
         if task!=None:
-            user=fetch_name(task[0])
+            user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=task[0])
             name=user[0]+' '+user[1]
+
             output=''
             output+='ID: '+str(id)+'\n'
             output+='Предмет: '+lessons[task[1]]+'\n'
@@ -154,18 +159,19 @@ def version_def(message):
 
 @bot.message_handler(func=lambda m: True) # Shows today's lessons with 'tomorrow's lessons show' button
 def All(message):
-    if message.reply_to_message!=None:
+    if message.reply_to_message!=None and message.reply_to_message.from_user.username=='zerothree_bot':
         bot_text=message.reply_to_message.text
         text=message.text
         if 'Реплайни' in bot_text:
             if len(text)==10:
                 date=text.split('-')
-
+                id=int(bot_text[bot_text.find('ID:')+4:])
+                
                 day=date[0]
                 month=date[1]
                 year=date[2]
 
-                bot.send_message(message.chat.id, 'Cool\n'+'Day: '+day+'\n'+'Month: '+month+'\n'+'Year: '+year+'\n')
+                bot.send_message(message.chat.id, 'Предмет: '+lessons[id]+'\n'+'Day: '+day+'\n'+'Month: '+month+'\n'+'Year: '+year+'\n')
 
             else:
                 bot.send_message(message.chat.id, 'Bad')

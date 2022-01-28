@@ -9,21 +9,29 @@ def update(id:int, column:str, value): #update(393483876, 'surname', 'Рябчу
     sql = f'update users set {column} = %s where id = %s'
     db_object.execute(sql,(value, id))
     db_connection.commit()
-def fetch_tasks(): 
-    db_object.execute("SELECT * FROM tasks ORDER BY id")
-    result = db_object.fetchall()
+
+def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, where_value=None):
+    if rows==None:
+        rows='*'
+    sql = f"SELECT {rows} FROM {table}"
+    
+    if order_by!=None:
+        sql+=f" ORDER BY {order_by}"
+
+    if where_column!=None and where_value!=None:
+        sql+=f" WHERE {where_column}={where_value}"
+
+
+    db_object.execute(sql)
+    if fetchone==False:
+        result = db_object.fetchall()
+    else:
+        result = db_object.fetchone()
     print(result)
     return result
 
-def fetch_task(id): 
-    db_object.execute(f"SELECT * FROM tasks WHERE id={id}")
-    result = db_object.fetchone()
-    return result
+#fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
 
-def fetch_name(id): 
-    db_object.execute(f"SELECT name, surname FROM users WHERE id={id}")
-    result = db_object.fetchone()
-    return result
 
 def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
     assign_date=datetime.date.today()
