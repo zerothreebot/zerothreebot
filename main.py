@@ -6,6 +6,7 @@ from inline_keyboards.keyboards import *
 from settings import bot, version, github_link, checkgmailevery
 from features.tagging import *
 from features.timetable import *
+from features.db import *
 
 @bot.message_handler(commands=['start'])
 def Command_Start(message):
@@ -69,8 +70,6 @@ def addhomework(message):
 
     bot.send_message(message.chat.id, output)
 
-with open(THIS_FOLDER+'/db/'+'lessons.json', encoding='utf-8') as json_file:
-    lessons = json.load(json_file)
 
 # Homework notification sketch
 @bot.message_handler(commands=['menu'])
@@ -94,17 +93,85 @@ def addhomework(message):
     bot.send_message(message.chat.id, 'Выбери предмет:', reply_markup=lessons_markup)
 @bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
 def Videopad_Query(query):
-    lesson_number=query.data.split(' ')[1]
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Введи дедлайн: '+lessons[lesson_number])
+    lesson_number=int(query.data.split(' ')[1])
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Реплайни на это сообщение дату дедлайна в виде 29-01-2050: '+lessons[lesson_number])
 @bot.message_handler(commands=['hw'])
 def addhomework(message):
-    bot.send_message(message.chat.id, 'Тут будут домашки')
+    tasks=fetch_tasks()
+    assign_date=datetime.date.today()
+
+
+    output='Вот текущие таски:\n'
+    
+    for i in tasks:
+        difference=i[2]-assign_date
+        if difference.total_seconds()>0:
+            output+='Предмет: '+lessons[i[1]]+'. Дедлайн: '+str(i[2])+'\n'
+
+    print(tasks)
+    bot.send_message(message.chat.id, output)
+
+@bot.message_handler(commands=['allhw'])
+def addhomework(message):
+    tasks=fetch_tasks()
+
+
+    output='Вот все таски:\n'
+    for i in tasks:
+        output+='Предмет: '+lessons[i[1]]+'. Дедлайн: '+str(i[2])+'. ID: '+str(i[7])+'\n'
+    
+    output+='\n/hwinfo ID'
+    bot.send_message(message.chat.id, output)    
+
+@bot.message_handler(commands=['hwinfo'])
+def addhomework(message):
+    try:
+        id=message.text.split(' ')[1]
+        task = fetch_task(id)
+        if task!=None:
+            user=fetch_name(task[0])
+            name=user[0]+' '+user[1]
+            output=''
+            output+='ID: '+str(id)+'\n'
+            output+='Предмет: '+lessons[task[1]]+'\n'
+            output+='Создано: '+name+'\n'
+            output+='Дата создания: '+str(task[2])+'\n'
+            output+='Дедлайн: '+str(task[3])+'\n'
+            output+='Задание: '+task[4]+'\n'
+            output+='Файлы: '+task[5]+'\n'
+            bot.send_message(message.chat.id, output)   
+        else:
+            bot.send_message(message.chat.id, 'Такое задание не найдено')
+    except:
+        bot.send_message(message.chat.id, 'Введи ID\n\n/hwinfo ID')  
+    
+      
 #
 
 @bot.message_handler(commands=['version']) # Outputs bot version
 def version_def(message):
     bot.send_message(message.chat.id, version+"\n"+github_link)
 
+@bot.message_handler(func=lambda m: True) # Shows today's lessons with 'tomorrow's lessons show' button
+def All(message):
+    if message.reply_to_message!=None:
+        bot_text=message.reply_to_message.text
+        text=message.text
+        if 'Реплайни' in bot_text:
+            if len(text)==10:
+                date=text.split('-')
+
+                day=date[0]
+                month=date[1]
+                year=date[2]
+
+                bot.send_message(message.chat.id, 'Cool\n'+'Day: '+day+'\n'+'Month: '+month+'\n'+'Year: '+year+'\n')
+
+            else:
+                bot.send_message(message.chat.id, 'Bad')
+
+            bot.delete_message(message.chat.id,message.reply_to_message.message_id)
+    
 def startbot(): # Starts bot
     bot.polling(none_stop=True, interval=0)
 

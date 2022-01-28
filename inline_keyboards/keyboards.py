@@ -26,8 +26,6 @@ tagAllConfirm_markup.add(types.InlineKeyboardButton(text='Да', callback_data='
 
 def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None): #Строит меню из массива кнопок. Принимает массив кнопок и кол-во столбцов в меню.
 
-        
-
     menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
     if header_buttons:
         menu.insert(0, header_buttons)
@@ -41,23 +39,25 @@ marks_markup.add(
                     types.InlineKeyboardButton(text='Итоговые оценки 3-го семестра 📈', url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),
                 
     )
-
+lessons={   0:'Теорія БМ сигналів',
+            1:'Нечіткі моделі в медицині',
+            2:'Методи обчислень',
+            3:'AтаП',
+            4:'Aнглийский',
+            5:'Математичний аналіз',
+            6:'Теорія ймовірностей',
+            7:'Додатковий предмет',
+            8:'Естетика',
+            9:'Еристика, Логіка',
+            10:'Другое',
+}
 
 lessons_markup = types.InlineKeyboardMarkup()
 lessons_markup.row_width=3
-lessons_markup.add(     
-                    types.InlineKeyboardButton(text='Теорія БМ сигналів', callback_data='addHWlesson 1'),
-                    types.InlineKeyboardButton(text='Нечіткі моделі в медицині', callback_data='addHWlesson 2'),
-                    types.InlineKeyboardButton(text='Методи обчислень', callback_data='addHWlesson 3'),
-                    types.InlineKeyboardButton(text='AтаП', callback_data='addHWlesson 4'),
-                    types.InlineKeyboardButton(text='Aнглийский', callback_data='addHWlesson 5'),
-                    types.InlineKeyboardButton(text='Математичний аналіз', callback_data='addHWlesson 6'),
-                    types.InlineKeyboardButton(text='Теорія ймовірностей', callback_data='addHWlesson 7'),
-                    types.InlineKeyboardButton(text='ФП', callback_data='addHWlesson 8'),
-                    types.InlineKeyboardButton(text='Естетика', callback_data='addHWlesson 9'),
-                    types.InlineKeyboardButton(text='Еристика, Логіка', callback_data='addHWlesson 10'),
-                    types.InlineKeyboardButton(text='Другое', callback_data='addHWlesson 11')               
-    )
+for i in lessons:
+    lessons_markup.add(     
+                    types.InlineKeyboardButton(text=lessons[i], callback_data='addHWlesson '+str(i)),              
+        )
 
 
 lessonsTomorrow_markup = types.InlineKeyboardMarkup()
