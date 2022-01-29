@@ -6,10 +6,29 @@ DB_URI=os.environ.get('DATABASE_URL', None)
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
 
-def update(id:int, column:str, value): #update(393483876, 'surname', 'Рябчун')
-    sql = f'update users set {column} = %s where id = %s'
-    db_object.execute(sql,(value, id))
+def list_to_str(lst):
+    if len(lst)==0:
+        return '{}'
+    lst_str='{'
+    k=0
+    while k<len(lst):
+        lst_str+=str(lst[k])
+        if k!=len(lst)-1:
+            lst_str+=', '
+        k+=1
+    lst_str+='}'
+    return lst_str
+
+
+def update(table, column, value, where_column, where_value): 
+
+    sql = f"update {table} set {column} = '{value}' WHERE {where_column}={where_value}"
+
+
+    db_object.execute(sql)
     db_connection.commit()
+
+#update('tasks', 'done_by', list_to_str([1,2,3,4]),'id','13')
 
 def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, where_value=None):
     if rows==None:
@@ -28,22 +47,10 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
         result = db_object.fetchall()
     else:
         result = db_object.fetchone()
-    print(result)
     return result
 
 #fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
-def list_to_str(lst):
-    if len(lst)==0:
-        return '{}'
-    lst_str='{'
-    k=0
-    while k<len(lst):
-        lst_str+=lst[k]
-        if k!=len(lst)-1:
-            lst_str+=', '
-        k+=1
-    lst_str+='}'
-    return lst_str
+
 
 def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
     assign_date=datetime.date.today()
