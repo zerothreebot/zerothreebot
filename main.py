@@ -132,20 +132,26 @@ def addhomework(message):
             bot.send_message(message.chat.id, 'Такое задание не найдено')
     #except:
         #bot.send_message(message.chat.id, 'Введи ID\n\n/hwinfo ID')  
-@bot.message_handler(commands=['hw'])
-def addhomework(message):
-    
-    tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
-    todays_date=datetime.date.today()
-    output='Вот текущие таски:\n'
-    lst=[]
-    for i in tasks:
-        difference=i[1]-todays_date
-        if difference.total_seconds()>=-86400:
-            output+='#'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
-            lst.append(types.InlineKeyboardButton(text='#'+str(i[2]), callback_data='watchtask '+str(i[2])))
 
-    bot.send_message(message.chat.id, output, reply_markup=types.InlineKeyboardMarkup(build_menu(lst, 4)))
+
+def actual_tasks_builder():
+        tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id', order_by='id')
+        todays_date=datetime.date.today()
+        output='Вот текущие таски:\n'
+        lst=[]
+        for i in tasks:
+            difference=i[1]-todays_date
+            if difference.total_seconds()>=-86400:
+                output+='#'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
+                lst.append(types.InlineKeyboardButton(text='#'+str(i[2]), callback_data='watchtask '+str(i[2])))
+        reply_markup=types.InlineKeyboardMarkup(build_menu(lst, 4))
+        return output, reply_markup
+
+@bot.message_handler(commands=['hw'])
+def actual_tasks(message):
+    output, reply_markup = actual_tasks_builder()
+
+    bot.send_message(message.chat.id, output, reply_markup=reply_markup) 
    
 
 @bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
@@ -162,8 +168,11 @@ def Videopad_Query(query):
     output+='Создано: '+name+'\n'
     output+='Дедлайн: '+str(task[3])+'\n'
     output+='Задание: '+task[4]+'\n'
+    task_watch_menu = types.InlineKeyboardMarkup()
+    task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'), 
+                            types.InlineKeyboardButton(text='Отметить выполненым', callback_data='set completed '+str(id)))
     if len(task[5])==0:
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output)
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=task_watch_menu)
     else:
         documentsContainer=[]
         k=0
@@ -171,17 +180,21 @@ def Videopad_Query(query):
         for i in task[5]:
             print(k,attachmentsCounter-1)
             if k==attachmentsCounter-1:
-                documentsContainer.append(InputMediaDocument(i, caption=output))
+                documentsContainer.append(InputMediaDocument(i))
             else:
                 documentsContainer.append(InputMediaDocument(i))
-            k+=1
+            k+=1    
 
+        
 
         bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
         bot.send_media_group(chat_id=query.message.chat.id, media=documentsContainer)
+        bot.send_message(chat_id=query.message.chat.id,text=output, reply_markup=task_watch_menu)
 
-
-
+@bot.callback_query_handler(lambda query: query.data.find('back_to_tasks')!=-1)
+def Videopad_Query(query):
+    output, reply_markup = actual_tasks_builder()
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=reply_markup)
 
 
 
