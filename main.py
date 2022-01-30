@@ -80,44 +80,49 @@ def version_def(message):
 @bot.message_handler(commands=['menu'])
 def menu(message):
     id=message.from_user.id
-    user = fetch('users', fetchone=True, rows='id, group_id, name, surname, contract', where_column='id', where_value=id)
+    user = fetch('users', fetchone=True, rows='group_id, name, surname, contract', where_column='id', where_value=id)
     if not user:
-        bot.send_message(message.chat.id, 'Тебя нет в БД')
+        bot.send_message(message.chat.id, 'Оу... Я не знаю кто ты такой... 🤔')
     else:
-        output='Вот что я нашел в базе данных:\n\n'
-        output+='Ты - '+user[2]+' '+user[3]+'\n'
-        output+='Твой номер в списке: '+str(user[1])+'\n'
-        output+='Форма обучения: '
-        if user[4]==False:
-            output+='Бюджет'+'\n'
+        output='🙃 Ты - '+user[1]+' '+user[2]+'\n'
+        output+='🥇 Твой номер в списке: '+str(user[0])+'\n'
+        output+='📚 Форма обучения: '
+        if user[3]==False:
+            output+='Бюджет 💫'+'\n'
         else:
-            output+='Контракт'+'\n'
-
-        output+='Твой Telegram ID: '+str(user[0])+'\n'
-        bot.send_message(message.chat.id, output)
+            output+='Контракт 💸'+'\n'
+        if message.chat.id>0:
+            reply_markup = types.InlineKeyboardMarkup()
+            reply_markup.add(types.InlineKeyboardButton(text='Посмотреть список д/з', callback_data='back_to_tasks'))
+        else:
+            reply_markup = None
+        bot.send_message(message.chat.id, output, reply_markup=reply_markup)
 
 @bot.message_handler(commands=['hwall'])
 def addhomework(message):
     user_id=message.from_user.id
-    tasks=fetch('tasks',rows='lesson_id, id, done_by', order_by='id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, assign_date', order_by='id')
             
     output='Вот все домашние задания:\n'
     for i in tasks:
-        if i[2]!=None:
-            if str(user_id) in i[2]:
-                toadd='✅'
+        if message.chat.id<0:
+            toadd=''
+        else:
+            if i[2]!=None:
+                if str(user_id) in i[2]:
+                    toadd='✅'
+                else:
+                    toadd='🕚'
             else:
                 toadd='🕚'
-        else:
-            toadd='🕚'
-        output+=toadd+'#'+str(i[1])+' - '+lessons[i[0]]+'\n'
+        output+=toadd+' #'+str(i[1])+' - '+lessons[i[0]]+'. Задано: '+str(i[3])+'\n'
     
     output+='\n/hwinfo ID'
     bot.send_message(message.chat.id, output)    
 
 
 
-def actual_tasks_builder(user_id):
+def actual_tasks_builder(user_id, group_chat=False):
         tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id, done_by', order_by='id')
         todays_date=datetime.date.today()
         output='Вот актуальные домашние задания:\n\n'
@@ -126,17 +131,22 @@ def actual_tasks_builder(user_id):
 
         actual_tasks_count=0
         for i in tasks:
-            if i[3]!=None:
-                if str(user_id) in i[3]:
-                    toadd='✅'
+            if group_chat==False:
+                if i[3]!=None:
+                    if str(user_id) in i[3]:
+                        toadd='✅'
+                    else:
+                        toadd='🕚'
                 else:
                     toadd='🕚'
-            else:
-                toadd='🕚'
+            else: toadd=''
             difference=i[1]-todays_date
             if difference.total_seconds()>=-86400:
                 actual_tasks_count+=1
-                output+=toadd+'#'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
+                if group_chat==True or str(user_id) not in i[3]:
+                    output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
+                else:
+                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'</i></s>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask '+str(i[2])))
 
         columns=round(actual_tasks_count**(1/2))
@@ -150,9 +160,13 @@ def actual_tasks_builder(user_id):
 
 @bot.message_handler(commands=['hw'])
 def actual_tasks(message):
-    output, reply_markup = actual_tasks_builder(message.from_user.id)
-
-    bot.send_message(message.chat.id, output, reply_markup=reply_markup) 
+    
+    if message.chat.id<0:
+        output, reply_markup = actual_tasks_builder(message.from_user.id, True)
+        bot.send_message(message.chat.id, output) 
+    else:
+        output, reply_markup = actual_tasks_builder(message.from_user.id)
+        bot.send_message(message.chat.id, output, reply_markup=reply_markup) 
    
 @bot.message_handler(commands=['hwinfo'])
 def addhomework(message):
@@ -192,11 +206,14 @@ def addhomework(message):
             print(done_by)
             if done_by==None:
                 done_by=[]
-            reply_markup = types.InlineKeyboardMarkup()
-            if str(message.from_user.id) in done_by:
-                reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(lesson_id)))
+            if message.chat.id<0:
+                reply_markup=None
             else:
-                reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(lesson_id)))
+                reply_markup = types.InlineKeyboardMarkup()
+                if str(message.from_user.id) in done_by:
+                    reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(lesson_id)))
+                else:
+                    reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(lesson_id)))
 
 
             
@@ -313,8 +330,10 @@ def Videopad_Query(query):
         if str(query.from_user.id) not in lst:
             lst.append(str(query.from_user.id))
             update('tasks', 'done_by', list_to_str(lst),'id',id)
+        try:    
             bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=query.message.text, reply_markup=task_watch_menu)
             bot.answer_callback_query(callback_query_id=query.id, text='Вы отметили это задание выполненым!')
+        except:pass
         
         
 
@@ -344,9 +363,10 @@ def Videopad_Query(query):
         if str(query.from_user.id) in lst:
             lst.remove(str(query.from_user.id))
             update('tasks', 'done_by', list_to_str(lst),'id',id)
+        try:    
             bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=query.message.text, reply_markup=task_watch_menu)
             bot.answer_callback_query(callback_query_id=query.id, text='Вы убрали отметку "Выполнено" с этого задания')
-
+        except:pass
         
 
 
@@ -359,7 +379,10 @@ def create_user_adding_hw(user_id):
     tasks_by_user[user_id]={}
 @bot.message_handler(commands=['hwadd'])
 def addhomework(message):
-    bot.send_message(message.chat.id, '📕 Выбери предмет:', reply_markup=lessons_markup)
+    if message.chat.id>0:
+        bot.send_message(message.chat.id, '📕 Выбери предмет:', reply_markup=lessons_markup)
+    else:
+        bot.send_message(message.chat.id, 'Домашнее задание можно создать только в ЛС бота 🙃')
 
 
 @bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
@@ -399,7 +422,7 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            if i[0]==393483876:
+            #if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchtask '+str(lesson_id)))
                 try:
