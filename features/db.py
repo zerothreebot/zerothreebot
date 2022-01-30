@@ -68,6 +68,7 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
     sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, need_to_be_done, task, files) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{need_to_be_done}', %s, %s)"
     db_object.execute(sql,(task ,files))
     db_connection.commit()
+    return id
 
 def remove_task(task_id): #remove_task(5)
     db_object.execute(f"DELETE FROM tasks WHERE id={task_id}")

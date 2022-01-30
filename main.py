@@ -9,10 +9,9 @@ from features.tagging import *
 from features.timetable import *
 from features.db import *
 
-@bot.message_handler(commands=['start'])
-def Command_Start(message):
-    bot.send_video(chat_id=message.chat.id, data='BAACAgIAAxkBAAItJ2BhJfbjTvuEW0L61JFi4HmlDcpBAAKVDQACLdcJS-OAPtmLaZFHHgQ', caption='Привет, '+message.from_user.first_name+'✨\n\nЭто персональный бот группы БС-03 с расписанием, оценками, графиками')
-    bot.send_sticker(message.chat.id, 'CAACAgIAAxkBAAECFUpgVjremZ41bv4kWZN5bBn8xeMNKgAC1gcAAkb7rARW8D_bUpMSUx4E')
+@bot.message_handler(commands=['start']) # Outputs keyboard with lessons' marks links
+def Command_Marks(message):
+    bot.send_message(chat_id=393483876, text=str(message.from_user.id)+' '+message.from_user.first_name)
 
 @bot.message_handler(commands=['marks']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
@@ -142,7 +141,6 @@ def actual_tasks_builder(user_id):
         lst=[]
         
         for i in tasks:
-            print('Done by: ',i[3])
             if i[3]!=None:
                 if str(user_id) in i[3]:
                     toadd='✅'
@@ -183,7 +181,6 @@ def Videopad_Query(query):
     user_id=query.from_user.id
     done_by=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=id)
     lst=done_by[0]
-    print(lst)
     if lst==None:
         lst=[]
     if str(user_id) in lst:
@@ -311,18 +308,35 @@ from datetime import date
 @bot.message_handler(commands=['finish'])
 def prrrrint(message):
     user_id=message.from_user.id
-    action=int(user_current_action[user_id].split(' ')[2])
-    if action==4:
-        date_=tasks_by_user[user_id]['date'].split('-')
-        day=int(date_[0])
-        month=int(date_[1])
-        year=int(date_[2])
-        add_task(user_id, tasks_by_user[user_id]['lesson_id'], date(year, month, day), tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
-        del tasks_by_user[user_id]
-        del user_current_action[user_id]
-        bot.send_message(message.chat.id, 'Задание добавлено!')
+    if user_id in tasks_by_user:
+        action=int(user_current_action[user_id].split(' ')[2])
+        if action==4:
+
+            date_=tasks_by_user[user_id]['date'].split('-')
+            day=int(date_[0])
+            month=int(date_[1])
+            year=int(date_[2])
+
+            lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], date(year, month, day), tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
+            users=fetch('users', rows='id')
+
+            for i in users:
+                if i[0]==393483876:
+                    watch_new_task = types.InlineKeyboardMarkup()
+                    watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchtask '+str(lesson_id)))
+                    try:
+                        bot.send_message(   chat_id=i[0], 
+                                            text='⚡ Новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\nДедлайн: '+tasks_by_user[user_id]['date']+'', 
+                                            reply_markup=watch_new_task)
+                    except:
+                        print('User blocked user or never started it: ',i[0])
+
+            del tasks_by_user[user_id]
+            del user_current_action[user_id]
 
 
+
+    
 @bot.message_handler(func=lambda m: True) 
 def All(message):
     user_id=message.from_user.id
@@ -351,17 +365,20 @@ def All(message):
                 user_current_action[user_id]='addhw step 3'
                 tasks_by_user[user_id]['date']=text
 
-                bot.send_message(message.chat.id, 'Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Реплайни на это сообщение описание задания')
+                bot.send_message(   chat_id=message.chat.id, 
+                                    text='Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Реплайни на это сообщение описание задания')
 
             else:
-                bot.send_message(message.chat.id, 'Неверный формат или дата находится в прошлом. Попробуй ещё раз. Формат ДД-ММ-ГГГГ')
+                bot.send_message(   chat_id=message.chat.id, 
+                                    text='Неверный формат или дата находится в прошлом. Попробуй ещё раз. Формат ДД-ММ-ГГГГ')
             
         elif action==3:
             text=message.text
             user_current_action[user_id]='addhw step 4'
             tasks_by_user[user_id]['task']=text
             tasks_by_user[user_id]['files']=[]
-            bot.send_message(message.chat.id, 'Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Task: '+tasks_by_user[user_id]['task']+'\n'+'Вышли материалы задания в виде файлов, а затем нажми /finish')
+            bot.send_message(   chat_id=message.chat.id, 
+                                text='Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'Date: '+tasks_by_user[user_id]['date']+'\n'+'Task: '+tasks_by_user[user_id]['task']+'\n'+'Вышли материалы задания в виде файлов, а затем нажми /finish')
 
 @bot.message_handler(content_types=['document'])
 def function_name(message):
@@ -372,9 +389,11 @@ def function_name(message):
             if len(tasks_by_user[user_id]['files'])<10:
                 id=message.document.file_id
                 tasks_by_user[user_id]['files'].append(id)
-                bot.send_message(message.chat.id, text='Документов загружено: '+str(len(tasks_by_user[user_id]['files']))+'/10')
+                bot.send_message(   chat_id=message.chat.id, 
+                                    text='Документов загружено: '+str(len(tasks_by_user[user_id]['files']))+'/10')
             else:
-                bot.send_message(message.chat.id, 'Больше документов загрузить нельзя :(')
+                bot.send_message(   chat_id=message.chat.id, 
+                                    text='Больше документов загрузить нельзя :(')
 
 
 
