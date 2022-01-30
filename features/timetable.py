@@ -46,7 +46,7 @@ def getcurrentweek(tod):
     if tod==0:
         for i in week[0]:
             k=1
-            if weeknumber!=5 and weeknumber!=6:
+            if weeknumber!=6:
                 weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
                 for j in i:
                     if j!='-':
@@ -56,7 +56,7 @@ def getcurrentweek(tod):
     elif tod==1:
         for i in week[1]:
             k=1
-            if weeknumber!=5 and weeknumber!=6:
+            if weeknumber!=6:
                 weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
                 for j in i:
                     if j!='-':

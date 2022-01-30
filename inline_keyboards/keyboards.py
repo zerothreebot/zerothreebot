@@ -40,26 +40,33 @@ marks_markup.add(
                     types.InlineKeyboardButton(text='Итоговые оценки 3-го семестра 📈', url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),
                 
     )
-lessons={   0:'Теорія БМ сигналів',
-            1:'Нечіткі моделі в медицині',
-            2:'Методи обчислень',
-            3:'AтаП',
-            4:'Aнглийский',
-            5:'Математичний аналіз',
-            6:'Теорія ймовірностей',
+
+lessons={   0:'🖥 ООП',
+            1:'📊 Основи системного аналізу',
+            2:'🧪 Основи молекулярної біології та біоінформатики',
+            3:'👨‍🦳 Філософія',
+            4:'📈 Обробка та аналіз БМД',
+            5:'🧑‍💻Безпека інформаційних систем',
+            6:'🇺🇸 English',
             7:'Додатковий предмет',
-            8:'Естетика',
-            9:'Еристика, Логіка',
-            10:'Другое',
+            8:'Другое',
 }
-
-lessons_markup = types.InlineKeyboardMarkup()
-lessons_markup.row_width=3
+main_buttons=[]
+footer_buttons=[]
 for i in lessons:
-    lessons_markup.add(     
-                    types.InlineKeyboardButton(text=lessons[i], callback_data='addHWlesson '+str(i)),              
-        )
+    main_buttons.append(types.InlineKeyboardButton(text=lessons[i], callback_data='addHWlesson '+str(i)))
+footer_buttons.append(types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding'))
+        
+cancel_adding_markup=types.InlineKeyboardMarkup()
+cancel_adding_button=types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding')
+cancel_adding_markup.add(cancel_adding_button)
 
+finish_adding_markup=types.InlineKeyboardMarkup()
+finish_adding_button=types.InlineKeyboardButton(text='Создать 📃', callback_data='finish_adding')
+finish_adding_markup.add(cancel_adding_button, finish_adding_button)
+
+
+lessons_markup=types.InlineKeyboardMarkup(build_menu(main_buttons, 2, footer_buttons=footer_buttons))
 
 lessonsTomorrow_markup = types.InlineKeyboardMarkup()
 lessonsTomorrow_markup.add(types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'))

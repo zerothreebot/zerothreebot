@@ -41,7 +41,7 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
     if where_column!=None and where_value!=None:
         sql+=f" WHERE {where_column}={where_value}"
 
-
+    print(sql)
     db_object.execute(sql)
     if fetchone==False:
         result = db_object.fetchall()
@@ -56,7 +56,6 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
     assign_date=datetime.date.today()
 
     files=list_to_str(files)
-    print(files)
 
     db_object.execute("SELECT id FROM tasks ORDER BY id")
     result = db_object.fetchall()
