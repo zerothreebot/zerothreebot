@@ -145,7 +145,7 @@ def actual_tasks_builder(user_id, group_chat=False):
                     output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
                 else:
                     output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'</i></s>\n'
-                lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask '+str(i[2])))
+                lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])))
 
         columns=round(actual_tasks_count**(1/2))
         if columns>6:
@@ -239,7 +239,7 @@ def addhomework(message):
         
 
 
-@bot.callback_query_handler(lambda query: query.data.find('watchnewtask')!=-1)
+@bot.callback_query_handler(lambda query: query.data.find('watchnewtask2')!=-1)
 def Videopad_Query(query):
     bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
     Watch_Task_Process(query)
@@ -309,7 +309,7 @@ def Watch_Task_Process(query):
         
     bot.send_message(chat_id=query.message.chat.id,text=output, reply_markup=task_watch_menu)
 
-@bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
+@bot.callback_query_handler(lambda query: query.data.find('watchtask2')!=-1)
 def Videopad_Query(query):
     bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     Watch_Task_Process(query)
@@ -446,7 +446,7 @@ def finish_adding(user_id):
         for i in users:
             #if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
-                watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(lesson_id)))
+                watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(lesson_id)))
                 try: bot.send_message(      chat_id=i[0], 
                                             text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
                                             reply_markup=watch_new_task)
@@ -561,7 +561,7 @@ def notification_tasks(days_left, message):
             #if j==393483876:
             if str(j) not in done_by:
                 watch_deadline_task = types.InlineKeyboardMarkup()
-                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(i[3])))
+                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(i[3])))
                 try:
                     bot.send_message(   chat_id=j, 
                                         text='Вы не выполнили задание с '+lessons[i[2]]+'\n\n'+message, 
