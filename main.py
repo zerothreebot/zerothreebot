@@ -584,6 +584,31 @@ schedule.every().day.at("12:00").do(notifications_14hr_before)
 schedule.every().day.at("21:00").do(notifications_day_before)
 schedule.every().day.at("22:00").do(notifications_2days_before)
 
+
+def ergrgegr1():
+    bot.send_message(   chat_id=393483876, 
+                        text='10:20')
+def ergrgegr2():
+    bot.send_message(   chat_id=393483876, 
+                        text='11:20')
+def ergrgegr3():
+    bot.send_message(   chat_id=393483876, 
+                        text='12:20')
+def ergrgegr4():
+    bot.send_message(   chat_id=393483876, 
+                        text='9:20')
+def ergrgegr5():                     
+    bot.send_message(   chat_id=393483876, 
+                        text='8:20')
+
+
+schedule.every().day.at("10:20").do(ergrgegr1)
+schedule.every().day.at("11:20").do(ergrgegr2)
+schedule.every().day.at("12:20").do(ergrgegr3)
+schedule.every().day.at("9:20").do(ergrgegr4)
+schedule.every().day.at("8:20").do(ergrgegr5)
+
+
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
     if __name__ == '__main__':
