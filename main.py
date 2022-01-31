@@ -224,12 +224,12 @@ def addhomework(message):
         except:
             fail=True
             lesson_id=0
-        if fail==True: task=None
-        else: 
-            
+        if fail==False: 
             task_succeed=ya_ne_znayu_kak_nazvat(message, lesson_id)
             if not task_succeed:
                 bot.send_message(message.chat.id, 'Такое задание не найдено... 😓\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
+        else:
+            bot.send_message(message.chat.id, 'бля а тут какой текст придумать... 🤨\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
         
 def sonmething_important(lesson_id):
     task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task', where_column='id', where_value=lesson_id)
