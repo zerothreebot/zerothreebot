@@ -1,8 +1,10 @@
 from distutils.command.build import build
 import json
+from pydoc import doc
 from threading import Thread
 import traceback
 from datetime import date
+from turtle import done
 
 from inline_keyboards.keyboards import *
 from settings import bot, version, github_link, checkgmailevery
@@ -167,7 +169,49 @@ def actual_tasks(message):
     else:
         output, reply_markup = actual_tasks_builder(message.from_user.id)
         bot.send_message(message.chat.id, output, reply_markup=reply_markup) 
-   
+
+
+
+def findreplymarkup(message, task, lesson_id):
+    files=task[0]
+    documentsContainer=[]
+    if len(files)!=0:
+        k=0
+        attachmentsCounter=len(files)
+        for i in files:
+            if k==attachmentsCounter-1:
+                documentsContainer.append(InputMediaDocument(i))
+            else:
+                documentsContainer.append(InputMediaDocument(i))
+            k+=1 
+            
+    done_by=task[1]
+    print(done_by)
+    if done_by==None:
+        done_by=[]
+    if message.chat.id<0:
+        reply_markup=None
+    else:
+        reply_markup = types.InlineKeyboardMarkup()
+        if str(message.from_user.id) in done_by:
+            reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(lesson_id)))
+        else:
+            reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(lesson_id)))
+
+    return reply_markup, documentsContainer
+
+def ya_ne_znayu_kak_nazvat(message, lesson_id):
+    task = fetch('tasks', fetchone=True, rows='files, done_by', where_column='id', where_value=int(lesson_id))
+    if task!=None:
+        output=sonmething_important(lesson_id)
+        reply_markup, documentsContainer=findreplymarkup(message, task, lesson_id)
+        if documentsContainer:
+            bot.send_media_group(chat_id=message.chat.id, media=documentsContainer)
+        bot.send_message(message.chat.id, output, reply_markup=reply_markup)
+        return True
+    else:
+        return False
+
 @bot.message_handler(commands=['hwinfo'])
 def addhomework(message):
     fail=False
@@ -182,50 +226,12 @@ def addhomework(message):
             fail=True
             lesson_id=0
         if fail==True: task=None
-        else: task = fetch('tasks', fetchone=True, rows='files, done_by', where_column='id', where_value=int(lesson_id))
+        else: 
+            
+            task_succeed=ya_ne_znayu_kak_nazvat(message, lesson_id)
+            if not task_succeed:
+                bot.send_message(message.chat.id, 'Такое задание не найдено... 😓\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
         
-        if task!=None:
-            files=task[0]
-            if len(files)!=0:
-                documentsContainer=[]
-                k=0
-                attachmentsCounter=len(files)
-                for i in files:
-                    if k==attachmentsCounter-1:
-                        documentsContainer.append(InputMediaDocument(i))
-                    else:
-                        documentsContainer.append(InputMediaDocument(i))
-                    k+=1 
-                bot.send_media_group(chat_id=message.chat.id, media=documentsContainer)
-
-            output=sonmething_important(lesson_id)
-
-            
-            
-            done_by=task[1]
-            print(done_by)
-            if done_by==None:
-                done_by=[]
-            if message.chat.id<0:
-                reply_markup=None
-            else:
-                reply_markup = types.InlineKeyboardMarkup()
-                if str(message.from_user.id) in done_by:
-                    reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(lesson_id)))
-                else:
-                    reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(lesson_id)))
-
-
-            
-            
-
-
-
-            bot.send_message(message.chat.id, output, reply_markup=reply_markup)
-        else:
-            bot.send_message(message.chat.id, 'Такое задание не найдено... 😓\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
-    
-
 def sonmething_important(lesson_id):
     task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task', where_column='id', where_value=lesson_id)
     user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=task[0])
@@ -239,6 +245,14 @@ def sonmething_important(lesson_id):
     output+='🔥 Дедлайн: '+str(task[3])+'\n'
     output+='✍ Задание: '+task[4]+'\n'
     return output
+
+@bot.callback_query_handler(lambda query: query.data.find('watchnewtask')!=-1)
+def Videopad_Query(query):
+    id=int(query.data.split(' ')[1])
+    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+    ya_ne_znayu_kak_nazvat(query.message, id)
+
+
 
 @bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
 def Videopad_Query(query):
@@ -295,6 +309,9 @@ def Videopad_Query(query):
         bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
         
         bot.send_message(chat_id=query.message.chat.id,text=output, reply_markup=task_watch_menu)
+
+
+
 
 @bot.callback_query_handler(lambda query: query.data.find('back_to_tasks')!=-1)
 def Videopad_Query(query):
@@ -422,7 +439,7 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            #if i[0]==393483876:
+            if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchtask '+str(lesson_id)))
                 try:
@@ -519,7 +536,41 @@ def function_name(message):
 def startbot(): # Starts bot
     bot.polling(none_stop=True, interval=0)
 
+def notification_tasks(days_left, message):
+    todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
+    users=fetch('users', rows='id')
+    task=fetch('tasks', rows='done_by, need_to_be_done, lesson_id, id', where_column='need_to_be_done', where_value="'"+str(todays_date)+"'")
+    print(task)
+    users_list=[]
+    for i in users:
+        users_list.append(i[0])
+    for i in task:
+        done_by=i[0]
+        for j in users_list:
+            if str(j) not in done_by:
+                pass
+            else:
+                watch_deadline_task = types.InlineKeyboardMarkup()
+                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(i[3])))
+                try:
+                    bot.send_message(   chat_id=j, 
+                                        text='Вы не выполнили задание с '+lessons[i[2]]+'\n\n'+message, 
+                                        reply_markup=watch_deadline_task
+                                        )
+                except: pass
 
+
+#if i[0]==393483876:
+#0 days - today
+#1 day - tomorrow
+def notifications_6hr_before():
+    notification_tasks(0, '💥 До дедлайна осталось 6 часов, поспеши!')
+def notifications_14hr_before():
+    notification_tasks(0, '🔥 До дедлайна осталось 14 часов!')
+def notifications_day_before():
+    notification_tasks(1, '❄ Завтра последний день сдачи работы')
+def notifications_2days_before():
+    notification_tasks(2, '🧊 Конец сдачи работы через 2 дня')
 
 
 from features.gmail import *
@@ -528,7 +579,13 @@ import threading
 from threading import Thread
 import traceback
 import schedule
+
 schedule.every(checkgmailevery).seconds.do(job)
+schedule.every().day.at("18:00").do(notifications_6hr_before)
+schedule.every().day.at("10:00").do(notifications_14hr_before)
+schedule.every().day.at("18:00").do(notifications_day_before)
+schedule.every().day.at("18:00").do(notifications_2days_before)
+
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
     if __name__ == '__main__':

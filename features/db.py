@@ -64,8 +64,8 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
     else:
         id=result[len(result)-1][0]+1
 
-    sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, need_to_be_done, task, files) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{need_to_be_done}', %s, %s)"
-    db_object.execute(sql,(task ,files))
+    sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, need_to_be_done, task, files, done_by) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{need_to_be_done}', %s, %s, %s)"
+    db_object.execute(sql,(task ,files, '{}'))
     db_connection.commit()
     return id
 
