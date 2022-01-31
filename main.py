@@ -580,7 +580,7 @@ import traceback
 import schedule
 schedule.every(checkgmailevery).seconds.do(job)
 schedule.every().day.at("16:00").do(notifications_6hr_before)
-schedule.every().day.at("09:30").do(notifications_14hr_before)
+schedule.every().day.at("08:45").do(notifications_14hr_before)
 schedule.every().day.at("17:00").do(notifications_day_before)
 schedule.every().day.at("19:00").do(notifications_2days_before)
 
