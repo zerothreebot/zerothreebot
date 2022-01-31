@@ -170,9 +170,7 @@ def actual_tasks(message):
         bot.send_message(message.chat.id, output, reply_markup=reply_markup) 
 
 
-
-def findreplymarkup(message, task, lesson_id):
-    files=task[0]
+def CreateDocumentsContainer(files):
     documentsContainer=[]
     if len(files)!=0:
         k=0
@@ -182,9 +180,10 @@ def findreplymarkup(message, task, lesson_id):
                 documentsContainer.append(InputMediaDocument(i))
             else:
                 documentsContainer.append(InputMediaDocument(i))
-            k+=1 
-            
-    done_by=task[1]
+            k+=1
+    return documentsContainer 
+
+def findreplymarkup(message, done_by, task_id):
     print(done_by)
     if done_by==None:
         done_by=[]
@@ -193,17 +192,27 @@ def findreplymarkup(message, task, lesson_id):
     else:
         reply_markup = types.InlineKeyboardMarkup()
         if str(message.from_user.id) in done_by:
-            reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(lesson_id)))
+            reply_markup.add(types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(task_id)))
         else:
-            reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(lesson_id)))
+            reply_markup.add(types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(task_id)))
 
-    return reply_markup, documentsContainer
+    return reply_markup
 
-def ya_ne_znayu_kak_nazvat(message, lesson_id):
-    task = fetch('tasks', fetchone=True, rows='files, done_by', where_column='id', where_value=int(lesson_id))
-    if task!=None:
-        output=sonmething_important(lesson_id)
-        reply_markup, documentsContainer=findreplymarkup(message, task, lesson_id)
+def SendTaskContent(message, task_id):
+    sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, need_to_be_done, task, files', where_column='id', where_value=task_id)
+    if sql!=None:
+        done_by=sql[0]
+        assigned_by=sql[1]
+        lesson_id=sql[2]
+        assign_date=sql[3]
+        need_to_be_done=sql[4]
+        task_mission=sql[5]
+        files=sql[6]
+
+        output=Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, task_mission, task_id)
+        reply_markup=findreplymarkup(message, done_by, task_id)
+        documentsContainer=CreateDocumentsContainer(files)
+
         if documentsContainer:
             bot.send_media_group(chat_id=message.chat.id, media=documentsContainer)
         bot.send_message(message.chat.id, output, reply_markup=reply_markup)
@@ -214,68 +223,69 @@ def ya_ne_znayu_kak_nazvat(message, lesson_id):
 @bot.message_handler(commands=['hwinfo'])
 def addhomework(message):
     fail=False
-    try: lesson_id=message.text.split(' ')[1]
+    try: task_id=message.text.split(' ')[1]
     except: fail=True
     
     if fail==True:
         bot.send_message(message.chat.id, 'Ты не ввел ID задания... 😣\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')    
     else:   
-        try: int(lesson_id)
+        try: int(task_id)
         except:
             fail=True
-            lesson_id=0
+            task_id=0
         if fail==False: 
-            task_succeed=ya_ne_znayu_kak_nazvat(message, lesson_id)
+            task_succeed=SendTaskContent(message, task_id)
             if not task_succeed:
                 bot.send_message(message.chat.id, 'Такое задание не найдено... 😓\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
         else:
-            bot.send_message(message.chat.id, 'бля а тут какой текст придумать... 🤨\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
+            bot.send_message(message.chat.id, 'ID задания не выглядит как число... 🤨\n\nПопробуй ещё раз введя /hwinfo <code>ID</code>')
         
-def sonmething_important(lesson_id):
-    task=fetch('tasks', fetchone=True, rows='assigned_by, lesson_id, assign_date, need_to_be_done, task', where_column='id', where_value=lesson_id)
-    user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=task[0])
-    name=user[0]+' '+user[1]
 
-    output=''
-    output+='ID: '+str(lesson_id)+'\n'
-    output+='📕 Предмет: '+lessons[task[1]]+'\n'
-    output+='🙃 Создано: '+name+'\n'
-    output+='🕘 Дата создания: '+str(task[2])+'\n'
-    output+='🔥 Дедлайн: '+str(task[3])+'\n'
-    output+='✍ Задание: '+task[4]+'\n'
-    return output
 
 @bot.callback_query_handler(lambda query: query.data.find('watchnewtask')!=-1)
 def Videopad_Query(query):
-    id=int(query.data.split(' ')[1])
-    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
-    ya_ne_znayu_kak_nazvat(query.message, id)
+    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
+    Watch_Task_Process(query)
 
+def Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, task_mission, task_id):
+    
+    #user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=assigned_by)
+    #name=user[0]+' '+user[1]
 
+    output='ID: '+str(task_id)+'\n'
+    output+='📕 Предмет: '+lessons[lesson_id]+'\n'
+    #output+='🙃 Создано: '+name+'\n'
+    #output+='🕘 Дата создания: '+str(assign_date)+'\n'
+    output+='🔥 Дедлайн: '+str(need_to_be_done)+'\n\n'
+    output+='✍ Задание: '+task_mission+'\n'
+    return output
 
-@bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
-def Videopad_Query(query):
-    id=int(query.data.split(' ')[1])
+def Watch_Task_Process(query):
+    task_id=int(query.data.split(' ')[1])
+    sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, need_to_be_done, task, files', where_column='id', where_value=task_id)
 
-    output=sonmething_important(id)
+    done_by=sql[0]
+    assigned_by=sql[1]
+    lesson_id=sql[2]
+    assign_date=sql[3]
+    need_to_be_done=sql[4]
+    task_mission=sql[5]
+    files=sql[6]
+
+    output=Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, task_mission, task_id)
     
     user_id=query.from_user.id
-    done_by=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=id)
-    lst=done_by[0]
-    if lst==None:
-        lst=[]
-    if str(user_id) in lst:
-        task_watch_menu = types.InlineKeyboardMarkup()
-        task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'), 
-                            types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(id)))
-    else:
-        task_watch_menu = types.InlineKeyboardMarkup()
-        task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'), 
-                            types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(id)))
-
-    files=fetch('tasks', fetchone=True, rows='files', where_column='id', where_value=id)[0]
+    task_watch_menu = types.InlineKeyboardMarkup()
+    if done_by==None:
+        done_by=[]
+    
     if len(files)==0:
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=task_watch_menu)
+        if str(user_id) in done_by:
+            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'), 
+                                types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(task_id)))
+        else:
+            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'), 
+                                types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(task_id)))
     else:
         documentsContainer=[]
         k=0
@@ -286,28 +296,27 @@ def Videopad_Query(query):
             else:
                 documentsContainer.append(InputMediaDocument(i))
             k+=1    
-
-        
-
         attachments_list=bot.send_media_group(chat_id=query.message.chat.id, media=documentsContainer)
         mes_ids=''
         for i in range(len(attachments_list)):
             mes_ids+=str(attachments_list[i].message_id)
             if i!=len(attachments_list)-1:
                 mes_ids+=' '
-        print(mes_ids)
-        if str(user_id) in lst:
-            task_watch_menu = types.InlineKeyboardMarkup()
-            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids), 
-                                types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(id)))
-        else:
-            task_watch_menu = types.InlineKeyboardMarkup()
-            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids), 
-                            types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(id)))
 
-        bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+        if str(user_id) in done_by:
+            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids), 
+                                types.InlineKeyboardButton(text='🕚 Отметить невыполненым', callback_data='set_uncompleted '+str(task_id)))
+        else:
+            task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids), 
+                            types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(task_id)))
         
-        bot.send_message(chat_id=query.message.chat.id,text=output, reply_markup=task_watch_menu)
+    bot.send_message(chat_id=query.message.chat.id,text=output, reply_markup=task_watch_menu)
+
+@bot.callback_query_handler(lambda query: query.data.find('watchtask')!=-1)
+def Videopad_Query(query):
+    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+    Watch_Task_Process(query)
+
 
 
 
@@ -324,9 +333,9 @@ def Videopad_Query(query):
 
 @bot.callback_query_handler(lambda query: query.data.find('set_completed')!=-1)
 def Videopad_Query(query):
-    id=query.data.split(' ')[1]
+    task_id=query.data.split(' ')[1]
     
-    task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=id)
+    task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=task_id)
     if task!=None:
 
         task_watch_menu = types.InlineKeyboardMarkup()
@@ -345,7 +354,7 @@ def Videopad_Query(query):
             lst=[]
         if str(query.from_user.id) not in lst:
             lst.append(str(query.from_user.id))
-            update('tasks', 'done_by', list_to_str(lst),'id',id)
+            update('tasks', 'done_by', list_to_str(lst),'id',task_id)
         try:    
             bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=query.message.text, reply_markup=task_watch_menu)
             bot.answer_callback_query(callback_query_id=query.id, text='Вы отметили это задание выполненым!')
@@ -356,8 +365,8 @@ def Videopad_Query(query):
 
 @bot.callback_query_handler(lambda query: query.data.find('set_uncompleted')!=-1)
 def Videopad_Query(query):
-    id=query.data.split(' ')[1]
-    task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=id)
+    task_id=query.data.split(' ')[1]
+    task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=task_id)
     if task!=None:
 
         task_watch_menu = types.InlineKeyboardMarkup()
@@ -378,7 +387,7 @@ def Videopad_Query(query):
             lst=[]
         if str(query.from_user.id) in lst:
             lst.remove(str(query.from_user.id))
-            update('tasks', 'done_by', list_to_str(lst),'id',id)
+            update('tasks', 'done_by', list_to_str(lst),'id',task_id)
         try:    
             bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=query.message.text, reply_markup=task_watch_menu)
             bot.answer_callback_query(callback_query_id=query.id, text='Вы убрали отметку "Выполнено" с этого задания')
@@ -438,9 +447,9 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            #if i[0]==393483876:
+            if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
-                watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchtask '+str(lesson_id)))
+                watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(lesson_id)))
                 try:
                     bot.send_message(   chat_id=i[0], 
                                         text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'', 
@@ -546,7 +555,8 @@ def notification_tasks(days_left, message):
     for i in task:
         done_by=i[0]
         for j in users_list:
-            if str(j) not in done_by:
+            if j==393483876:
+            #if str(j) not in done_by:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(i[3])))
                 try:
@@ -584,7 +594,7 @@ schedule.every().day.at("08:00").do(notifications_14hr_before)
 schedule.every().day.at("17:00").do(notifications_day_before)
 schedule.every().day.at("19:00").do(notifications_2days_before)
 
-
+#schedule.every(checkgmailevery).seconds.do(notifications_6hr_before)
 
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
