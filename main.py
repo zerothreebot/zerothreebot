@@ -439,7 +439,7 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            if i[0]==393483876:
+            #if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchtask '+str(lesson_id)))
                 try:
@@ -548,8 +548,6 @@ def notification_tasks(days_left, message):
         done_by=i[0]
         for j in users_list:
             if str(j) not in done_by:
-                pass
-            else:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(i[3])))
                 try:
@@ -558,6 +556,8 @@ def notification_tasks(days_left, message):
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass
+            
+                
 
 
 #if i[0]==393483876:
