@@ -4,7 +4,6 @@ from pydoc import doc
 from threading import Thread
 import traceback
 from datetime import date
-from turtle import done
 
 from inline_keyboards.keyboards import *
 from settings import bot, version, github_link, checkgmailevery
