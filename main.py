@@ -605,8 +605,8 @@ def ergrgegr5():
 schedule.every().day.at("10:20").do(ergrgegr1)
 schedule.every().day.at("11:20").do(ergrgegr2)
 schedule.every().day.at("12:20").do(ergrgegr3)
-schedule.every().day.at("9:20").do(ergrgegr4)
-schedule.every().day.at("8:20").do(ergrgegr5)
+schedule.every().day.at("09:20").do(ergrgegr4)
+schedule.every().day.at("08:20").do(ergrgegr5)
 
 
 try:
