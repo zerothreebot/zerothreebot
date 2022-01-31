@@ -3,7 +3,7 @@ import pytz
 import os
 
 #configure bot in your .env file
-version='2.1 - Snapshot 3'
+version='2.1 - Snapshot 4'
 github_link='https://github.com/zerothreebot/03bot'
 chat_id=int(os.environ.get('chatid', None))
 checkgmailevery = int(os.environ.get("checkgmailevery", None))

@@ -447,15 +447,21 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            if i[0]==393483876:
+            #if i[0]==393483876:
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(lesson_id)))
-                try:
-                    bot.send_message(   chat_id=i[0], 
-                                        text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'', 
-                                        reply_markup=watch_new_task)
-                except:
-                    print('User blocked user or never started it: ',i[0])
+                try: bot.send_message(      chat_id=i[0], 
+                                            text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                            reply_markup=watch_new_task)
+                    
+                except: pass
+                link_markup=types.InlineKeyboardMarkup()
+                link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
+                bot.send_message(   chat_id=chat_id, 
+                                    text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                    reply_markup=link_markup)
+                
+
         del_user_from_adding_hw(user_id)
 
 def del_user_from_adding_hw(user_id):
@@ -495,7 +501,7 @@ def All(message):
                 if fail == None:
                     user_current_action[user_id]='addhw step 3'
                     tasks_by_user[user_id]['date']=text
-
+            
                     bot.send_message(   chat_id=message.chat.id, 
                                         text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
                                         reply_markup=cancel_adding_markup)
@@ -555,8 +561,8 @@ def notification_tasks(days_left, message):
     for i in task:
         done_by=i[0]
         for j in users_list:
-            if j==393483876:
-            #if str(j) not in done_by:
+            #if j==393483876:
+            if str(j) not in done_by:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask '+str(i[3])))
                 try:
@@ -580,6 +586,8 @@ def notifications_day_before():
     notification_tasks(1, '❄ Завтра последний день сдачи работы')
 def notifications_2days_before():
     notification_tasks(2, '🧊 Конец сдачи работы через 2 дня')
+
+
 
 
 from features.gmail import *
