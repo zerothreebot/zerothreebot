@@ -62,12 +62,9 @@ def Day_PrevDay(query):
 from features.db import db_object
 @bot.message_handler(commands=['list']) # Outputs list of people in the group
 def addhomework(message):
-    db_object.execute("SELECT group_id, name, surname FROM users")
-    result = db_object.fetchall()
-    #print(result)
+    result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
     output=''
     for i in result:
-        #print(i)
         output+=str(i[0])+' - '+i[1]+' '+i[2]+'\n'
 
     bot.send_message(message.chat.id, output)
