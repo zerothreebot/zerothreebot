@@ -28,46 +28,36 @@ def getdayofweek():
     return int(datetime.now(tz).weekday())
 
 def getcurrentweek(tod):
-    if tod==2:
-        tod=0
-    if tod==0:
-        weekroz='<i> - Первая неделя</i>'
-        if getweek()==0 and getdayofweek()!=6:
-            weekroz+=' (Текущая)'
-        elif getweek()==0 and getdayofweek()==6:
-            weekroz+=' (Начинается завтра)'
-    elif tod==1:
-        weekroz='<i> - Вторая неделя</i>'
-        if getweek()==1 and getdayofweek()!=6:
-            weekroz+=' (Текущая)'
-        elif getweek()==1 and getdayofweek()==6:
-            weekroz+=' (Начинается завтра)'
+    if tod==2: tod=0
+
+    if tod==0: weekroz='<i> - Первая неделя</i>'
+    elif tod==1: weekroz='<i> - Вторая неделя</i>'
+
+    if getweek()==tod and getdayofweek()!=6: weekroz+=' (Текущая)'
+    elif getweek()==tod and getdayofweek()==6: weekroz+=' (Начинается завтра)'
+
     weeknumber=0
-    if tod==0:
-        for i in week[0]:
-            k=1
-            if weeknumber!=6:
-                weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
-                for j in i:
-                    if j!='-':
-                        weekroz+='<i>'+str(k)+'</i> - '+j+'\n'
-                    k+=1
-            weeknumber+=1
-    elif tod==1:
-        for i in week[1]:
-            k=1
-            if weeknumber!=6:
-                weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
-                for j in i:
-                    if j!='-':
-                        weekroz+='<i>'+str(k)+'</i> - '+j+'\n'
-                    k+=1
-            weeknumber+=1
+
+    for i in week[tod]:
+        k=1
+        if weeknumber!=6:
+            weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
+            for j in i:
+                if j!='-':
+                    weekroz+='<i>'+str(k)+'</i> - '+j['lesson']
+
+                    if j['type']!='': weekroz+=' <i>'+j['type']+'</i>'
+
+                    if j['link']!='': weekroz+=' - <a href="'+j['link']+'">'+j['where']+'</a>'  
+
+                    weekroz+='\n'
+                k+=1
+        weeknumber+=1
+    
     return weekroz
 
 def output(tod,whatday):
-    if tod==7:
-        tod=0
+    if tod==7: tod=0
     rozklad='<b>'+unit_to_multiplier[tod]+'</b>'
     if whatday==0:
         rozklad+='<i> - Сегодня</i>\n'
@@ -79,10 +69,14 @@ def output(tod,whatday):
             rozklad+=i+'\n'
             break
         elif i!='-':
+            rozklad+='<i>'+str(k)+'</i> - '+i['lesson']
+            if i['type']!='': rozklad+=' <i>'+i['type']+'</i>'
+
+            if i['link']!='': rozklad+=' - <a href="'+i['link']+'">'+i['where']+'</a>' 
+
             if k==getcurrentlessonnumber() and whatday==0:
-                rozklad+='<i>'+str(k)+'</i> - '+i+' - <b><u>СЕЙЧАС</u></b>\n'
-            else:
-                rozklad+='<i>'+str(k)+'</i> - '+i+'\n'
+                rozklad+=' - <b><u>СЕЙЧАС</u></b>\n'
+            rozklad+='\n'
         k+=1
     return rozklad
 
