@@ -142,7 +142,7 @@ def actual_tasks_builder(user_id, group_chat=False):
                     toadd='🕚'
             else: toadd=''
             difference=i[1]-todays_date
-            if difference.total_seconds()>=-86400:
+            if difference.days>=0:
                 actual_tasks_count+=1
                 if group_chat==True or str(user_id) not in i[3]:
                     output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
