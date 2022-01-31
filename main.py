@@ -578,12 +578,11 @@ import threading
 from threading import Thread
 import traceback
 import schedule
-
 schedule.every(checkgmailevery).seconds.do(job)
-schedule.every().day.at("18:00").do(notifications_6hr_before)
-schedule.every().day.at("10:00").do(notifications_14hr_before)
-schedule.every().day.at("19:00").do(notifications_day_before)
-schedule.every().day.at("20:00").do(notifications_2days_before)
+schedule.every().day.at("20:00").do(notifications_6hr_before)
+schedule.every().day.at("12:00").do(notifications_14hr_before)
+schedule.every().day.at("21:00").do(notifications_day_before)
+schedule.every().day.at("22:00").do(notifications_2days_before)
 
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
