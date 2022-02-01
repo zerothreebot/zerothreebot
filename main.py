@@ -10,6 +10,7 @@ from settings import bot, version, github_link, checkgmailevery
 from features.tagging import *
 from features.timetable import *
 from features.db import *
+from features.lessons import lessons_additional
 
 @bot.message_handler(commands=['start']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
@@ -25,11 +26,13 @@ def Command_Timetable(message):
 
 @bot.message_handler(commands=['today']) # Shows today's lessons with 'tomorrow's lessons show' button
 def Command_Today(message):
-    bot.send_message(message.chat.id, output(getdayofweek(),0), disable_web_page_preview=True,reply_markup=lessonsTomorrow_markup, parse_mode='HTML')
+    text, markup=output(getdayofweek(),0)
+    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
 
 @bot.message_handler(commands=['tomorrow']) # Shows tomorrow's lessons with 'today's lessons show' button
 def Command_Tomorrow(message):
-    bot.send_message(message.chat.id, output(getdayofweek()+1,1), disable_web_page_preview=True,reply_markup=lessonsToday_markup, parse_mode='HTML')
+    text, markup=output(getdayofweek()+1,1)
+    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
 
 @bot.message_handler(commands=['week']) # Shows current week lessons with 'next week's lessons show' button
 def Command_Week(message):
@@ -54,10 +57,38 @@ def Week_PrevWeek(query):
         bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+0), reply_markup=nextweek_markup,disable_web_page_preview=True, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='nextday')
 def Day_NextDay(query): 
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output(getdayofweek()+1,1), reply_markup=prevday_markup,disable_web_page_preview=True, parse_mode='HTML')
+    text, markup=output(getdayofweek()+1,1)
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='prevday')
-def Day_PrevDay(query):    
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output(getdayofweek(),0), reply_markup=nextday_markup,disable_web_page_preview=True, parse_mode='HTML')
+def Day_PrevDay(query):
+    text, markup=output(getdayofweek(),0)
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
+
+@bot.callback_query_handler(lambda query: query.data.find('additional_lessons_info')!=-1)
+def back_to_rozklad(query):
+    button_callback_data = query.data.split(' ')[1]
+    back_button = types.InlineKeyboardMarkup()
+    back_button.add(types.InlineKeyboardButton(text='« Назад', callback_data=button_callback_data))
+    output=''
+    for i in lessons_additional:
+        output+=lessons_additional[i]['lesson_name']
+        if lessons_additional[i]['lesson_link']!=None:
+            if lessons_additional[i]['lesson_link'].find('zoom')!=-1:
+                where='Zoom'
+            elif lessons_additional[i]['lesson_link'].find('meet')!=-1: 
+                where='Meet'
+            else:
+                where='Ссылка'
+            output+=' - <a href="'+lessons_additional[i]['lesson_link']+'">'+where+'</a>'
+        if lessons_additional[i]['chat_link']!=None and lessons_additional[i]['classroom_link']!=None: 
+            output+=' ('
+            if lessons_additional[i]['chat_link']!=None:   
+                output+='<a href="'+lessons_additional[i]['chat_link']+'">Чат</a>' 
+            if lessons_additional[i]['classroom_link']!=None: 
+                output+=', <a href="'+lessons_additional[i]['classroom_link']+'">Класрум</a>'   
+            output+=')'
+        output+='\n'
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=back_button, disable_web_page_preview=True)
 #
 from features.db import db_object
 @bot.message_handler(commands=['list']) # Outputs list of people in the group
@@ -601,7 +632,7 @@ schedule.every().day.at("19:00").do(notifications_2days_before)
 #schedule.every(checkgmailevery).seconds.do(notifications_6hr_before)
 
 try:
-    bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
+    #bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
     if __name__ == '__main__':
         my_thread = threading.Thread(target=startbot, args=())
         my_thread.start()
@@ -611,6 +642,7 @@ try:
         
 except Exception as e: 
     var = traceback.format_exc()
+    bot.send_message(393483876, str(var), parse_mode='Markdown')
     print(var)
 
 

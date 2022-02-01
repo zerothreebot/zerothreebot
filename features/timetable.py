@@ -1,3 +1,4 @@
+from audioop import add
 from datetime import datetime
 from time import gmtime,strftime
 
@@ -55,7 +56,7 @@ def getcurrentweek(tod):
         weeknumber+=1
     
     return weekroz
-
+from telebot import types
 def output(tod,whatday):
     if tod==7: tod=0
     rozklad='<b>'+unit_to_multiplier[tod]+'</b>'
@@ -64,12 +65,16 @@ def output(tod,whatday):
     elif whatday==1:
         rozklad+='<i> - Завтра</i>\n'
     k=1
+    additional_lesson_found=False
     for i in week[getweek()][tod]:
         if i=='Отдыхай, чумба':
             rozklad+=i+'\n'
             break
         elif i!='-':
             rozklad+='<i>'+str(k)+'</i> - '+i['lesson']
+
+            if i['lesson'].find('Доп')!=-1: additional_lesson_found=True
+
             if i['type']!='': rozklad+=' <i>'+i['type']+'</i>'
 
             if i['link']!='': rozklad+=' - <a href="'+i['link']+'">'+i['where']+'</a>' 
@@ -78,7 +83,30 @@ def output(tod,whatday):
                 rozklad+=' - <b><u>СЕЙЧАС</u></b>'
             rozklad+='\n'
         k+=1
-    return rozklad
+    markup = types.InlineKeyboardMarkup()
+    
+    if additional_lesson_found==True:
+        if whatday==0:
+            markup.add(
+                types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
+                types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info prevday'),
+            )
+        elif whatday==1:
+            markup.add(
+                types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
+                types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info nextday'),
+            )
+        
+    else:
+        if whatday==0:
+            markup.add(
+                types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
+            )
+        elif whatday==1:
+            markup.add(
+                types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
+            )
+    return rozklad, markup
 
 def getcurrentlessonnumber():
     now=datetime.now(tz)
