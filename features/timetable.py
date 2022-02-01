@@ -4,7 +4,18 @@ from time import gmtime,strftime
 from settings import tz
 from db.week import *
 
-
+def Timetable_Output():
+    text=''
+    currentpara=getcurrentlessonnumber()
+    k=1
+    for i in paras:
+        text+=i
+        if k==currentpara:
+            text+=' - <b><u>СЕЙЧАС</u></b>'
+        text+='\n'
+        k+=1
+    return text
+    
 def getweek():
     today = int(datetime.now(tz).strftime("%U"))
     if today%2==1:
