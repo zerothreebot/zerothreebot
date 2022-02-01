@@ -119,7 +119,6 @@ def addhomework(message):
     bot.send_message(message.chat.id, output)    
 
 
-
 def actual_tasks_builder(user_id, group_chat=False):
         tasks=fetch('tasks',rows='lesson_id, need_to_be_done, id, done_by', order_by='id')
         todays_date=datetime.date.today()
