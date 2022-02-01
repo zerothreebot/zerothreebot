@@ -7,7 +7,7 @@ week=[
             '-'
         ],
         [   '-',
-            {'lesson':'Філософія','type':'(лек.)', 'where':'Zoom','link':'https://wefwefwefwefe.com'},
+            {'lesson':'Філософія','type':'(лек.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/9584503319?pwd=U1BrSlZ2dkxuMUVQSDRMMVBOZ0s1UT09'},
             {'lesson':'Психологія','type':'(лек.)', 'where':'','link':''},
             {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
             '-'
