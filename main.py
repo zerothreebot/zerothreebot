@@ -632,7 +632,7 @@ schedule.every().day.at("19:00").do(notifications_2days_before)
 #schedule.every(checkgmailevery).seconds.do(notifications_6hr_before)
 
 try:
-    #bot.send_message(393483876, '@rozklad_bot LOG: Bot started')
+    bot.send_message(393483876, '@rozklad_bot LOG: Bot started', disable_notification=True)
     if __name__ == '__main__':
         my_thread = threading.Thread(target=startbot, args=())
         my_thread.start()
