@@ -42,11 +42,11 @@ marks_markup.add(
     )
 
 from features.lessons import lessons
-
 main_buttons=[]
 footer_buttons=[]
 for i in lessons:
     main_buttons.append(types.InlineKeyboardButton(text=lessons[i], callback_data='addHWlesson '+str(i)))
+
 footer_buttons.append(types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding'))
         
 cancel_adding_markup=types.InlineKeyboardMarkup()
@@ -57,7 +57,7 @@ finish_adding_markup=types.InlineKeyboardMarkup()
 finish_adding_button=types.InlineKeyboardButton(text='Создать 📃', callback_data='finish_adding')
 finish_adding_markup.add(cancel_adding_button, finish_adding_button)
 
-
+  
 lessons_markup=types.InlineKeyboardMarkup(build_menu(main_buttons, 2, footer_buttons=footer_buttons))
 
 lessonsTomorrow_markup = types.InlineKeyboardMarkup()
