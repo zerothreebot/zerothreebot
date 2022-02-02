@@ -56,7 +56,9 @@ def Left_Showgraf(query):
     result=fetch(table='users', rows="id")
     for i in result:
         #if i[0]==393483876:
+        try:
             bot.send_message(chat_id=i[0], text=query.message.text)
+        except: pass
     bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id,reply_markup=None)
 
 @bot.callback_query_handler(lambda query: query.data=='cancelsendall')
