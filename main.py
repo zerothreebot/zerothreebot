@@ -42,6 +42,27 @@ def Command_Week(message):
 def Command_Left(message):
     bot.send_message(message.chat.id, gettimeleft(), reply_markup=Graf_markup, parse_mode='HTML')
 
+
+@bot.message_handler(commands=['sendall']) # Shows how much time till lesson/break ends with timetable button
+def Command_Left(message):
+    sendall = types.InlineKeyboardMarkup()
+    sendall.add(    types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancelsendall'),
+                    types.InlineKeyboardButton(text='Отправить всем 🕊️', callback_data='sendall'))
+    text=message.text.replace('/sendall ','')
+    bot.send_message(message.chat.id, text, reply_markup=sendall)
+
+@bot.callback_query_handler(lambda query: query.data=='sendall')
+def Left_Showgraf(query):
+    result=fetch(table='users', rows="id")
+    for i in result:
+        #if i[0]==393483876:
+            bot.send_message(chat_id=i[0], text=query.message.text)
+    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id,reply_markup=None)
+
+@bot.callback_query_handler(lambda query: query.data=='cancelsendall')
+def Left_Showgraf(query):
+    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+
 # Query togglers of commands week, timetable, left, today, tomorrow.
 @bot.callback_query_handler(lambda query: query.data=='showgraf')
 def Left_Showgraf(query):
