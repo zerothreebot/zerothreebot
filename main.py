@@ -484,7 +484,7 @@ def finish_adding(user_id):
                 except: pass
                 link_markup=types.InlineKeyboardMarkup()
                 link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
-                bot.send_message(   chat_id=chat_id, 
+        bot.send_message(   chat_id=chat_id, 
                                     text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
                                     reply_markup=link_markup)
                 
