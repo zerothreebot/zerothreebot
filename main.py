@@ -1,3 +1,6 @@
+from distutils.command.build import build
+import json
+from pydoc import doc
 from threading import Thread
 import traceback
 from datetime import date
@@ -6,7 +9,7 @@ from inline_keyboards.keyboards import *
 from settings import bot, version, github_link, checkgmailevery
 from features.tagging import *
 from features.timetable import *
-from database.db import *
+from features.db import *
 from features.lessons import lessons_additional
 
 @bot.message_handler(commands=['start']) # Outputs keyboard with lessons' marks links
@@ -110,7 +113,7 @@ def back_to_rozklad(query):
         output+='\n'
     bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=back_button, disable_web_page_preview=True)
 #
-from database.db import db_object
+from features.db import db_object
 @bot.message_handler(commands=['list']) # Outputs list of people in the group
 def addhomework(message):
     result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
@@ -622,7 +625,7 @@ def notification_tasks(days_left, message):
                 
 
 
-
+#if i[0]==393483876:
 #0 days - today
 #1 day - tomorrow
 def notifications_6hr_before():
@@ -646,9 +649,10 @@ import schedule
 schedule.every(checkgmailevery).seconds.do(job)
 schedule.every().day.at("16:00").do(notifications_6hr_before)
 schedule.every().day.at("08:00").do(notifications_14hr_before)
-schedule.every().day.at("11:00").do(notifications_day_before)
-schedule.every().day.at("12:00").do(notifications_2days_before)
+schedule.every().day.at("15:00").do(notifications_day_before)
+schedule.every().day.at("18:00").do(notifications_2days_before)
 
+#schedule.every(checkgmailevery).seconds.do(notifications_6hr_before)
 
 try:
     bot.send_message(393483876, '@rozklad_bot LOG: Bot started', disable_notification=True)
