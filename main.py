@@ -650,7 +650,7 @@ schedule.every(checkgmailevery).seconds.do(job)
 schedule.every().day.at("16:00").do(notifications_6hr_before)
 schedule.every().day.at("08:00").do(notifications_14hr_before)
 schedule.every().day.at("15:00").do(notifications_day_before)
-schedule.every().day.at("15:00").do(notifications_2days_before)
+schedule.every().day.at("18:00").do(notifications_2days_before)
 
 #schedule.every(checkgmailevery).seconds.do(notifications_6hr_before)
 
