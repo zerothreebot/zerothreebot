@@ -42,7 +42,7 @@ def getcurrentweek(tod):
     for i in week[tod]:
         k=1
         if weeknumber!=6:
-            weekroz+='\n<b>'+unit_to_multiplier[weeknumber]+'</b>\n'
+            weekroz+='\n<b>'+weekdays[weeknumber]+'</b>\n'
             for j in i:
                 if j!='-':
                     weekroz+='<i>'+str(k)+'</i> - '+j['lesson']
@@ -59,7 +59,7 @@ def getcurrentweek(tod):
 
 def output(tod,whatday):
     if tod==7: tod=0
-    rozklad='<b>'+unit_to_multiplier[tod]+'</b>'
+    rozklad='<b>'+weekdays[tod]+'</b>'
     if whatday==0:
         rozklad+='<i> - Сегодня</i>\n'
     elif whatday==1:

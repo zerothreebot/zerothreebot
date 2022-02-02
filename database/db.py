@@ -20,13 +20,9 @@ def list_to_str(lst):
 
 
 def update(table, column, value, where_column, where_value): 
-
     sql = f"update {table} set {column} = '{value}' WHERE {where_column}={where_value}"
-
-
     db_object.execute(sql)
     db_connection.commit()
-
 #update('tasks', 'done_by', list_to_str([1,2,3,4]),'id','13')
 
 def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, where_value=None):
@@ -47,9 +43,7 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
     else:
         result = db_object.fetchone()
     return result
-
 #fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
-
 
 def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
     assign_date=datetime.date.today()
@@ -68,11 +62,11 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
     db_object.execute(sql,(task ,files, '{}'))
     db_connection.commit()
     return id
+#add_task(1231, 2, datetime.date.today(), 'egrerg', ['1','2'])
 
 def remove_task(task_id): #remove_task(5)
     db_object.execute(f"DELETE FROM tasks WHERE id={task_id}")
     db_connection.commit()
 
-#add_task(1231, 2, datetime.date.today(), 'egrerg', ['1','2'])
-#fetch('tasks')
+
 

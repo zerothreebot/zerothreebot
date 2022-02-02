@@ -11,3 +11,4 @@ token = os.environ.get('token', None)
 bot = telebot.TeleBot(token, parse_mode='HTML')
 timezone=os.environ.get('timezone', None)
 tz=pytz.timezone(timezone)
+admin_id=393483876

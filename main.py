@@ -3,7 +3,7 @@ import traceback
 from datetime import date
 
 from inline_keyboards.keyboards import *
-from settings import bot, version, github_link, checkgmailevery
+from settings import bot, version, github_link, checkgmailevery, admin_id
 from features.tagging import *
 from features.timetable import *
 from database.db import *
@@ -11,7 +11,7 @@ from features.lessons import lessons_additional
 
 @bot.message_handler(commands=['start']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
-    bot.send_message(chat_id=393483876, text=str(message.from_user.id)+' '+message.from_user.first_name)
+    bot.send_message(chat_id=admin_id, text=str(message.from_user.id)+' '+message.from_user.first_name)
 
 @bot.message_handler(commands=['marks']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
@@ -52,7 +52,7 @@ def Command_Left(message):
 def Left_Showgraf(query):
     result=fetch(table='users', rows="id")
     for i in result:
-        #if i[0]==393483876:
+        #if i[0]==admin_id:
         try:
             bot.send_message(chat_id=i[0], text=query.message.text)
         except: pass
@@ -494,7 +494,7 @@ def finish_adding(user_id):
         users=fetch('users', rows='id')
 
         for i in users:
-            #if i[0]==393483876:
+            #if i[0]==admin_id:
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(lesson_id)))
                 try: bot.send_message(      chat_id=i[0], 
@@ -608,7 +608,7 @@ def notification_tasks(days_left, message):
     for i in task:
         done_by=i[0]
         for j in users_list:
-            #if j==393483876:
+            #if j==admin_id:
             if str(j) not in done_by:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(i[3])))
@@ -653,7 +653,7 @@ schedule.every().day.at("12:00").do(notifications_2days_before)
  
  
 try:
-    bot.send_message(393483876, '@rozklad_bot LOG: Bot started', disable_notification=True)
+    bot.send_message(admin_id, '@rozklad_bot LOG: Bot started', disable_notification=True)
     if __name__ == '__main__':
         my_thread = threading.Thread(target=startbot, args=())
         my_thread.start()
@@ -663,7 +663,7 @@ try:
         
 except Exception as e: 
     var = traceback.format_exc()
-    bot.send_message(393483876, str(var), parse_mode='Markdown')
+    bot.send_message(admin_id, str(var), parse_mode='Markdown')
     print(var)
 
 
