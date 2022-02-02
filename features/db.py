@@ -1,4 +1,5 @@
 from cgitb import reset
+import re
 import psycopg2
 import os
 import datetime
@@ -59,7 +60,8 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
 
     db_object.execute("SELECT id FROM tasks ORDER BY id")
     result = db_object.fetchall()
-    if result==None:
+    print(result)
+    if result==[]:
         id=0
     else:
         id=result[len(result)-1][0]+1
