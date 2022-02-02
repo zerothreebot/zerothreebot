@@ -1,14 +1,13 @@
-import json
-
-from settings import bot, chat_id, THIS_FOLDER
+from settings import bot, chat_id
 from inline_keyboards.keyboards import tagmarkup, tagAllConfirm_markup
 
-with open(THIS_FOLDER+'/db/'+'taglist.json', encoding='utf-8') as json_file:
-    tagging = json.load(json_file)
-
-def update_taglist():
-    with open(THIS_FOLDER+'/db/'+'taglist.json', 'w', encoding='utf-8') as outfile:
-        json.dump(tagging, outfile, indent=4, ensure_ascii=False)
+tagging = {
+    "message": {
+        "chat_id": 0,
+        "message_id": 0
+    },
+    "tag_users": {}
+}
 
 @bot.message_handler(commands=['tagging'])
 def Command_Tagging(message):
@@ -20,7 +19,6 @@ def Command_Tagging(message):
             except:pass
         tagging['message']['chat_id'] = message.chat.id
         tagging['message']['message_id'] = bot.send_message(message.chat.id, get_tag_list_text('pending'), reply_markup=tagmarkup).message_id
-        update_taglist()
         bot.pin_chat_message(tagging['message']['chat_id'], tagging['message']['message_id'], disable_notification=True)
 
 def get_tag_list_text(tagging_type):
@@ -59,7 +57,6 @@ def Command_TagListClear(message):
 def tag_list_clear():
     global tagging
     if tagging['message']['chat_id']!=0:
-        update_taglist()
         bot.unpin_chat_message(chat_id=tagging['message']['chat_id'], message_id=tagging['message']['message_id'])
         bot.edit_message_text(chat_id=tagging['message']['chat_id'], message_id=tagging['message']['message_id'], text=get_tag_list_text('expired'), reply_markup=None)
         tagging={
@@ -69,7 +66,6 @@ def tag_list_clear():
             },
             "tag_users":{}
         }
-        update_taglist()
         return 'Список сброшен'
     else:
         return 'Список пуст'
@@ -81,7 +77,6 @@ def Tagging_AddMe(query):
         first_name=query.from_user.first_name
         if str(user_id) not in tagging['tag_users']:
             tagging['tag_users'][str(user_id)]={'username':username, 'first_name':first_name}
-            update_taglist()
             bot.answer_callback_query(callback_query_id=query.id, text='Добавил тебя в список ✅')
             bot.edit_message_text(chat_id=tagging['message']['chat_id'], message_id=tagging['message']['message_id'], text=get_tag_list_text('pending'),reply_markup=tagmarkup)
         else: bot.answer_callback_query(callback_query_id=query.id, text='Ты уже в списке')
@@ -90,7 +85,6 @@ def Tagging_AddMe(query):
 def Tagging_DelMe(query):             
         if str(query.from_user.id) in tagging['tag_users']:
                 del tagging['tag_users'][str(query.from_user.id)]
-                update_taglist()
                 bot.answer_callback_query(callback_query_id=query.id, text='Убрал тебя из списка ✅')
                 bot.edit_message_text(chat_id=tagging['message']['chat_id'], message_id=tagging['message']['message_id'], text=get_tag_list_text('pending'),reply_markup=tagmarkup)
         else:

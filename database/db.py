@@ -1,5 +1,3 @@
-from cgitb import reset
-import re
 import psycopg2
 import os
 import datetime

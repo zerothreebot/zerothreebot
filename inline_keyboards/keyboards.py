@@ -1,4 +1,5 @@
 from telebot import types
+from features.lessons import lessons
 
 tagmarkup = types.InlineKeyboardMarkup()
 tagmarkup.add(types.InlineKeyboardButton(text='🗑 Убрать меня из списка', callback_data='delme'), types.InlineKeyboardButton(text='📩 Добавить меня в список', callback_data='addme'))
@@ -41,7 +42,7 @@ marks_markup.add(
                 
     )
 
-from features.lessons import lessons
+
 main_buttons=[]
 footer_buttons=[]
 for i in lessons:

@@ -1,9 +1,9 @@
-from audioop import add
 from datetime import datetime
 from time import gmtime,strftime
+from telebot import types
 
 from settings import tz
-from db.week import *
+from database.week import *
 
 def Timetable_Output():
     text=''
@@ -56,7 +56,7 @@ def getcurrentweek(tod):
         weeknumber+=1
     
     return weekroz
-from telebot import types
+
 def output(tod,whatday):
     if tod==7: tod=0
     rozklad='<b>'+unit_to_multiplier[tod]+'</b>'

@@ -1,4 +1,5 @@
-from features.db import fetch
+from database.db import fetch
+
 sql=fetch('lessons',rows='lesson_id, lesson_name, chat_link, lesson_link, classroom_link', order_by='lesson_id')
 lessons={}
 for i in sql:
