@@ -594,8 +594,7 @@ def function_name(message):
 
         
     
-def startbot(): # Starts bot
-    bot.polling(none_stop=True, interval=0)
+
 
 def notification_tasks(days_left, message):
     todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
@@ -636,6 +635,8 @@ def notifications_2days_before():
 
 
 
+def startbot(): # Starts bot
+    bot.polling(non_stop=True, none_stop=True, interval=0)
 
 from features.gmail import *
 import time
