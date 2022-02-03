@@ -164,7 +164,7 @@ def addhomework(message):
                     toadd='🕚'
             else:
                 toadd='🕚'
-        output+=toadd+' #'+str(i[1])+' - '+lessons[i[0]]+'. Задано: '+str(i[3])+'\n'
+        output+=toadd+' #'+str(i[1])+' - '+lessons[i[0]]['lesson_name']+'. Задано: '+str(i[3])+'\n'
     
     output+='\n/hwinfo ID'
     bot.send_message(message.chat.id, output)    
@@ -192,9 +192,9 @@ def actual_tasks_builder(user_id, group_chat=False):
             if difference.days>=0:
                 actual_tasks_count+=1
                 if group_chat==True or str(user_id) not in i[3]:
-                    output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'\n'
+                    output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'\n'
                 else:
-                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]+'. Дедлайн: '+str(i[1])+'</i></s>\n'
+                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'</i></s>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])))
 
         columns=round(actual_tasks_count**(1/2))
@@ -300,7 +300,7 @@ def Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, t
     #name=user[0]+' '+user[1]
 
     output='ID: '+str(task_id)+'\n'
-    output+='📕 Предмет: '+lessons[lesson_id]+'\n'
+    output+='📕 Предмет: '+lessons[lesson_id]['lesson_name']+'\n'
     #output+='🙃 Создано: '+name+'\n'
     #output+='🕘 Дата создания: '+str(assign_date)+'\n'
     output+='🔥 Дедлайн: '+str(need_to_be_done)+'\n\n'
@@ -468,7 +468,7 @@ def Videopad_Query(query):
 
     bot.edit_message_text(  chat_id=query.message.chat.id, 
                             message_id=query.message.message_id, 
-                            text='📕 Предмет: '+lessons[lesson_number]+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>: ', 
+                            text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>: ', 
                             reply_markup=cancel_adding_markup)
 
 
@@ -498,14 +498,14 @@ def finish_adding(user_id):
                 watch_new_task = types.InlineKeyboardMarkup()
                 watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(lesson_id)))
                 try: bot.send_message(      chat_id=i[0], 
-                                            text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                            text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
                                             reply_markup=watch_new_task)
                     
                 except: pass
                 link_markup=types.InlineKeyboardMarkup()
                 link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
         bot.send_message(   chat_id=chat_id, 
-                                    text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                    text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
                                     reply_markup=link_markup)
                 
 
@@ -550,7 +550,7 @@ def All(message):
                     tasks_by_user[user_id]['date']=text
             
                     bot.send_message(   chat_id=message.chat.id, 
-                                        text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
+                                        text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
                                         reply_markup=cancel_adding_markup)
 
                 else:
@@ -570,7 +570,7 @@ def All(message):
                 tasks_by_user[user_id]['task']=text
                 tasks_by_user[user_id]['files']=[]
                 bot.send_message(   chat_id=message.chat.id, 
-                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n'+'✍ Задание: '+tasks_by_user[user_id]['task']+'\n\nВышли материалы задания в виде файлов, а затем нажми "Создать"', 
+                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n'+'✍ Задание: '+tasks_by_user[user_id]['task']+'\n\nВышли материалы задания в виде файлов, а затем нажми "Создать"', 
                                     reply_markup=finish_adding_markup)
 
 @bot.message_handler(content_types=['document'])
@@ -613,7 +613,7 @@ def notification_tasks(days_left, message):
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(i[3])))
                 try:
                     bot.send_message(   chat_id=j, 
-                                        text='Вы не выполнили задание с '+lessons[i[2]]+'\n\n'+message, 
+                                        text='Вы не выполнили задание с '+lessons[i[2]]['lesson_name']+'\n\n'+message, 
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass

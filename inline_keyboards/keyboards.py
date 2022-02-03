@@ -46,7 +46,8 @@ marks_markup.add(
 main_buttons=[]
 footer_buttons=[]
 for i in lessons:
-    main_buttons.append(types.InlineKeyboardButton(text=lessons[i], callback_data='addHWlesson '+str(i)))
+    print(lessons[i]['lesson_name'])
+    main_buttons.append(types.InlineKeyboardButton(text=lessons[i]['lesson_name'], callback_data='addHWlesson '+str(i)))
 
 footer_buttons.append(types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding'))
         
