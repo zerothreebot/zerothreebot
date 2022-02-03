@@ -129,7 +129,7 @@ def version_def(message):
 @bot.message_handler(commands=['menu'])
 def menu(message):
     id=message.from_user.id
-    user = fetch('users', fetchone=True, rows='group_id, name, surname, contract', where_column='id', where_value=id)
+    user = fetch('users', fetchone=True, rows='group_id, name, surname, contract, email', where_column='id', where_value=id)
     if not user:
         bot.send_message(message.chat.id, 'Оу... Я не знаю кто ты такой... 🤔')
     else:
@@ -140,6 +140,8 @@ def menu(message):
             output+='Бюджет 💫'+'\n'
         else:
             output+='Контракт 💸'+'\n'
+        if user[4]!=None:
+            output+='Почта КПИ: '+user[4]+'\n'
         if message.chat.id>0:
             reply_markup = types.InlineKeyboardMarkup()
             reply_markup.add(types.InlineKeyboardButton(text='Посмотреть список д/з', callback_data='back_to_tasks'))
