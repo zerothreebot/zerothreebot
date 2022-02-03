@@ -18,7 +18,7 @@ def Timetable_Output():
     return text
     
 def getweek():
-    today = int(datetime.now(tz).strftime("%U"))
+    today = int(datetime.datetime.now(tz).strftime("%U"))
     if today%2==1:
         week=0
     else:
@@ -26,7 +26,7 @@ def getweek():
     return week
 
 def getdayofweek():
-    return int(datetime.now(tz).weekday())
+    return int(datetime.datetime.now(tz).weekday())
 
 def getcurrentweek(tod):
     if tod==2: tod=0
@@ -109,7 +109,7 @@ def output(tod,whatday):
     return rozklad, markup
 
 def getcurrentlessonnumber():
-    now=datetime.now(tz)
+    now=datetime.datetime.now(tz)
     nowsec=3600*int(now.strftime("%H"))+60*int(now.strftime("%M"))+int(now.strftime("%S"))
     paranumber=0
     if nowsec>=30600 and nowsec<36300:

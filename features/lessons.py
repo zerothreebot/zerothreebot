@@ -13,8 +13,8 @@ for i in sql:
 
 
 
-lessons[-1]='📙 Додатковий предмет'
-lessons[-2]='📔 Другое'
+lessons[-1]='Дод. предмет'
+lessons[-2]='Другое'
 
 sql=fetch('lessons_additional',rows='lesson_id, lesson_name, chat_link, lesson_link, classroom_link', order_by='lesson_id')
 lessons_additional={}

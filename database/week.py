@@ -1,83 +1,70 @@
-week=[
-    [
-        [   '-',
-            {'lesson':'Основи системного аналізу','type':'(прак.)', 'where':'Meet','link':'https://meet.google.com/mhr-ykwa-yvn'},
-            {'lesson':'ООП','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Основи молекулярної біології та біоінформатики','type':'(прак.)', 'where':'Meet','link':'https://meet.google.com/rnk-pgqw-yjo'},
-            '-'
-        ],
-        [   '-',
-            {'lesson':'Філософія','type':'(лек.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/9584503319?pwd=U1BrSlZ2dkxuMUVQSDRMMVBOZ0s1UT09'},
-            {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
-            {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
-            '-'
-        ],
-        [   '-',
-            {'lesson':'Основи системного аналізу','type':'(лек.)', 'where':'Meet','link':'https://meet.google.com/mhr-ykwa-yvn'},
-            {'lesson':'Обробка та аналіз БМД','type':'(лек.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/78908811232?pwd=_sFuGldgTGrloK17P8eB_xw9SQXIg0.1'},
-            {'lesson':'Основи молекулярної біології та біоінформатики','type':'(лек.)', 'where':'Meet','link':'https://meet.google.com/rnk-pgqw-yjo'},
-            '-',
-        ],
-        [   {'lesson':'ООП','type':'(лек.)', 'where':'','link':''},
-            '-',
-            {'lesson':'Безпека інформаційних систем','type':'(лек.)', 'where':'Zoom','link':'https://us02web.zoom.us/j/5850411662?pwd=VFdVb2hoekovRE56bC8xV1V0RXd3Zz09'},
-            '-',
-            '-',
-        ],
-        [   {'lesson':'Обробка та аналіз БМД','type':'(прак.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/78908811232?pwd=_sFuGldgTGrloK17P8eB_xw9SQXIg0.1'},
-            {'lesson':'English','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Безпека інформаційних систем','type':'(прак.)', 'where':'Zoom','link':'https://us02web.zoom.us/j/5850411662?pwd=VFdVb2hoekovRE56bC8xV1V0RXd3Zz09'},
-            {'lesson':'Філософія','type':'(прак.)', 'where':'','link':''},
-            '-',
-        ],
-        [   {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
-            '-',
-            '-',
-            '-',
-            '-',
-        ],
-        ['Отдыхай, чумба']
-    ],
-    [
-        [   '-',
-            {'lesson':'Основи системного аналізу','type':'(прак.)', 'where':'Meet','link':'https://meet.google.com/mhr-ykwa-yvn'},
-            {'lesson':'ООП','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Основи молекулярної біології та біоінформатики','type':'(прак.)', 'where':'Meet','link':'https://meet.google.com/rnk-pgqw-yjo'},
-            '-',
-        ],
-        [   '-',
-            {'lesson':'Розумні міста','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Психологія','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
-            {'lesson':'Політична наука','type':'(прак.)', 'where':'','link':''},
-        ],
-        [   '-',
-            {'lesson':'Основи системного аналізу','type':'(лек.)', 'where':'Meet','link':'https://meet.google.com/mhr-ykwa-yvn'},
-            {'lesson':'Обробка та аналіз БМД','type':'(лек.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/78908811232?pwd=_sFuGldgTGrloK17P8eB_xw9SQXIg0.1'},
-            {'lesson':'Основи молекулярної біології та біоінформатики','type':'(лек.)', 'where':'Meet','link':'https://meet.google.com/rnk-pgqw-yjo'},
-            '-',
-        ],
-        [   {'lesson':'ООП','type':'(лек.)', 'where':'','link':''},
-            '-',
-            {'lesson':'Безпека інформаційних систем','type':'(лек.)', 'where':'Zoom','link':'https://us02web.zoom.us/j/5850411662?pwd=VFdVb2hoekovRE56bC8xV1V0RXd3Zz09'},
-            '-',
-            '-',
-        ],
-        [   {'lesson':'Обробка та аналіз БМД','type':'(прак.)', 'where':'Zoom','link':'https://us04web.zoom.us/j/78908811232?pwd=_sFuGldgTGrloK17P8eB_xw9SQXIg0.1'},
-            {'lesson':'English','type':'(прак.)', 'where':'','link':''},
-            {'lesson':'Безпека інформаційних систем','type':'(прак.)', 'where':'Zoom','link':'https://us02web.zoom.us/j/5850411662?pwd=VFdVb2hoekovRE56bC8xV1V0RXd3Zz09'},
-            '-',
-            '-',
-        ],
-        [   {'lesson':'Доп. предмет','type':'', 'where':'','link':''},
-            '-',
-            '-',
-            '-',
-            '-',
-        ],
-        ['Отдыхай, чумба']
-    ]
-]
+from database.db import *
+
+sql=fetch('lessons',rows='lesson_id, lesson_name, chat_link, lesson_link, classroom_link', order_by='lesson_id')
+lessons={}
+for i in sql:
+    lessons[i[0]]={}
+    lessons[i[0]]['lesson_name']=i[1]
+    lessons[i[0]]['chat_link']=i[2]
+    lessons[i[0]]['lesson_link']=i[3]
+    lessons[i[0]]['classroom_link']=i[4]
+    
+
+
+
+lessons[-1]='Дод. предмет'
+lessons[-2]='Другое'
+
+
+
+
+
+
+
+print(lessons)
+sql1=fetch('timetable_week_1',rows='para_1, para_2, para_3, para_4, para_5', order_by='day')
+sql2=fetch('timetable_week_2',rows='para_1, para_2, para_3, para_4, para_5', order_by='day')
+sqls=[sql1,sql2]
+week={0:[], 1:[]}
+
+for z in range(0,2):
+    for i in sqls[z]:
+        k=0
+        array=[]
+        for j in i:
+            print(j)
+            lesson_id=j[0]
+            if lesson_id==-1:
+                array.append('-')
+            elif lesson_id==-2:
+                array.append({'lesson':'Доп. предмет','type':'', 'where':'','link':''})
+            else:
+                type=j[1]
+                print(lesson_id, type)
+                if lessons[lesson_id]['lesson_link']!=None:
+                    if lessons[lesson_id]['lesson_link'].find('zoom')!=-1: where='Zoom'
+                    elif lessons[lesson_id]['lesson_link'].find('meet')!=-1: where='Meet'
+                    else: where='Ссылка'
+                    link=lessons[lesson_id]['lesson_link']
+                else: 
+                    where=''
+                    link=''
+                if type == 0 :
+                    type_='(лек.)'
+                else:
+                    type_='(прак.)'
+                array.append({'lesson':lessons[lesson_id]['lesson_name'], 'type':type_, 'where':where, 'link':link})
+
+        week[z].append(array)
+
+print(week)        
+
+
+
+
+
+
+
 
 paras=[     '<i>1 пара</i>  <b>08:30 - 10:05</b>',
             '<i>2 пара</i>  <b>10:25 - 12:00</b>',
