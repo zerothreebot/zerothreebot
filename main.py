@@ -119,6 +119,14 @@ def addhomework(message):
         output+=str(i[0])+' - '+i[1]+' '+i[2]+'\n'
 
     bot.send_message(message.chat.id, output)
+@bot.message_handler(commands=['emaillist']) # Outputs list of people in the group
+def addhomework(message):
+    result=fetch(table='users', rows="group_id, name, surname, email", order_by='group_id')
+    output=''
+    for i in result:
+        output+=str(i[0])+' - '+i[1]+' '+i[2]+' '+str(i[3])+'\n'
+
+    bot.send_message(message.chat.id, output)
 
 @bot.message_handler(commands=['version']) # Outputs bot version
 def version_def(message):
