@@ -123,7 +123,7 @@ def getcurrentlessonnumber():
     return paranumber
 
 def gettimeleft():
-    now=datetime.now(tz)
+    now=datetime.datetime.now(tz)
     nowsec=3600*int(now.strftime("%H"))+60*int(now.strftime("%M"))+int(now.strftime("%S"))
     if nowsec>=25200 and nowsec<30600:
         timeleft='До начала пары осталось: <b>'+strftime("%H:%M:%S", gmtime(30600-nowsec))+'</b>'
