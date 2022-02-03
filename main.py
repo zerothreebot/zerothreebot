@@ -11,7 +11,7 @@ from features.lessons import lessons_additional
 
 @bot.message_handler(commands=['start']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
-    bot.send_message(chat_id=admin_id, text=str(message.from_user.id)+' '+message.from_user.first_name)
+    bot.send_message(chat_id=message.chat.id, text='Привет. Это персональный бот группы БС-03 который помогает в организации учёбного процесса.\n\nВоспользуйся командами чтобы посмотреть что он умеет)')
 
 @bot.message_handler(commands=['marks']) # Outputs keyboard with lessons' marks links
 def Command_Marks(message):
