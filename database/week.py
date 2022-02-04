@@ -17,18 +17,24 @@ for z in range(0,2):
                 array.append({'lesson':'Доп. предмет','type':'', 'where':'','link':''})
             else:
                 type=j[1]
-                if lessons[lesson_id]['lesson_link']!=None:
-                    if lessons[lesson_id]['lesson_link'].find('zoom')!=-1: where='Zoom'
-                    elif lessons[lesson_id]['lesson_link'].find('meet')!=-1: where='Meet'
-                    else: where='Ссылка'
-                    link=lessons[lesson_id]['lesson_link']
-                else: 
-                    where=''
-                    link=''
                 if type == 0 :
                     type_='(лек.)'
                 else:
                     type_='(прак.)'
+                if lessons[lesson_id]['lesson_link']!=None:
+                    if type==1 and lessons[lesson_id]['lesson_link_add']!=None:
+                        link=lessons[lesson_id]['lesson_link_add']
+                    else:
+                        link=lessons[lesson_id]['lesson_link']
+
+                    if link.find('zoom')!=-1: where='Zoom'
+                    elif link.find('meet')!=-1: where='Meet'
+                    else: where='Ссылка'
+                    
+                else: 
+                    where=''
+                    link=''
+                
                 array.append({'lesson':lessons[lesson_id]['lesson_name'], 'type':type_, 'where':where, 'link':link})
 
         week[z].append(array)

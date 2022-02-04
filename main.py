@@ -592,6 +592,7 @@ def function_name(message):
             
             if len(tasks_by_user[user_id]['files'])<6:
                 id=message.document.file_id
+                print(id)
                 tasks_by_user[user_id]['files'].append(id)
                 bot.send_message(   chat_id=message.chat.id, 
                                     text='📃 Документов загружено: '+str(len(tasks_by_user[user_id]['files'])))
@@ -635,13 +636,13 @@ def notification_tasks(days_left, message):
 #0 days - today
 #1 day - tomorrow
 def notifications_6hr_before():
-    notification_tasks(0, '💥 До дедлайна осталось 6 часов, поспеши!')
+    notification_tasks(1, '💥 Осталось 6 часов, до дня сдачи работы!')
 def notifications_14hr_before():
-    notification_tasks(0, '🔥 До дедлайна осталось 14 часов!')
+    notification_tasks(1, '🔥 До дня сдачи работы осталось 14 часов!')
 def notifications_day_before():
-    notification_tasks(1, '❄ Завтра последний день сдачи работы')
+    notification_tasks(2, '❄ Завтра дедллайн сдачи работы')
 def notifications_2days_before():
-    notification_tasks(2, '🧊 Конец сдачи работы через 2 дня')
+    notification_tasks(3, '🧊 Дедллайн сдачи через 2 дня')
 
 
 
