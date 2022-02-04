@@ -78,7 +78,7 @@ class Email:
         return message_text
 
     def messageTextMaker(self):
-        message_text=self.messageFromFormatting()
+        message_text='#email\n'+self.messageFromFormatting()
         message_text+="\n"
         message_text+="👉<b>"+self.subject+"</b>"
         if len(self.text)>2:
