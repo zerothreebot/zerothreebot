@@ -204,7 +204,8 @@ def actual_tasks_builder(user_id, group_chat=False):
             difference=i[1]-todays_date
             if difference.days>=0:
                 actual_tasks_count+=1
-                
+                if deadline==datetime.date(2222,1,1):
+                    deadline='долгосрок'
                 if group_chat==True or str(user_id) not in i[3]:
                     output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
                 else:
