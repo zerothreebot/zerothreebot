@@ -189,9 +189,12 @@ def actual_tasks_builder(user_id, group_chat=False):
 
         actual_tasks_count=0
         for i in tasks:
+            deadline=i[1]
             if group_chat==False:
                 if i[3]!=None:
                     if str(user_id) in i[3]:
+                        if deadline==datetime.date(2222,1,1):
+                            continue
                         toadd='✅'
                     else:
                         toadd='🕚'
@@ -201,8 +204,9 @@ def actual_tasks_builder(user_id, group_chat=False):
             difference=i[1]-todays_date
             if difference.days>=0:
                 actual_tasks_count+=1
+                
                 if group_chat==True or str(user_id) not in i[3]:
-                    output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'\n'
+                    output+=toadd+' #'+str(i[2])+' - '+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
                 else:
                     output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'</i></s>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])))
@@ -313,6 +317,8 @@ def Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, t
     output+='📕 Предмет: '+lessons[lesson_id]['lesson_name']+'\n'
     #output+='🙃 Создано: '+name+'\n'
     #output+='🕘 Дата создания: '+str(assign_date)+'\n'
+    if need_to_be_done==datetime.date(2222,1,1):
+        need_to_be_done='<b>Это долгосрочное задание. Если вы отметите его выполненым, то оно пропадет из /hw и найти его можно будет только в /hwall</b>'
     output+='🔥 Дедлайн: '+str(need_to_be_done)+'\n\n'
     output+='✍ Задание: '+task_mission+'\n'
     return output
@@ -478,7 +484,7 @@ def Videopad_Query(query):
 
     bot.edit_message_text(  chat_id=query.message.chat.id, 
                             message_id=query.message.message_id, 
-                            text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>: ', 
+                            text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>:\n\nЕсли задание долгосрочное, реплайни "долгосрок" ', 
                             reply_markup=cancel_adding_markup)
 
 
@@ -496,10 +502,16 @@ def Videopad_Query(query):
 
 def finish_adding(user_id):
     if user_id in tasks_by_user:
-        date_=tasks_by_user[user_id]['date'].split('-')
-        day=int(date_[0])
-        month=int(date_[1])
-        year=int(date_[2])
+        if tasks_by_user[user_id]['date']!='долгосрок':
+            date_=tasks_by_user[user_id]['date'].split('-')
+            day=int(date_[0])
+            month=int(date_[1])
+            year=int(date_[2])
+        else:
+            day=int(1)
+            month=int(1)
+            year=int(2222)
+
         lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], date(year, month, day), tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
         users=fetch('users', rows='id')
 
@@ -514,7 +526,7 @@ def finish_adding(user_id):
                 except: pass
                 link_markup=types.InlineKeyboardMarkup()
                 link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
-        bot.send_message(   chat_id=chat_id, 
+        bot.send_message(   chat_id=chat_id,
                                     text='#task\n⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
                                     reply_markup=link_markup)
                 
@@ -536,20 +548,25 @@ def All(message):
             action=int(user_current_action[user_id].split(' ')[2])
             if action==2:
                 text=message.text
+                fail=None
                 try:
-                    date_=text.split('-')
-                    day=int(date_[0])
-                    month=int(date_[1])
-                    year=int(date_[2])
-                    fail=None
-                
-                    date_assigned=date(year, month, day)
-                    todays_date=datetime.date.today()
-                    difference=date_assigned-todays_date
-                    if difference.total_seconds()<=-86400:
-                        fail='past'
-                    elif difference.total_seconds()>=31536000:
-                        fail='future'
+                    if text!='долгосрок':
+                        date_=text.split('-')
+                        day=int(date_[0])
+                        month=int(date_[1])
+                        year=int(date_[2])
+                        
+                    
+                        date_assigned=date(year, month, day)
+                        todays_date=datetime.date.today()
+                        difference=date_assigned-todays_date
+                        if difference.total_seconds()<=-86400:
+                            fail='past'
+                        elif difference.total_seconds()>=31536000:
+                            fail='future'
+                    else:
+                        date_assigned=date(2222, 1, 1)
+                    
                 except:
                     fail='format'
 
