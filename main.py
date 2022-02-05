@@ -1,3 +1,4 @@
+from cgitb import text
 from threading import Thread
 import traceback
 from datetime import date
@@ -132,14 +133,10 @@ def addhomework(message):
 def version_def(message):
     bot.send_message(message.chat.id, version+"\n"+github_link)
 
-
-# Homework notification sketch
-@bot.message_handler(commands=['menu'])
-def menu(message):
-    id=message.from_user.id
-    user = fetch('users', fetchone=True, rows='group_id, name, surname, contract, email', where_column='id', where_value=id)
+def orheioerg(chat_id, user_id):
+    user = fetch('users', fetchone=True, rows='group_id, name, surname, contract, email, not_lesson_alert', where_column='id', where_value=user_id)
     if not user:
-        bot.send_message(message.chat.id, 'Оу... Я не знаю кто ты такой... 🤔')
+        return 'Оу... Я не знаю кто ты такой... 🤔', None
     else:
         output='🙃 Ты - '+user[1]+' '+user[2]+'\n'
         output+='🥇 Твой номер в списке: '+str(user[0])+'\n'
@@ -150,12 +147,26 @@ def menu(message):
             output+='Контракт 💸'+'\n'
         if user[4]!=None:
             output+='Почта КПИ: '+user[4]+'\n'
-        if message.chat.id>0:
+        if chat_id>0:
+            if user[5]==True:
+                text='Звонок на пару: Вкл'
+                callback_data='alert turnoff'
+            else:
+                text='Звонок на пару: Выкл'
+                callback_data='alert turnon'
             reply_markup = types.InlineKeyboardMarkup()
-            reply_markup.add(types.InlineKeyboardButton(text='Посмотреть список д/з', callback_data='back_to_tasks'))
+            reply_markup.add(   types.InlineKeyboardButton(text='Посмотреть список д/з', callback_data='back_to_tasks'),
+                                types.InlineKeyboardButton(text=text, callback_data=callback_data))
         else:
             reply_markup = None
-        bot.send_message(message.chat.id, output, reply_markup=reply_markup)
+        return output, reply_markup 
+
+# Homework notification sketch
+@bot.message_handler(commands=['menu'])
+def menu(message):
+    user_id=message.from_user.id
+    output, reply_markup = orheioerg(message.chat.id, user_id)
+    bot.send_message(message.chat.id, output, reply_markup=reply_markup)
 
 @bot.message_handler(commands=['hwall'])
 def addhomework(message):
@@ -489,6 +500,21 @@ def Videopad_Query(query):
                             reply_markup=cancel_adding_markup)
 
 
+@bot.callback_query_handler(lambda query: query.data.find('alert')!=-1)
+def Videopad_Query(query):
+    user_id=query.from_user.id
+    action=query.data.split(' ')[1]
+    if action == 'turnoff':
+        update('users', 'not_lesson_alert', False, where_column='id', where_value=user_id)
+        bot.answer_callback_query(callback_query_id=query.id, text='Вы отключили уведомления о начале пары')
+    else:
+        update('users', 'not_lesson_alert', True, where_column='id', where_value=user_id)
+        bot.answer_callback_query(callback_query_id=query.id, text='Теперь вам будут приходит уведомления!')
+    output, reply_markup = orheioerg(query.message.chat.id, user_id)
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.id, text=output, reply_markup=reply_markup)
+    
+
+
 @bot.callback_query_handler(lambda query: query.data==('cancel_adding'))
 def Videopad_Query(query):
     user_id=query.from_user.id
@@ -680,8 +706,34 @@ schedule.every().day.at("08:00").do(notifications_14hr_before)
 schedule.every().day.at("11:00").do(notifications_day_before)
 schedule.every().day.at("12:00").do(notifications_2days_before)
 
- 
- 
+
+def lesson_started():
+    users=fetch('users', rows='id, not_lesson_alert')
+    k=0
+    for i in week[getweek()][getdayofweek()]:
+        if i['lesson']=='Отдыхай, чумба':
+            print('Break')
+            break
+        elif i!='-':
+            if k==getcurrentlessonnumber(True):
+                for i in users:
+                    user_id=i[0]
+                    alert=i[1]
+                    
+                    if alert==True:
+                        try:bot.send_message(chat_id=user_id, text='Пара начнется через 10 минут! /today')
+                        except:
+                            pass
+                break 
+        k+=1
+    
+
+
+
+lesson_start=["06:20", "08:15", "10:10", "12:05", "14:00"] 
+for i in lesson_start:
+    schedule.every().day.at(i).do(lesson_started)
+#schedule.every(checkgmailevery).seconds.do(lesson_started)
 try:
     bot.send_message(admin_id, '@rozklad_bot LOG: Bot started', disable_notification=True)
     if __name__ == '__main__':

@@ -36,8 +36,10 @@ for z in range(0,2):
                     link=''
                 
                 array.append({'lesson':lessons[lesson_id]['lesson_name'], 'type':type_, 'where':where, 'link':link})
-
+        
         week[z].append(array)
+    week[z].append([{'lesson':'Отдыхай, чумба', 'type':'', 'where':'', 'link':''}])
+    
  
 
 

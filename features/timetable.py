@@ -7,7 +7,7 @@ from database.week import *
 
 def Timetable_Output():
     text=''
-    currentpara=getcurrentlessonnumber()
+    currentpara=getcurrentlessonnumber(False)
     k=1
     for i in paras:
         text+=i
@@ -79,7 +79,7 @@ def output(tod,whatday):
 
             if i['link']!='': rozklad+=' - <a href="'+i['link']+'">'+i['where']+'</a>' 
 
-            if k==getcurrentlessonnumber() and whatday==0:
+            if k==getcurrentlessonnumber(False) and whatday==0:
                 rozklad+=' - <b><u>СЕЙЧАС</u></b>'
             rozklad+='\n'
         k+=1
@@ -108,8 +108,11 @@ def output(tod,whatday):
             )
     return rozklad, markup
 
-def getcurrentlessonnumber():
-    now=datetime.datetime.now(tz)
+def getcurrentlessonnumber(offset):
+    if offset==True:
+        now=datetime.datetime.now(tz)+datetime.timedelta(minutes=15)
+    else:
+        now=datetime.datetime.now(tz)
     nowsec=3600*int(now.strftime("%H"))+60*int(now.strftime("%M"))+int(now.strftime("%S"))
     paranumber=0
     if nowsec>=30600 and nowsec<36300:
