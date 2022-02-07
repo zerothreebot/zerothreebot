@@ -711,9 +711,10 @@ def lesson_started():
     users=fetch('users', rows='id, not_lesson_alert')
     k=0
     for i in week[getweek()][getdayofweek()]:
-        if i['lesson']=='Отдыхай, чумба':
+        print(i)
+        if i=='-':
             print('Break')
-            break
+            continue
         elif i!='-':
             if k==getcurrentlessonnumber(True):
                 for i in users:
@@ -726,11 +727,10 @@ def lesson_started():
                             pass
                 break 
         k+=1
-    
 
 
 
-lesson_start=["06:20", "08:15", "10:10", "12:05", "14:00"] 
+lesson_start=["06:20", "08:25", "10:10", "12:05", "14:00"] 
 for i in lesson_start:
     schedule.every().day.at(i).do(lesson_started)
 #schedule.every(checkgmailevery).seconds.do(lesson_started)
