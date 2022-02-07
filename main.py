@@ -709,13 +709,10 @@ schedule.every().day.at("12:00").do(notifications_2days_before)
 
 def lesson_started():
     users=fetch('users', rows='id, not_lesson_alert')
-    k=0
+    k=1
     for i in week[getweek()][getdayofweek()]:
-        print(i)
-        if i=='-':
-            print('Break')
-            continue
-        elif i!='-':
+        print(k, getcurrentlessonnumber(True),'---------', i)
+        if i!='-':
             if k==getcurrentlessonnumber(True):
                 for i in users:
                     user_id=i[0]
@@ -725,9 +722,9 @@ def lesson_started():
                         try:bot.send_message(chat_id=user_id, text='Пара начнется через 10 минут! /today')
                         except:
                             pass
-                break 
+                break
         k+=1
-
+#lesson_started()
 
 
 lesson_start=["06:20", "08:20", "10:10", "12:05", "14:00"] 
