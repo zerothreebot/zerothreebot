@@ -94,13 +94,15 @@ def back_to_rozklad(query):
     for i in lessons_additional:
         output+=lessons_additional[i]['lesson_name']
         if lessons_additional[i]['lesson_link']!=None:
-            if lessons_additional[i]['lesson_link'].find('zoom')!=-1:
-                where='Zoom'
-            elif lessons_additional[i]['lesson_link'].find('meet')!=-1: 
-                where='Meet'
-            else:
-                where='Ссылка'
-            output+=' - <a href="'+lessons_additional[i]['lesson_link']+'">'+where+'</a>'
+
+            if lessons_additional[i]['lesson_link'] != None:
+                output+=' - <a href="'+lessons_additional[i]['lesson_link']+'">Лек. </a>'
+            if lessons_additional[i]['lesson_link_add'] != None:
+                output+=' - <a href="'+lessons_additional[i]['lesson_link']+'">Прак. </a>'
+                
+
+
+
         if lessons_additional[i]['chat_link']!=None and lessons_additional[i]['classroom_link']!=None: 
             output+=' ('
             if lessons_additional[i]['chat_link']!=None:   
