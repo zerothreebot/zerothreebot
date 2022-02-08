@@ -98,7 +98,7 @@ def back_to_rozklad(query):
             if lessons_additional[i]['lesson_link'] != None:
                 output+='<a href="'+lessons_additional[i]['lesson_link']+'">Лек. </a>'
             if lessons_additional[i]['lesson_link_add'] != None:
-                output+='<a href="'+lessons_additional[i]['lesson_link']+'">Прак. </a>'
+                output+='<a href="'+lessons_additional[i]['lesson_link_add']+'">Прак. </a>'
                 
 
 
