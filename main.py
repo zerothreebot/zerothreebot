@@ -682,13 +682,13 @@ def notification_tasks(days_left, message):
 #0 days - today
 #1 day - tomorrow
 def notifications_6hr_before():
-    notification_tasks(1, '💥 Осталось 6 часов, до дня сдачи работы!')
+    notification_tasks(0, '💥 Осталось 6 часов, до дня сдачи работы!')
 def notifications_14hr_before():
-    notification_tasks(1, '🔥 До дня сдачи работы осталось 14 часов!')
+    notification_tasks(0, '🔥 До дня сдачи работы осталось 14 часов!')
 def notifications_day_before():
-    notification_tasks(2, '❄ Завтра дедллайн сдачи работы')
+    notification_tasks(1, '❄ Завтра дедллайн сдачи работы')
 def notifications_2days_before():
-    notification_tasks(3, '🧊 Дедллайн сдачи через 2 дня')
+    notification_tasks(2, '🧊 Дедллайн сдачи через 2 дня')
 
 
 
