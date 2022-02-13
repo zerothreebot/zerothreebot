@@ -70,7 +70,7 @@ def output(tod,whatday):
         if i=='Отдыхай, чумба':
             rozklad+=i+'\n'
             break
-        elif i!='-':
+        elif i['lesson']!='-':
             rozklad+='<i>'+str(k)+'</i> - '+i['lesson']
 
             if i['lesson'].find('Доп')!=-1: additional_lesson_found=True
