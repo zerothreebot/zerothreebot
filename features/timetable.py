@@ -44,7 +44,7 @@ def getcurrentweek(tod):
         if weeknumber!=6:
             weekroz+='\n<b>'+weekdays[weeknumber]+'</b>\n'
             for j in i:
-                if j!='-':
+                if j['lesson']!='-':
                     weekroz+='<i>'+str(k)+'</i> - '+j['lesson']
 
                     if j['type']!='': weekroz+=' <i>'+j['type']+'</i>'

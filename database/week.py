@@ -12,7 +12,7 @@ for z in range(0,2):
         for j in i:
             lesson_id=j[0]
             if lesson_id==-1:
-                array.append('-')
+                array.append({'lesson':'-', 'type':'', 'where':'', 'link':''})
             elif lesson_id==-2:
                 array.append({'lesson':'Доп. предмет','type':'', 'where':'','link':''})
             else:

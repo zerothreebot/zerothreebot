@@ -714,7 +714,7 @@ def lesson_started():
     k=1
     for i in week[getweek()][getdayofweek()]:
         print(k, getcurrentlessonnumber(True),'---------', i)
-        if i!='-':
+        if i['lesson']!='-' and i['lesson']!='Отдыхай, чумба':
             if k==getcurrentlessonnumber(True):
                 for i in users:
                     user_id=i[0]
@@ -729,7 +729,7 @@ def lesson_started():
 #lesson_started()
 
 
-lesson_start=["06:20", "08:20", "10:10", "12:05", "14:00"] 
+lesson_start=["06:20", "08:15", "10:10", "12:05", "14:00"] 
 for i in lesson_start:
     schedule.every().day.at(i).do(lesson_started)
 #schedule.every(checkgmailevery).seconds.do(lesson_started)
