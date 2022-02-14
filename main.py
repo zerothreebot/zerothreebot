@@ -475,7 +475,11 @@ def Videopad_Query(query):
 
 
 user_current_action={}
-tasks_by_user={}  
+tasks_by_user={} 
+@bot.message_handler(commands=['print'])
+def addhomework(message):
+    bot.send_message(message.chat.id, str(user_current_action)+str(tasks_by_user))
+    
 def create_user_adding_hw(user_id):
     user_current_action[user_id]='addhw step 1'
     tasks_by_user[user_id]={}
