@@ -29,10 +29,6 @@ def Command_Tomorrow(message):
 def Command_Week(message):
     bot.send_message(message.chat.id,getcurrentweek(getweek()), disable_web_page_preview=True, parse_mode='HTML', reply_markup=nextWeek_markup)
 
-@bot.message_handler(commands=['left'])
-def Command_Left(message):
-    bot.send_message(message.chat.id, gettimeleft(), reply_markup=Graf_markup, parse_mode='HTML')
-
 
 
 @bot.callback_query_handler(lambda query: query.data=='showgraf')
@@ -145,8 +141,13 @@ def getcurrentweek(tod):
     return weekroz
 
 def output(tod,whatday):
+    rozklad=''
+    timeleft = gettimeleft()
+    if timeleft!=None:
+        rozklad+=timeleft+'\n\n'
+
     if tod==7: tod=0
-    rozklad='<b>'+weekdays[tod]+'</b>'
+    rozklad+='<b>'+weekdays[tod]+'</b>'
     if whatday==0:
         rozklad+='<i> - Сегодня</i>\n'
     elif whatday==1:
@@ -230,6 +231,6 @@ def gettimeleft():
         timeleft='До конца пары осталось: <b>'+strftime("%H:%M:%S", gmtime(57000-nowsec))+'</b>'
 
     else:
-        timeleft='Отдыхай, чумба'
+        return None
     return timeleft
 
