@@ -93,7 +93,7 @@ def job():
 
             email = Email(msg)
             if email.attachmentsCounter!=0:
-                bot.pin_chat_message(chat_id = chat_id, message_id=bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments).message_id)
+                bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments)
             else:
-                bot.pin_chat_message(chat_id = chat_id, message_id=bot.send_message(chat_id=chat_id, text=email.messageText).message_id)
+                bot.send_message(chat_id=chat_id, text=email.messageText)
         
