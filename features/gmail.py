@@ -7,13 +7,7 @@ app_password=os.environ.get('password', None)
 gmail_host='imap.gmail.com'
 
 
-emails_list = {
-    'riabchun.andrii@gmail.com':'Боб',
-    'matankpi@gmail.com':'Бакун (ТЙ,МА)',
-    'dobrovska.liudmyla@lll.kpi.ua':'Добровская Людмила (Модели)',
-    'repetalesia@gmail.com':'Леся Репета (ТЙ,МА)',
-    'back2void@gmail.com':'Рысин (АтаП)',
-}
+
 
 class Email:
     def __init__(self, msg):
@@ -53,9 +47,6 @@ class Email:
         open_exist=False
         for line in message.splitlines():
 
-            for i in emails_list.keys():
-                if line.find(i)!=-1:
-                    return output
 
             output+=line+'\n'
             if line.find(">")!=-1:
@@ -72,8 +63,6 @@ class Email:
 
     def messageFromFormatting(self):
         message_text="👤"
-        if self.from_ in emails_list:
-            message_text+=emails_list[self.from_]
         message_text+="  <code>"+self.from_+"</code>"
         return message_text
 
@@ -93,7 +82,11 @@ def job():
 
             email = Email(msg)
             if email.attachmentsCounter!=0:
-                bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments)
+                array=bot.send_media_group(chat_id=chat_id, media=email.messageText_WithAttachments)
+                message_id=array[len(array)-1].message_id
+                bot.pin_chat_message(chat_id=chat_id, message_id=message_id)
+                
             else:
-                bot.send_message(chat_id=chat_id, text=email.messageText)
+                message_id=bot.send_message(chat_id=chat_id, text=email.messageText).message_id
+                bot.pin_chat_message(chat_id=chat_id, message_id=message_id)
         

@@ -518,7 +518,31 @@ def Videopad_Query(query):
         bot.answer_callback_query(callback_query_id=query.id, text='Теперь вам будут приходит уведомления!')
     output, reply_markup = orheioerg(query.message.chat.id, user_id)
     bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.id, text=output, reply_markup=reply_markup)
-    
+
+
+@bot.message_handler(commands=['hbd'])
+def addhomework(message):
+    reply_markup = types.InlineKeyboardMarkup()
+    reply_markup.add(types.InlineKeyboardButton(text='🎂 0', callback_data='plusone 0'))    
+    message_id=bot.send_animation(  chat_id=chat_id, 
+                                    animation="CgACAgIAAxkBAAJT_GIM5J_tH7V3RHo-ByWxKDUAAVQ7cQACgAMAAi0eMUhsq3FZBpcUCCME", 
+                                    caption='В году целых 365 или 366 дней, но только один из них такой знаменательный — день рождения <a href="tg://user?id=1681799529">нашего бота</a>! 🎉', 
+                                    reply_markup=reply_markup).message_id
+    bot.pin_chat_message(chat_id=chat_id, message_id=message_id)
+
+#@bot.message_handler(content_types=['animation'])
+#def function_name(message):
+#    print(message)
+
+@bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
+def bdpl(query):
+    count=int(query.data.split(' ')[1])
+    count+=1
+
+    reply_markup = types.InlineKeyboardMarkup()
+    reply_markup.add(types.InlineKeyboardButton(text='🎂 '+str(count), callback_data='plusone '+str(count)))
+
+    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=reply_markup)
 
 
 @bot.callback_query_handler(lambda query: query.data==('cancel_adding'))
@@ -570,6 +594,7 @@ def del_user_from_adding_hw(user_id):
     if user_id in tasks_by_user:
         del tasks_by_user[user_id]
         del user_current_action[user_id]
+        
 
     
 @bot.message_handler(func=lambda m: True) 
