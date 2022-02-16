@@ -2,8 +2,95 @@ from datetime import datetime
 from time import gmtime,strftime
 from telebot import types
 
-from settings import tz
+from settings import tz, bot
 from database.week import *
+from inline_keyboards.keyboards import *
+from features.lessons import lessons_additional
+
+@bot.message_handler(commands=['start']) 
+def Command_Marks(message):
+    bot.send_message(chat_id=message.chat.id, text='Привет. Это персональный бот группы БС-03 который помогает в организации учёбного процесса.\n\nВоспользуйся командами чтобы посмотреть что он умеет)')
+
+@bot.message_handler(commands=['marks'])
+def Command_Marks(message):
+    bot.send_message(chat_id=message.chat.id, text='<pre>КПИ ФБМИ 122 2022 БС</pre>', reply_markup=marks_markup)
+
+@bot.message_handler(commands=['today'])
+def Command_Today(message):
+    text, markup=output(getdayofweek(),0)
+    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
+
+@bot.message_handler(commands=['tomorrow'])
+def Command_Tomorrow(message):
+    text, markup=output(getdayofweek()+1,1)
+    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
+
+@bot.message_handler(commands=['week'])
+def Command_Week(message):
+    bot.send_message(message.chat.id,getcurrentweek(getweek()), disable_web_page_preview=True, parse_mode='HTML', reply_markup=nextWeek_markup)
+
+@bot.message_handler(commands=['left'])
+def Command_Left(message):
+    bot.send_message(message.chat.id, gettimeleft(), reply_markup=Graf_markup, parse_mode='HTML')
+
+
+
+@bot.callback_query_handler(lambda query: query.data=='showgraf')
+def Left_Showgraf(query):
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft()+'\n\n'+Timetable_Output(),reply_markup=hidegraf_markup, parse_mode='HTML')
+@bot.callback_query_handler(lambda query: query.data=='hidegraf')
+def Left_Hidegraf(query):
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft(), reply_markup=showgraf_markup, parse_mode='HTML')
+@bot.callback_query_handler(lambda query: query.data=='nextweek')
+def Week_NextWeek(query):    
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+1), reply_markup=prevweek_markup, disable_web_page_preview=True, parse_mode='HTML')
+@bot.callback_query_handler(lambda query: query.data=='prevweek')
+def Week_PrevWeek(query):  
+        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+0), reply_markup=nextweek_markup,disable_web_page_preview=True, parse_mode='HTML')
+@bot.callback_query_handler(lambda query: query.data=='nextday')
+def Day_NextDay(query): 
+    text, markup=output(getdayofweek()+1,1)
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
+@bot.callback_query_handler(lambda query: query.data=='prevday')
+def Day_PrevDay(query):
+    text, markup=output(getdayofweek(),0)
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
+
+@bot.callback_query_handler(lambda query: query.data.find('timetable')!=-1)
+def Day_PrevDay(query):
+    button_callback_data = query.data.split(' ')[1]
+    back_button = types.InlineKeyboardMarkup()
+    back_button.add(types.InlineKeyboardButton(text='« Назад', callback_data=button_callback_data))
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=Timetable_Output(), reply_markup=back_button, parse_mode='HTML')
+
+@bot.callback_query_handler(lambda query: query.data.find('additional_lessons_info')!=-1)
+def back_to_rozklad(query):
+    button_callback_data = query.data.split(' ')[1]
+    back_button = types.InlineKeyboardMarkup()
+    back_button.add(types.InlineKeyboardButton(text='« Назад', callback_data=button_callback_data))
+    output=''
+    for i in lessons_additional:
+        output+=lessons_additional[i]['lesson_name']
+        if lessons_additional[i]['lesson_link']!=None:
+            output+=' - '
+            if lessons_additional[i]['lesson_link'] != None:
+                output+='<a href="'+lessons_additional[i]['lesson_link']+'">Лек. </a>'
+            if lessons_additional[i]['lesson_link_add'] != None:
+                output+='<a href="'+lessons_additional[i]['lesson_link_add']+'">Прак. </a>'
+                
+
+
+
+        if lessons_additional[i]['chat_link']!=None and lessons_additional[i]['classroom_link']!=None: 
+            output+=' ('
+            if lessons_additional[i]['chat_link']!=None:   
+                output+='<a href="'+lessons_additional[i]['chat_link']+'">Чат</a>' 
+            if lessons_additional[i]['classroom_link']!=None: 
+                output+=', <a href="'+lessons_additional[i]['classroom_link']+'">Класрум</a>'   
+            output+=')'
+        output+='\n'
+    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=back_button, disable_web_page_preview=True)
+
 
 def Timetable_Output():
     text=''
@@ -83,29 +170,23 @@ def output(tod,whatday):
                 rozklad+=' - <b><u>СЕЙЧАС</u></b>'
             rozklad+='\n'
         k+=1
+
+
     markup = types.InlineKeyboardMarkup()
     
-    if additional_lesson_found==True:
-        if whatday==0:
-            markup.add(
-                types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
-                types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info prevday'),
-            )
-        elif whatday==1:
-            markup.add(
-                types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
-                types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info nextday'),
-            )
+    if whatday==0:
+        markup.add(         types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
+                            types.InlineKeyboardButton(text='График', callback_data='timetable prevday'))
+        if additional_lesson_found==True:
+            markup.add(     types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info prevday'))
+
+    elif whatday==1:
+        markup.add(         types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
+                            types.InlineKeyboardButton(text='График', callback_data='timetable nextday'))
+        if additional_lesson_found==True:
+            markup.add(     types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info nextday'))
+
         
-    else:
-        if whatday==0:
-            markup.add(
-                types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
-            )
-        elif whatday==1:
-            markup.add(
-                types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
-            )
     return rozklad, markup
 
 def getcurrentlessonnumber(offset):
@@ -151,3 +232,4 @@ def gettimeleft():
     else:
         timeleft='Отдыхай, чумба'
     return timeleft
+

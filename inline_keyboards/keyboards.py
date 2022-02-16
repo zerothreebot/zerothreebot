@@ -73,3 +73,6 @@ nextWeek_markup.add(types.InlineKeyboardButton(text='Следущая недел
 
 Graf_markup = types.InlineKeyboardMarkup()
 Graf_markup.add(types.InlineKeyboardButton(text='Показать график', callback_data='showgraf'))
+
+
+delete_button=types.InlineKeyboardButton(text='Закрыть ❌', callback_data='delete_button')

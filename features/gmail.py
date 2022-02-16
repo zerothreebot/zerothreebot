@@ -76,7 +76,7 @@ class Email:
         return message_text
 
 from imap_tools import MailBox
-def job():
+def checker():
     with MailBox(gmail_host).login(username, app_password, 'INBOX') as mailbox:
         for msg in mailbox.fetch(criteria = "UNSEEN"):
 
