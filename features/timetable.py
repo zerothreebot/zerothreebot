@@ -170,7 +170,7 @@ def output(tod,whatday):
                 rozklad+=' - <b><u>СЕЙЧАС</u></b>'
             rozklad+='\n'
         k+=1
-    if timeleft!=None:
+    if timeleft!=None and whatday==0:
         rozklad+='\n'+timeleft
     
     markup = types.InlineKeyboardMarkup()

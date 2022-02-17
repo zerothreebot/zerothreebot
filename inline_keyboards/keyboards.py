@@ -43,7 +43,7 @@ marks_markup.add(
     )
 
 link_markup=types.InlineKeyboardMarkup()
-link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
+link_markup.add(types.InlineKeyboardButton(text='Перейти', url='https://t.me/zerothree_bot'))
 main_buttons=[]
 
 for i in lessons:

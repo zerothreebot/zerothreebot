@@ -10,7 +10,7 @@ from database.db import *
 from features.notifications import *
 from features.menu import *
 from features.tasks import *
-
+from features.birthday import *
 
 @bot.message_handler(commands=['list'])
 def addhomework(message):
@@ -28,19 +28,9 @@ def addhomework(message):
 def version_def(message):
     bot.send_message(message.chat.id, version+"\n"+github_link)
 
-
-@bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
-def bdpl(query):
-    count=int(query.data.split(' ')[1])
-    count+=1
-    reply_markup = types.InlineKeyboardMarkup()
-    reply_markup.add(types.InlineKeyboardButton(text='🎂 '+str(count), callback_data='plusone '+str(count)))
-
-    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=reply_markup)
-     
 @bot.message_handler(content_types=['animation'])
 def function_name(message):
-    print(message)
+    print(message.document.file_id)
 
 def startbot():
     bot.polling(non_stop=True, none_stop=True, interval=0)
