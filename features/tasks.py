@@ -70,6 +70,7 @@ def Videopad_Query(query):
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_back')
 def Videopad_Query(query):
     message_id=query.message.message_id
+    chat_id=query.message.chat.id
     bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text='Меню домашних заданий 📕',
