@@ -143,8 +143,7 @@ def getcurrentweek(tod):
 def output(tod,whatday):
     rozklad=''
     timeleft = gettimeleft()
-    if timeleft!=None:
-        rozklad+=timeleft+'\n\n'
+    
 
     if tod==7: tod=0
     rozklad+='<b>'+weekdays[tod]+'</b>'
@@ -171,8 +170,9 @@ def output(tod,whatday):
                 rozklad+=' - <b><u>СЕЙЧАС</u></b>'
             rozklad+='\n'
         k+=1
-
-
+    if timeleft!=None:
+        rozklad+='\n\n'+timeleft
+    
     markup = types.InlineKeyboardMarkup()
     
     if whatday==0:
