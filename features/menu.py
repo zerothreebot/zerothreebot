@@ -15,7 +15,7 @@ def menu_output(chat_id, user_id):
         else:
             output+='Контракт 💸'+'\n'
         if user[4]!=None:
-            output+='Почта КПИ: '+user[4]+'\n'
+            output+='💌 Почта КПИ: '+user[4]+'\n'
         if chat_id>0:
             if user[5]==True:
                 text='Звонок на пару: Вкл'
