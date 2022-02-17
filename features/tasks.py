@@ -50,6 +50,7 @@ def all_tasks_builder(user_id):
 def actual_tasks(message):
     if message.chat.id>0:
         bot.send_message(message.chat.id, 'Меню домашних заданий 📕', reply_markup=hwmenu_markup) 
+        bot.delete_message(message.chat.id, message.message_id)
     else:
         bot.send_message(message.chat.id, 'Эту команду можно использовать только в лс бота 😟', reply_markup=link_markup) 
 

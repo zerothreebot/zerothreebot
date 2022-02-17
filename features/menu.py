@@ -36,6 +36,7 @@ def menu(message):
         user_id=message.from_user.id
         output, reply_markup = menu_output(message.chat.id, user_id)
         bot.send_message(message.chat.id, output, reply_markup=reply_markup)
+        bot.delete_message(message.chat.id, message.message_id)
     else:
         bot.send_message(message.chat.id, 'Эту команду можно использовать только в лс бота 😟', reply_markup=link_markup) 
 
