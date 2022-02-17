@@ -340,7 +340,7 @@ def Videopad_Query(query):
 
     bot.edit_message_text(  chat_id=query.message.chat.id, 
                             message_id=query.message.message_id, 
-                            text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>:\n\nЕсли задание долгосрочное, реплайни "долгосрок" ', 
+                            text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nВышли дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>:\n\nЕсли задание долгосрочное, напиши "долгосрок" ', 
                             reply_markup=cancel_adding_markup)
 def finish_adding(user_id):
     if user_id in tasks_by_user:
@@ -384,8 +384,9 @@ def del_user_from_adding_hw(user_id):
 @bot.message_handler(func=lambda m: True) 
 def All(message):
     user_id=message.from_user.id
+    
     if user_id in tasks_by_user:
-        if message.reply_to_message!=None:
+        if message.chat.id>0:
             bot.delete_message(message.chat.id,message.reply_to_message.message_id)
             action=int(user_current_action[user_id].split(' ')[2])
             if action==2:
@@ -419,7 +420,7 @@ def All(message):
                     tasks_by_user[user_id]['date']=text
             
                     bot.send_message(   chat_id=message.chat.id, 
-                                        text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
+                                        text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nВышли описание задания', 
                                         reply_markup=cancel_adding_markup)
 
                 else:
@@ -448,17 +449,15 @@ def function_name(message):
     if user_id in tasks_by_user:
         action=int(user_current_action[user_id].split(' ')[2])
         if action==4:
-            
+            bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
             if len(tasks_by_user[user_id]['files'])<6:
                 id=message.document.file_id
-                print(id)
                 tasks_by_user[user_id]['files'].append(id)
                 bot.send_message(   chat_id=message.chat.id, 
                                     text='📃 Документов загружено: '+str(len(tasks_by_user[user_id]['files'])))
             else:
                 bot.send_message(   chat_id=message.chat.id, 
                                     text='Больше документов загрузить нельзя 😕')
-            print(len(tasks_by_user[user_id]['files']))
 
 @bot.callback_query_handler(lambda query: query.data==('cancel_adding'))
 def Videopad_Query(query):
