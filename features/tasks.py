@@ -386,7 +386,7 @@ def All(message):
     user_id=message.from_user.id
     
     if user_id in tasks_by_user:
-        if message.chat.id>0:
+        if message.reply_to_message!=None:
             bot.delete_message(message.chat.id,message.reply_to_message.message_id)
             action=int(user_current_action[user_id].split(' ')[2])
             if action==2:
