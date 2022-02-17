@@ -9,7 +9,7 @@ from database.db import *
 
 from features.notifications import *
 from features.menu import *
-from features.tasks import *
+
 from features.birthday import *
 
 @bot.message_handler(commands=['list'])
@@ -34,10 +34,12 @@ def function_name(message):
 
 def startbot():
     bot.polling(non_stop=True, none_stop=True, interval=0)
+    
 @bot.callback_query_handler(lambda query: query.data==('delete_button'))
 def Videopad_Query(query):
     bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
+from features.tasks import *
 import time
 import threading
 from threading import Thread
