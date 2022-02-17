@@ -171,7 +171,7 @@ def output(tod,whatday):
             rozklad+='\n'
         k+=1
     if timeleft!=None:
-        rozklad+='\n\n'+timeleft
+        rozklad+='\n'+timeleft
     
     markup = types.InlineKeyboardMarkup()
     
