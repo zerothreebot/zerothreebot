@@ -48,9 +48,10 @@ def Videopad_Query(query):
 
 @bot.callback_query_handler(lambda query: query.data=='show_tagging')
 def Videopad_Query(query):
-    bot.delete_message(     chat_id=chat_id, 
-                            message_id=tagging.message_id)
-
+    try:
+        bot.delete_message(     chat_id=chat_id, 
+                                message_id=tagging.message_id)
+    except:pass
     tagging.message_id = query.message.message_id
 
     bot.edit_message_text(  chat_id=chat_id, 
