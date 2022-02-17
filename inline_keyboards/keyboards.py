@@ -42,15 +42,16 @@ marks_markup.add(
                 
     )
 
-
+link_markup=types.InlineKeyboardMarkup()
+link_markup.add(types.InlineKeyboardButton(text='Посмотреть задание', url='https://t.me/zerothree_bot'))
 main_buttons=[]
-footer_buttons=[]
+
 for i in lessons:
-    print(lessons[i]['lesson_name'])
     main_buttons.append(types.InlineKeyboardButton(text=lessons[i]['lesson_name'], callback_data='addHWlesson '+str(i)))
 
-footer_buttons.append(types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding'))
-        
+footer_buttons=[]
+footer_buttons.append(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
+lessons_markup=types.InlineKeyboardMarkup(build_menu(main_buttons, 2, footer_buttons=footer_buttons))      
 cancel_adding_markup=types.InlineKeyboardMarkup()
 cancel_adding_button=types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancel_adding')
 cancel_adding_markup.add(cancel_adding_button)
@@ -60,7 +61,7 @@ finish_adding_button=types.InlineKeyboardButton(text='Создать 📃', call
 finish_adding_markup.add(cancel_adding_button, finish_adding_button)
 
   
-lessons_markup=types.InlineKeyboardMarkup(build_menu(main_buttons, 2, footer_buttons=footer_buttons))
+
 
 lessonsTomorrow_markup = types.InlineKeyboardMarkup()
 lessonsTomorrow_markup.add(types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'))
@@ -76,3 +77,10 @@ Graf_markup.add(types.InlineKeyboardButton(text='Показать график',
 
 
 delete_button=types.InlineKeyboardButton(text='Закрыть ❌', callback_data='delete_button')
+
+
+hwmenu_markup=types.InlineKeyboardMarkup()
+
+hwmenu_markup.add(  types.InlineKeyboardButton(text='Актуальные домашки ✅🕚', callback_data='hwmenu_actual'))
+hwmenu_markup.add(  types.InlineKeyboardButton(text='Все домашки...', callback_data='hwmenu_allhws'),
+                    types.InlineKeyboardButton(text='Добавить домашку ✍', callback_data='hwmenu_addhw'))

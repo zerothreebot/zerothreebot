@@ -1,7 +1,7 @@
 from telebot import types
 from settings import bot, chat_id
 from database.db import fetch, update
-
+from inline_keyboards.keyboards import link_markup
 def menu_output(chat_id, user_id):
     user = fetch('users', fetchone=True, rows='group_id, name, surname, contract, email, not_lesson_alert', where_column='id', where_value=user_id)
     if not user:
@@ -24,8 +24,7 @@ def menu_output(chat_id, user_id):
                 text='Звонок на пару: Выкл'
                 callback_data='alert turnon'
             reply_markup = types.InlineKeyboardMarkup()
-            reply_markup.add(   types.InlineKeyboardButton(text='Посмотреть список д/з', callback_data='back_to_tasks'),
-                                types.InlineKeyboardButton(text=text, callback_data=callback_data))
+            reply_markup.add(types.InlineKeyboardButton(text=text, callback_data=callback_data))
         else:
             reply_markup = None
         return output, reply_markup 
@@ -33,9 +32,12 @@ def menu_output(chat_id, user_id):
 
 @bot.message_handler(commands=['menu'])
 def menu(message):
-    user_id=message.from_user.id
-    output, reply_markup = menu_output(message.chat.id, user_id)
-    bot.send_message(message.chat.id, output, reply_markup=reply_markup)
+    if message.chat.id>0:
+        user_id=message.from_user.id
+        output, reply_markup = menu_output(message.chat.id, user_id)
+        bot.send_message(message.chat.id, output, reply_markup=reply_markup)
+    else:
+        bot.send_message(message.chat.id, 'Эту команду можно использовать только в лс бота 😟', reply_markup=link_markup) 
 
 
 @bot.callback_query_handler(lambda query: query.data.find('alert')!=-1)
