@@ -385,8 +385,9 @@ def del_user_from_adding_hw(user_id):
 def All(message):
     user_id=message.from_user.id
     if user_id in tasks_by_user:
-        if message.reply_to_message!=None:
+        if message.reply_to_message!=None and message.chat.id>0:
             bot.delete_message(message.chat.id,message.reply_to_message.message_id)
+            bot.delete_message(message.chat.id,message.message_id)
             action=int(user_current_action[user_id].split(' ')[2])
             if action==2:
                 text=message.text
