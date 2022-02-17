@@ -495,9 +495,9 @@ def actual_tasks_builder(user_id):
                 if deadline==datetime.date(2222,1,1):
                     deadline='долгосрок'
                 if toadd=='✅':
-                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'</i></s>\n'
+                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'</i></s>\n'
                 else:
-                    output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(i[1])+'</b>\n'
+                    output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'</b>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])))
 
         columns=round(actual_tasks_count**(1/2))
