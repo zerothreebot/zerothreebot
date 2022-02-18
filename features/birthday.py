@@ -112,11 +112,18 @@ def birthday_prepare(days_left, message):
     todays_date=date.today()+timedelta(days=days_left)
     users=fetch('birthdates', rows='id, date')
 
+    todays_day_count=todays_date.day
+    todays_month_count=todays_date.month
+
+
+
     for i in users:
         user_bd_id = i[0]
         birthdate = i[1]
+        bd_day_count=birthdate.day
+        bd_month_count=birthdate.month
 
-        if todays_date==birthdate:
+        if bd_day_count==todays_day_count and todays_month_count==bd_month_count:
             
             member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
             photo = bot.get_user_profile_photos(user_bd_id)
