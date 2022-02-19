@@ -12,17 +12,18 @@ from features.menu import *
 
 from features.birthday import *
 
+
+result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
+group_list_output=''
+for i in result:
+    group_id = i[0]
+    name = i[1]
+    surname = i[2]
+    group_list_output+=str(group_id)+' - '+name+' '+surname+'\n'
+
 @bot.message_handler(commands=['list'])
 def addhomework(message):
-    result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
-    output=''
-    for i in result:
-        group_id = i[0]
-        name = i[1]
-        surname = i[2]
-        output+=str(group_id)+' - '+name+' '+surname+'\n'
-
-    bot.send_message(message.chat.id, output)
+    bot.send_message(message.chat.id, group_list_output)
 
 @bot.message_handler(commands=['version']) 
 def version_def(message):

@@ -1,7 +1,9 @@
 from telebot import types
 from settings import bot, chat_id
 from database.db import fetch
+
 import schedule
+import random
 from datetime import date, timedelta 
  
 @bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
@@ -75,7 +77,7 @@ animations=[
 
 
 
-import random
+
 def birthday_today():
     todays_date=date.today()
     users=fetch('birthdates', rows='id, date')
@@ -97,11 +99,13 @@ def birthday_today():
 
             random_quote=random.choice(birthday_quotes).replace('hyperlink', hyperlink)
             random_animation=random.choice(animations)
+
+            #chat_id=393483876 #DELETE ON DEPLOY
+
             message_id=bot.send_animation(  chat_id=chat_id,
                                             animation=random_animation,
                                             caption=random_quote,
-                                            reply_markup=reply_markup).message_id
-                                    
+                                            reply_markup=reply_markup).message_id                   
             bot.send_message(   chat_id=chat_id,
                                 text='🎉')
             bot.pin_chat_message(   chat_id=chat_id,
@@ -127,7 +131,7 @@ def birthday_prepare(days_left, message):
             
             member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
             photo = bot.get_user_profile_photos(user_bd_id)
-
+            
             if photo.total_count!=0:
                 photo_id=photo.photos[0][0].file_id
 
@@ -138,17 +142,17 @@ def birthday_prepare(days_left, message):
 
 
             for j in users:
-                user_id = j[0]
-                if user_id!=user_bd_id:
+                    user_id = j[0]
+                #if user_id!=user_bd_id:
+                #if user_id==393483876: #DELETE ON DEPLOY 
                     try: 
-                        #if user_id==393483876:
-                            if photo.total_count!=0:
-                                bot.send_photo(     chat_id=user_id,
-                                                    caption=message+' у '+hyperlink+' день рождения 🎉\nНе забудьте поздравить в чате группы ☺️',
-                                                    photo=photo_id)
-                            else:
-                                bot.send_message(   chat_id=user_id,
-                                                    text=message+' у '+hyperlink+' день рождения 🎉\nНе забудьте поздравить в чате группы ☺️')
+                        if photo.total_count!=0:
+                            bot.send_photo(     chat_id=user_id,
+                                                caption=message+' у '+hyperlink+' день рождения 🎉\nНе забудьте поздравить в чате группы ☺️',
+                                                photo=photo_id)
+                        else:
+                            bot.send_message(   chat_id=user_id,
+                                                text=message+' у '+hyperlink+' день рождения 🎉\nНе забудьте поздравить в чате группы ☺️')
                     except:pass
 
 def birthday_1day_before():
@@ -158,7 +162,7 @@ def birthday_3days_before():
     birthday_prepare(3,'Через 3 дня')
 
 
-
-schedule.every().day.at("12:00").do(birthday_today)
+#schedule.every(10).seconds.do(birthday_1day_before)
+schedule.every().day.at("07:30").do(birthday_today) #8:00
+schedule.every().day.at("12:00").do(birthday_1day_before)
 schedule.every().day.at("14:00").do(birthday_3days_before)
-schedule.every().day.at("16:00").do(birthday_1day_before)
