@@ -4,7 +4,7 @@ from database.db import *
 from features.lessons import *
 from datetime import date
 from inline_keyboards.keyboards import *
-
+from features.date import *
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_allhws')
@@ -139,6 +139,7 @@ def SendTaskContent(message, task_id):
         return False   
 
 
+
 @bot.callback_query_handler(lambda query: query.data.find('watchnewtask2')!=-1)
 def Videopad_Query(query):
     bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
@@ -148,17 +149,15 @@ def Videopad_Query(query):
 
 def Lesson_Output_String(assigned_by, lesson_id, assign_date, need_to_be_done, task_mission, task_id):
     
-    #user=fetch('users', fetchone=True, rows='name, surname', where_column='id', where_value=assigned_by)
-    #name=user[0]+' '+user[1]
-
     output='ID: '+str(task_id)+'\n'
     output+='📕 Предмет: '+lessons[lesson_id]['lesson_name']+'\n'
-    #output+='🙃 Создано: '+name+'\n'
-    #output+='🕘 Дата создания: '+str(assign_date)+'\n'
+    #output+='🙃 Создано: '+assigned_by+'\n'
+    #output+='🕘 Дата создания: '+convert_date(assign_date)+'\n'
     if need_to_be_done==datetime.date(2222,1,1):
-        need_to_be_done='<b>Это долгосрочное задание. Если вы отметите его выполненым, то оно пропадет из /hw и найти его можно будет только в /hwall</b>'
-    output+='🔥 Дедлайн: '+str(need_to_be_done)+'\n\n'
-    output+='✍ Задание: '+task_mission+'\n'
+        output+='🔥 Дедлайн: <b>Это долгосрочное задание. Если вы отметите его выполненым, то оно пропадет из /hw и найти его можно будет только в /hwall</b>'
+    else:
+        output+='🔥 Дедлайн: '+convert_date(need_to_be_done)+' ('+days_left(need_to_be_done)+')'
+    output+='\n\n✍ Задание: '+task_mission+'\n'
     return output
 
 def Watch_Task_Process(task_id, user_id, back_to_all_hws):
@@ -353,22 +352,25 @@ def finish_adding(user_id):
             day=int(1)
             month=int(1)
             year=int(2222)
-
-        lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], datetime.date(year, month, day), tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
+        deadline_date=datetime.date(year, month, day)
+        lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], deadline_date, tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
         users=fetch('users', rows='id')
+        deadline=convert_date(deadline_date)+' ('+days_left(deadline_date)+')'
 
+        message='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+deadline
+        watch_new_task = types.InlineKeyboardMarkup()
+        watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(lesson_id)))
+        
         for i in users:
-            #if i[0]==admin_id:
-                watch_new_task = types.InlineKeyboardMarkup()
-                watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(lesson_id)))
+            #if i[0]==1:
                 try: bot.send_message(      chat_id=i[0], 
-                                            text='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                            text=message, 
                                             reply_markup=watch_new_task)
                     
                 except: pass
                 
         bot.send_message(   chat_id=chat_id,
-                                    text='#task\n⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+tasks_by_user[user_id]['date'], 
+                                    text='#task\n'+message, 
                                     reply_markup=link_markup)
                 
 
@@ -413,11 +415,11 @@ def All(message):
                     fail='format'
 
                 
-
+                
                 if fail == None:
                     user_current_action[user_id]='addhw step 3'
                     tasks_by_user[user_id]['date']=text
-            
+
                     bot.send_message(   chat_id=message.chat.id, 
                                         text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
                                         reply_markup=cancel_adding_markup)
@@ -495,10 +497,13 @@ def actual_tasks_builder(user_id):
                 actual_tasks_count+=1
                 if deadline==datetime.date(2222,1,1):
                     deadline='долгосрок'
-                if toadd=='✅':
-                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'</i></s>\n'
                 else:
-                    output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+str(deadline)+'</b>\n'
+                    deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
+
+                if toadd=='✅':
+                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+deadline+'</i></s>\n'
+                else:
+                    output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+deadline+'</b>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])))
 
         columns=round(actual_tasks_count**(1/2))
