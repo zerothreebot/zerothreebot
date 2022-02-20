@@ -15,13 +15,16 @@ def days_left(date_deadline):
     if days_count.days==0:
         return 'Сегодня'
     output=str(days_count.days)+' '
-    last_digit=days_count.days % 10
-    if last_digit==1:
-        output+='день'
-    elif last_digit==2 or last_digit==3 or last_digit==4:
-        output+='дня'
-    else:
+    if days_count>=10 and days_count<=20:
         output+='дней'
+    else:
+        last_digit=days_count.days % 10
+        if last_digit==1:
+            output+='день'
+        elif last_digit==2 or last_digit==3 or last_digit==4:
+            output+='дня'
+        else:
+            output+='дней'
 
     return output
 
