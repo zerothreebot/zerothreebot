@@ -172,11 +172,10 @@ def output(tod,whatday):
             rozklad+='🎉'
             k=0
             for i in today_users_birthday:
+                hyperlink='<b>'+i['name']+'</b>'
                 if k==0:
-                    hyperlink='<a href="tg://user?id='+str(i['id'])+'">'+i['name']+'</a>'
                     rozklad+=hyperlink
                 else:
-                    hyperlink='<a href="tg://user?id='+str(i['id'])+'">'+i['name']+'</a>'
                     rozklad+=', '+hyperlink
                 k+=1
             rozklad+='🎉\n\n'
