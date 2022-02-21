@@ -19,9 +19,9 @@ def days_left(date_deadline):
         output+='дней'
     else:
         last_digit=days_count.days % 10
-        if last_digit==1:
+        if last_digit==1 or last_digit==-1:
             output+='день'
-        elif last_digit==2 or last_digit==3 or last_digit==4:
+        elif last_digit==2 or last_digit==3 or last_digit==4 or last_digit==-2 or last_digit==-3 or last_digit==-4:
             output+='дня'
         else:
             output+='дней'

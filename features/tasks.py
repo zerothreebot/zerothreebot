@@ -55,7 +55,7 @@ def lost_tasks_builder(user_id):
             if str(user_id) not in task_done_by:
 
                 losttasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' lost'))
-                output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
+                output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+deadline+'\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
@@ -93,7 +93,7 @@ def all_tasks_builder(user_id):
             deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
 
         alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' all'))
-        output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
+        output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+deadline+'\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
