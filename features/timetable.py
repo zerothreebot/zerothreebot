@@ -1,12 +1,13 @@
 from datetime import datetime
+from queue import Empty
 from time import gmtime,strftime
 from telebot import types
+import schedule
 
-from settings import tz, bot
+from settings import tz, bot, chat_id
 from database.week import *
 from inline_keyboards.keyboards import *
 from features.lessons import lessons_additional
-
 
 @bot.message_handler(commands=['today'])
 def Command_Today(message):
@@ -141,10 +142,44 @@ def getcurrentweek(tod):
     
     return weekroz
 
+today_users_birthday=[]
+
+def define_birthday_users():
+    global today_users_birthday
+    today_users_birthday=[]
+    todays_date=datetime.date.today()
+    users=fetch('birthdates', rows='id, date')
+    for i in users:
+        user_bd_id = i[0]
+        birthdate = i[1]
+        member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
+        fullname=member.user.first_name
+        if member.user.last_name!=None:
+            fullname+=' '+member.user.last_name
+
+        if todays_date==birthdate:
+            today_users_birthday.append({'name':fullname, 'id':user_bd_id})
+define_birthday_users()
+
+
+schedule.every().day.at("01:30").do(define_birthday_users)
+
 def output(tod,whatday):
     rozklad=''
     timeleft = gettimeleft()
-    
+    if whatday==0:
+        if today_users_birthday!=[]:
+            rozklad+='🎉'
+            k=0
+            for i in today_users_birthday:
+                if k==0:
+                    hyperlink='<a href="tg://user?id='+str(i['id'])+'">'+i['name']+'</a>'
+                    rozklad+=hyperlink
+                else:
+                    hyperlink='<a href="tg://user?id='+str(i['id'])+'">'+i['name']+'</a>'
+                    rozklad+=', '+hyperlink
+                k+=1
+            rozklad+='🎉\n\n'
 
     if tod==7: tod=0
     rozklad+='<b>'+weekdays[tod]+'</b>'
