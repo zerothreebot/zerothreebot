@@ -11,17 +11,19 @@ def convert_date(date, show_year=False):
 def days_left(date_deadline):
     date_today=date.today()
     days_count=date_deadline-date_today
-    
-    if days_count.days==0:
+    days_left=days_count.days
+
+    if days_left==0:
         return 'Сегодня 💥'
-    output=str(days_count.days)+' '
-    if days_count.days % 100 >= 10 and days_count.days % 100 <= 20:
+
+    if days_left<0:
+        days_left*=-1
+
+    output=str(days_left)+' '
+    if days_left % 100 >= 10 and days_left % 100 <= 20:
         output+='дней'
     else:
-        last_digit=days_count.days % 10
-        
-        if last_digit<0:
-            last_digit*=-1
+        last_digit=days_left % 10
 
         if last_digit==1:
             output+='день'

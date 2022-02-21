@@ -86,6 +86,8 @@ schedule.every().day.at("12:00").do(notifications_2days_before)
 from database.week import week
 from features.timetable import *
 def lesson_started():
+    lessonsToday_markup= types.InlineKeyboardMarkup()
+    lessonsToday_markup.add(types.InlineKeyboardButton(text='Расписание на сегодня', callback_data='prevday'))
     users=fetch('users', rows='id, not_lesson_alert')
     k=1
     for i in week[getweek()][getdayofweek()]:
