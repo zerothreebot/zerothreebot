@@ -7,27 +7,28 @@ from database.week import *
 from inline_keyboards.keyboards import *
 from features.lessons import lessons_additional
 
-@bot.message_handler(commands=['start']) 
-def Command_Marks(message):
-    bot.send_message(chat_id=message.chat.id, text='Привет. Это персональный бот группы БС-03 который помогает в организации учёбного процесса.\n\nВоспользуйся командами чтобы посмотреть что он умеет)')
-
-@bot.message_handler(commands=['marks'])
-def Command_Marks(message):
-    bot.send_message(chat_id=message.chat.id, text='<pre>КПИ ФБМИ 122 2022 БС</pre>', reply_markup=marks_markup)
 
 @bot.message_handler(commands=['today'])
 def Command_Today(message):
     text, markup=output(getdayofweek(),0)
-    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
+    bot.send_message(   chat_id=message.chat.id, 
+                        text=text, disable_web_page_preview=True,
+                        reply_markup=markup)
 
 @bot.message_handler(commands=['tomorrow'])
 def Command_Tomorrow(message):
     text, markup=output(getdayofweek()+1,1)
-    bot.send_message(message.chat.id, text, disable_web_page_preview=True,reply_markup=markup, parse_mode='HTML')
+    bot.send_message(   chat_id=message.chat.id, 
+                        text=text, 
+                        disable_web_page_preview=True,
+                        reply_markup=markup)
 
 @bot.message_handler(commands=['week'])
 def Command_Week(message):
-    bot.send_message(message.chat.id,getcurrentweek(getweek()), disable_web_page_preview=True, parse_mode='HTML', reply_markup=nextWeek_markup)
+    bot.send_message(   chat_id=message.chat.id,
+                        text=getcurrentweek(getweek()), 
+                        disable_web_page_preview=True, 
+                        reply_markup=nextWeek_markup)
 
 
 
@@ -154,7 +155,7 @@ def output(tod,whatday):
     k=1
     additional_lesson_found=False
     for i in week[getweek()][tod]:
-        if i=='Отдыхай, чумба':
+        if i=='Отдыхай 😅':
             rozklad+=i+'\n'
             break
         elif i['lesson']!='-':
@@ -177,15 +178,15 @@ def output(tod,whatday):
     
     if whatday==0:
         markup.add(         types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
-                            types.InlineKeyboardButton(text='График', callback_data='timetable prevday'))
+                            types.InlineKeyboardButton(text='График 📃', callback_data='timetable prevday'))
         if additional_lesson_found==True:
-            markup.add(     types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info prevday'))
+            markup.add(     types.InlineKeyboardButton(text='Ссылки допов 🔗', callback_data='additional_lessons_info prevday'))
 
     elif whatday==1:
         markup.add(         types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
-                            types.InlineKeyboardButton(text='График', callback_data='timetable nextday'))
+                            types.InlineKeyboardButton(text='График 📃', callback_data='timetable nextday'))
         if additional_lesson_found==True:
-            markup.add(     types.InlineKeyboardButton(text='Ссылки допов', callback_data='additional_lessons_info nextday'))
+            markup.add(     types.InlineKeyboardButton(text='Ссылки допов 🔗', callback_data='additional_lessons_info nextday'))
 
         
     return rozklad, markup

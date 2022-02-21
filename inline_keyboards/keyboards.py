@@ -1,14 +1,25 @@
 from telebot import types
+
 from features.lessons import lessons
 
-tagmarkup = types.InlineKeyboardMarkup()
-tagmarkup.add(types.InlineKeyboardButton(text='🗑 Убрать меня из списка', callback_data='delme'), types.InlineKeyboardButton(text='📩 Добавить меня в список', callback_data='addme'))
+def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None): #Строит меню из массива кнопок. Принимает массив кнопок и кол-во столбцов в меню.
+
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+    
+    if header_buttons:
+        menu.insert(0, header_buttons)
+    if footer_buttons:
+        menu.append(footer_buttons)
+    return menu
+
+tagging_markup = types.InlineKeyboardMarkup()
+tagging_markup.add(types.InlineKeyboardButton(text='🗑 Убрать меня из списка', callback_data='delme'), types.InlineKeyboardButton(text='📩 Добавить меня в список', callback_data='addme'))
 
 hidegraf_markup = types.InlineKeyboardMarkup()
-hidegraf_markup.add(types.InlineKeyboardButton(text='Скрыть график', callback_data='hidegraf'))
+hidegraf_markup.add(types.InlineKeyboardButton(text='Скрыть график 🙈', callback_data='hidegraf'))
 
 showgraf_markup = types.InlineKeyboardMarkup()
-showgraf_markup.add(types.InlineKeyboardButton(text='Показать график', callback_data='showgraf'))
+showgraf_markup.add(types.InlineKeyboardButton(text='Показать график 👁', callback_data='showgraf'))
 
 prevweek_markup = types.InlineKeyboardMarkup()
 prevweek_markup.add(types.InlineKeyboardButton(text='« Текущая неделя', callback_data='prevweek'))
@@ -23,27 +34,18 @@ nextday_markup = types.InlineKeyboardMarkup()
 nextday_markup.add(types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'))
 
 tagAllConfirm_markup = types.InlineKeyboardMarkup()
-tagAllConfirm_markup.add(types.InlineKeyboardButton(text='Да', callback_data='yes sure'), types.InlineKeyboardButton(text='Нет', callback_data='not sure'))
-
-def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None): #Строит меню из массива кнопок. Принимает массив кнопок и кол-во столбцов в меню.
-
-    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-    
-    if header_buttons:
-        menu.insert(0, header_buttons)
-    if footer_buttons:
-        menu.append(footer_buttons)
-    return menu
+tagAllConfirm_markup.add(types.InlineKeyboardButton(    text='Да ✅', callback_data='tagall_accept'), 
+                                                        types.InlineKeyboardButton(text='Нет ❌', callback_data='tagall_cancel'))
 
 marks_markup = types.InlineKeyboardMarkup()
 marks_markup.row_width=5
 marks_markup.add(     
-                    types.InlineKeyboardButton(text='Итоговые оценки 3-го семестра 📈', url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),
-                
+                    types.InlineKeyboardButton( text='Итоговые оценки 3-го семестра 📈', 
+                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),        
     )
 
 link_markup=types.InlineKeyboardMarkup()
-link_markup.add(types.InlineKeyboardButton(text='Перейти', url='https://t.me/zerothree_bot'))
+link_markup.add(types.InlineKeyboardButton(text='Перейти 🤖', url='https://t.me/zerothree_bot'))
 main_buttons=[]
 
 for i in lessons:
@@ -72,9 +74,6 @@ lessonsToday_markup.add(types.InlineKeyboardButton(text='« Расписание
 nextWeek_markup = types.InlineKeyboardMarkup()
 nextWeek_markup.add(types.InlineKeyboardButton(text='Следущая неделя »', callback_data='nextweek'))
 
-Graf_markup = types.InlineKeyboardMarkup()
-Graf_markup.add(types.InlineKeyboardButton(text='Показать график', callback_data='showgraf'))
-
 
 delete_button=types.InlineKeyboardButton(text='Закрыть ❌', callback_data='delete_button')
 
@@ -82,5 +81,6 @@ delete_button=types.InlineKeyboardButton(text='Закрыть ❌', callback_dat
 hwmenu_markup=types.InlineKeyboardMarkup()
 
 hwmenu_markup.add(  types.InlineKeyboardButton(text='Актуальные домашки ✅🕚', callback_data='hwmenu_actual'))
-hwmenu_markup.add(  types.InlineKeyboardButton(text='Все домашки...', callback_data='hwmenu_allhws'),
-                    types.InlineKeyboardButton(text='Добавить домашку ✍', callback_data='hwmenu_addhw'))
+hwmenu_markup.add(  types.InlineKeyboardButton(text='Добавить домашку ✍', callback_data='hwmenu_addhw'))
+hwmenu_markup.add(  types.InlineKeyboardButton(text='Пропущенные 😓', callback_data='hwmenu_losthws'),
+                    types.InlineKeyboardButton(text='Все домашки 📃', callback_data='hwmenu_allhws'))

@@ -38,22 +38,15 @@ for z in range(0,2):
                 array.append({'lesson':lessons[lesson_id]['lesson_name'], 'type':type_, 'where':where, 'link':link})
         
         week[z].append(array)
-    week[z].append([{'lesson':'Отдыхай, чумба', 'type':'', 'where':'', 'link':''}])
+    week[z].append([{'lesson':'Отдыхай 😅', 'type':'', 'where':'', 'link':''}])
     
- 
-
-
-
-
-
-
-
 
 paras=[     '<i>1 пара</i>  <b>08:30 - 10:05</b>',
             '<i>2 пара</i>  <b>10:25 - 12:00</b>',
             '<i>3 пара</i>  <b>12:20 - 13:55</b>',
             '<i>4 пара</i>  <b>14:15 - 15:50</b>',
             '<i>5 пара</i>  <b>16:10 - 17:45</b>']
+
 
 weekdays = {
     0: 'Понедельник',

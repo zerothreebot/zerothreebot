@@ -1,23 +1,26 @@
 from telebot import types
-from settings import bot, chat_id
-from database.db import fetch
-
 import schedule
 import random
 from datetime import date, timedelta 
+
+from settings import bot, chat_id
+from database.db import fetch
  
 @bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
 def bdpl(query):
+    emojii=query.data.split(' ')[0]
     count=int(query.data.split(' ')[1])
     count+=1
+
     reply_markup = types.InlineKeyboardMarkup()
-    reply_markup.add(types.InlineKeyboardButton(text='🎂 '+str(count), callback_data='plusone '+str(count)))
+    reply_markup.add(types.InlineKeyboardButton(text=emojii+' '+str(count), callback_data='plusone '+str(count)))
     
     bot.edit_message_reply_markup(  chat_id=query.message.chat.id, 
                                     message_id=query.message.message_id, 
                                     reply_markup=reply_markup)
+    bot.answer_callback_query(  callback_query_id=query.id, 
+                                text=emojii)
  
-
 birthday_quotes=[
 'Ну наконец-то! Целый год ждал этого дня — дня рождения hyperlink. Поздравляю 🎉',
 'Данной мне безграничной властью над Вселенной освобождаю hyperlink от любых дел сегодня. Не завидуйте, у него сегодня тяжелый день — постарел на год. С днем рождения 🎉',
@@ -73,11 +76,6 @@ animations=[
 ]
 
 
-
-
-
-
-
 def birthday_today():
     todays_date=date.today()
     users=fetch('birthdates', rows='id, date')
@@ -129,8 +127,9 @@ def birthday_prepare(days_left, message):
 
         if bd_day_count==todays_day_count and todays_month_count==bd_month_count:
             
-            member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
-            photo = bot.get_user_profile_photos(user_bd_id)
+            member=bot.get_chat_member( chat_id=chat_id, 
+                                        user_id=user_bd_id)
+            photo = bot.get_user_profile_photos(user_id=user_bd_id)
             
             if photo.total_count!=0:
                 photo_id=photo.photos[0][0].file_id
@@ -163,6 +162,6 @@ def birthday_3days_before():
 
 
 #schedule.every(10).seconds.do(birthday_1day_before)
-schedule.every().day.at("07:30").do(birthday_today) #8:00
+schedule.every().day.at("07:30").do(birthday_today)
 schedule.every().day.at("12:00").do(birthday_1day_before)
 schedule.every().day.at("14:00").do(birthday_3days_before)

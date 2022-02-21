@@ -1,9 +1,10 @@
 
 from telebot import types
-from settings import bot, chat_id
-from database.db import fetch
 import schedule
 from datetime import datetime
+
+from settings import bot
+from database.db import fetch
 
 
 @bot.message_handler(commands=['sendall']) # Shows how much time till lesson/break ends with timetable button
@@ -12,20 +13,27 @@ def Command_Left(message):
     sendall.add(    types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancelsendall'),
                     types.InlineKeyboardButton(text='Отправить всем 🕊️', callback_data='sendall'))
     text=message.text.replace('/sendall ','')
+    bot.delete_message( chat_id=message.chat.id, 
+                        message_id=message.message_id)
     bot.send_message(message.chat.id, text, reply_markup=sendall)
 
 @bot.callback_query_handler(lambda query: query.data=='sendall')
 def Left_Showgraf(query):
     result=fetch(table='users', rows="id")
+    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id,reply_markup=None)
     for i in result:
         #if i[0]==admin_id:
         try:
             bot.send_message(chat_id=i[0], text=query.message.text)
         except: pass
-    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id,reply_markup=None)
+    bot.answer_callback_query(  callback_query_id=query.id, 
+                                text='Отправлено 🕊')
+    
 
 @bot.callback_query_handler(lambda query: query.data=='cancelsendall')
 def Left_Showgraf(query):
+    bot.answer_callback_query(  callback_query_id=query.id, 
+                                text='Отменено ❌')
     bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
 
 
@@ -79,14 +87,16 @@ def lesson_started():
     k=1
     for i in week[getweek()][getdayofweek()]:
         print(k, getcurrentlessonnumber(True),'---------', i)
-        if i['lesson']!='-' and i['lesson']!='Отдыхай, чумба':
+        if i['lesson']!='-' and i['lesson']!='Отдыхай 😅':
             if k==getcurrentlessonnumber(True):
                 for i in users:
                     user_id=i[0]
                     alert=i[1]
                     
                     if alert==True:
-                        try:bot.send_message(chat_id=user_id, text='Пара начнется через 10 минут! /today')
+                        try:bot.send_message(   chat_id=user_id, 
+                                                text='🔔 Пара начнется через 10 минут!',
+                                                reply_markup=lessonsToday_markup)
                         except:
                             pass
                 break

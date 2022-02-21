@@ -13,7 +13,7 @@ def days_left(date_deadline):
     days_count=date_deadline-date_today
     
     if days_count.days==0:
-        return 'Сегодня'
+        return 'Сегодня 💥'
     output=str(days_count.days)+' '
     if days_count.days % 100 >= 10 and days_count.days % 100 <= 20:
         output+='дней'

@@ -1,9 +1,11 @@
 import psycopg2
 import os
 import datetime
+
 DB_URI=os.environ.get('DATABASE_URL', None)
 db_connection = psycopg2.connect(DB_URI, sslmode='require')
 db_object = db_connection.cursor()
+
 
 def list_to_str(lst):
     if len(lst)==0:
@@ -67,6 +69,4 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
 def remove_task(task_id): #remove_task(5)
     db_object.execute(f"DELETE FROM tasks WHERE id={task_id}")
     db_connection.commit()
-
-
 
