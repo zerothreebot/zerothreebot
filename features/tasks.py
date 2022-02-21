@@ -38,26 +38,32 @@ def lost_tasks_builder(user_id):
     tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline', order_by='id')
 
 
-    alltasks_buttons=[]
+    losttasks_buttons=[]
     output='😓 Вот пропущенные вами домашки:\n\n'
     for i in tasks:
         lesson_id=i[0]
         task_id=i[1]
         task_done_by=i[2]
         deadline=i[3]
+
+        if deadline==datetime.date(2222,1,1):
+            deadline='долгосрок'
+        else:
+            deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
+
         if task_done_by!=None:
             if str(user_id) not in task_done_by:
 
-                alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' lost'))
+                losttasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' lost'))
                 output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
 
-    columns=round(len(alltasks_buttons)**(1/2))
+    columns=round(len(losttasks_buttons)**(1/2))
 
     tasks_markup=types.InlineKeyboardMarkup(
-        build_menu(alltasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')])
+        build_menu(losttasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')])
         )  
     return output, tasks_markup
 
@@ -80,6 +86,12 @@ def all_tasks_builder(user_id):
                 toadd='🕚'
         else:
             toadd='🕚'
+            
+        if deadline==datetime.date(2222,1,1):
+            deadline='долгосрок'
+        else:
+            deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
+
         alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' all'))
         output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+str(deadline)+'\n'
     

@@ -42,10 +42,10 @@ def notification_tasks(days_left, message):
     users=fetch('users', rows='id')
     tasks=fetch('tasks', rows='done_by, lesson_id, id', where_column='deadline', where_value="'"+str(todays_date)+"'")
     
-
     users_list=[]
     for i in users:
         users_list.append(i[0])
+        
     for i in tasks:
         done_by=i[0]
         lesson_id=i[1]
