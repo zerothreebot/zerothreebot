@@ -40,21 +40,24 @@ def Left_Showgraf(query):
 def notification_tasks(days_left, message):
     todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
     users=fetch('users', rows='id')
-    task=fetch('tasks', rows='done_by, need_to_be_done, lesson_id, id', where_column='need_to_be_done', where_value="'"+str(todays_date)+"'")
-    print(task)
+    tasks=fetch('tasks', rows='done_by, lesson_id, id', where_column='deadline', where_value="'"+str(todays_date)+"'")
+    
+
     users_list=[]
     for i in users:
         users_list.append(i[0])
-    for i in task:
+    for i in tasks:
         done_by=i[0]
+        lesson_id=i[1]
+        task_id=i[2]
         for j in users_list:
             #if j==admin_id:
             if str(j) not in done_by:
                 watch_deadline_task = types.InlineKeyboardMarkup()
-                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(i[3])))
+                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(task_id)))
                 try:
                     bot.send_message(   chat_id=j, 
-                                        text='Вы не выполнили задание с '+lessons[i[2]]['lesson_name']+'\n\n'+message, 
+                                        text='Вы не выполнили задание с '+lessons[lesson_id]['lesson_name']+'\n\n'+message, 
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass
