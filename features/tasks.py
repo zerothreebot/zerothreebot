@@ -60,7 +60,13 @@ def lost_tasks_builder(user_id):
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
 
-    columns=round(len(losttasks_buttons)**(1/2))
+    columns=7
+    tasks_count=len(losttasks_buttons)
+    toadd_blanks=columns-tasks_count%columns
+    if toadd_blanks!=0 and tasks_count!=0:
+        for i in range(toadd_blanks):
+            losttasks_buttons.append(types.InlineKeyboardButton(text='...', callback_data='blank'))
+
 
     tasks_markup=types.InlineKeyboardMarkup(
         build_menu(losttasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')])
@@ -98,8 +104,12 @@ def all_tasks_builder(user_id):
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
 
-    columns=round(len(alltasks_buttons)**(1/2))
-
+    columns=7
+    tasks_count=len(alltasks_buttons)
+    toadd_blanks=columns-tasks_count%columns
+    if toadd_blanks!=0 and tasks_count!=0:
+        for i in range(toadd_blanks):
+            alltasks_buttons.append(types.InlineKeyboardButton(text='...', callback_data='blank'))
     tasks_markup=types.InlineKeyboardMarkup(build_menu(alltasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')]))  
     return output, tasks_markup
      
@@ -212,7 +222,7 @@ def NameDoesntMatter(query):
     bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
     task_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
-    Watch_Task_Process(task_id, user_id, False)
+    Watch_Task_Process(task_id, user_id, 'actual')
 
 
 def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id): 
@@ -581,11 +591,7 @@ def actual_tasks_builder(user_id):
                     output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+deadline+'</b>\n'
                 lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])+' actual'))
 
-        columns=round(actual_tasks_count**(1/2))
-        if columns>6:
-            columns=6
-        elif columns<3:
-            columns=3
+        columns=5
         
         reply_markup=types.InlineKeyboardMarkup(build_menu(lst, columns))
         return output, reply_markup
