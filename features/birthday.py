@@ -169,4 +169,4 @@ def birthday_3days_before():
 #schedule.every(10).seconds.do(birthday_1day_before)
 schedule.every().day.at("07:30").do(birthday_today)
 schedule.every().day.at("12:00").do(birthday_1day_before)
-schedule.every().day.at("14:00").do(birthday_3days_before)
+schedule.every().day.at("12:00").do(birthday_3days_before)
