@@ -103,8 +103,8 @@ def birthday_today():
 
             #chat_id=393483876 #DELETE ON DEPLOY
             for j in users:
-                    user_id = j[0]
-                #if user_id!=user_bd_id:
+                user_id = j[0]
+                if user_id!=user_bd_id:
                 #if user_id==393483876: #DELETE ON DEPLOY 
                     try: 
                         if photo.total_count!=0:
@@ -151,8 +151,8 @@ def birthday_prepare(days_left, message):
 
 
             for j in users:
-                    user_id = j[0]
-                #if user_id!=user_bd_id:
+                user_id = j[0]
+                if user_id!=user_bd_id:
                 #if user_id==393483876: #DELETE ON DEPLOY 
                     try: 
                         bot.send_message(   chat_id=user_id,
