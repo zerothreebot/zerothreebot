@@ -85,7 +85,7 @@ schedule.every().day.at("12:00").do(notifications_2days_before)
 
 from database.week import week
 from features.timetable import *
-def lesson_started():
+def lesson_started(message_text):
     lessonsToday_markup= types.InlineKeyboardMarkup()
     lessonsToday_markup.add(types.InlineKeyboardButton(text='Расписание на сегодня', callback_data='prevday'))
     users=fetch('users', rows='id, not_lesson_alert')
@@ -99,15 +99,24 @@ def lesson_started():
                     alert=i[1]
                     
                     if alert==True:
-                        try:bot.send_message(   chat_id=user_id, 
-                                                text='🔔 Пара начнется через 10 минут!',
+                        try: bot.send_message(  chat_id=user_id, 
+                                                text=message_text,
                                                 reply_markup=lessonsToday_markup)
-                        except:
-                            pass
+                        except: pass
                 break
         k+=1
 #lesson_started()
 
-lesson_start=["06:20", "08:15", "10:10", "12:05", "14:00"] 
+def lesson_started_prepare():
+    lesson_started('🔔 Пара начнется через 10 минут!')
+
+def lesson_started_now():
+    lesson_started('🔔 Началась пара')
+    
+lesson_start_prepare=["06:20", "08:15", "10:10", "12:05", "14:00"] 
+for i in lesson_start_prepare:
+    schedule.every().day.at(i).do(lesson_started_prepare)
+
+lesson_start=["06:30", "08:25", "10:20", "12:15", "14:10"] 
 for i in lesson_start:
-    schedule.every().day.at(i).do(lesson_started)
+    schedule.every().day.at(i).do(lesson_started_now)
