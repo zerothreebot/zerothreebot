@@ -40,8 +40,8 @@ tagAllConfirm_markup.add(types.InlineKeyboardButton(    text='Да ✅', callbac
 marks_markup = types.InlineKeyboardMarkup()
 marks_markup.row_width=5
 marks_markup.add(     
-                    types.InlineKeyboardButton( text='Итоговые оценки 3-го семестра 📈', 
-                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=1591893357'),        
+                    types.InlineKeyboardButton( text='Итоговые оценки 4-го семестра 📈', 
+                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712'),        
     )
 
 link_markup=types.InlineKeyboardMarkup()
