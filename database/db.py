@@ -47,7 +47,7 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
     return result
 #fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
 
-def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
+def add_task(assigned_by, lesson_id, deadline, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
     assign_date=datetime.date.today()
 
     files=list_to_str(files)
@@ -60,7 +60,7 @@ def add_task(assigned_by, lesson_id, need_to_be_done, task, files): #add_task(us
     else:
         id=result[len(result)-1][0]+1
 
-    sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, need_to_be_done, task, files, done_by) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{need_to_be_done}', %s, %s, %s)"
+    sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, deadline, task, files, done_by) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{deadline}', %s, %s, %s)"
     db_object.execute(sql,(task ,files, '{}'))
     db_connection.commit()
     return id
