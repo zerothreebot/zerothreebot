@@ -11,6 +11,7 @@ from features.birthday import *
 from features.tagging import *
 from features.timetable import *
 
+
 result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
 group_list_output=''
 for i in result:
@@ -22,7 +23,7 @@ for i in result:
 @bot.message_handler(commands=['start']) 
 def Command_Marks(message):
     bot.send_message(   chat_id=message.chat.id, 
-                        text='Привет. Это персональный бот группы БС-03 который организовывает и регулирует учёбный процесс.\n\nЕсли вы не свой, то работу я вам, конечно-же, показать не могу, но если очень хочется посмотреть - пишите <a href="tg://user?id='+str(admin_id)+'">Админу</a>')
+                        text='Приветик. Это персональный бот группы БС-03 который организовывает и регулирует учёбный процесс.\n\nЕсли вы не свой, то работу я вам, конечно-же, показать не могу, но если очень хочется посмотреть - пишите <a href="tg://user?id='+str(admin_id)+'">Админу</a>')
 
 @bot.message_handler(commands=['marks'])
 def Command_Marks(message):

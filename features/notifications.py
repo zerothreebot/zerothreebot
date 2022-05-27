@@ -113,10 +113,10 @@ def lesson_started_prepare():
 def lesson_started_now():
     lesson_started('🔔 Началась пара')
     
-lesson_start_prepare=["06:20", "08:15", "10:10", "12:05", "14:00"] 
+lesson_start_prepare=["05:20", "07:15", "09:10", "11:05", "13:00"] 
 for i in lesson_start_prepare:
     schedule.every().day.at(i).do(lesson_started_prepare)
 
-lesson_start=["06:30", "08:25", "10:20", "12:15", "14:10"] 
+lesson_start=["05:30", "07:25", "09:20", "11:15", "13:10"] 
 for i in lesson_start:
     schedule.every().day.at(i).do(lesson_started_now)

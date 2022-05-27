@@ -8,7 +8,7 @@ from database.db import fetch
  
 @bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
 def bdpl(query):
-    emojii=query.data.split(' ')[0]
+    emojii='🎂'
     count=int(query.data.split(' ')[1])
     count+=1
 

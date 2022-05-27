@@ -1,7 +1,7 @@
 from telebot import types
 from datetime import date
 
-from settings import bot, chat_id
+from settings import bot, chat_id, admin_id
 from database.db import *
 from features.lessons import *
 from inline_keyboards.keyboards import *
@@ -127,6 +127,17 @@ def actual_tasks(message):
                             text='Эту команду можно использовать только в лс бота 😟', 
                             reply_markup=link_markup) 
 
+@bot.message_handler(commands=['removetask'])
+def remove_task_c(message):
+    if message.from_user.id==admin_id:
+        try:
+            task_id=int(message.text.split(' ')[1])
+            print(task_id)
+            remove_task(task_id)
+        except:
+            bot.send_message(   chat_id=message.chat.id, 
+                                text='Такое задание не существует 😟')
+        
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_actual')
 def NameDoesntMatter(query):
@@ -425,17 +436,20 @@ def finish_adding(user_id):
             day=int(date_[0])
             month=int(date_[1])
             year=int(date_[2])
+            deadline_date=datetime.date(year, month, day)
+            deadline=convert_date(deadline_date)+' ('+days_left(deadline_date)+')'
         else:
             day=int(1)
             month=int(1)
             year=int(2222)
-
-        deadline_date=datetime.date(year, month, day)
+            deadline_date=datetime.date(year, month, day)
+            deadline='долгосрок'
+        
         lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], deadline_date, tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
         users=fetch('users', rows='id')
-        deadline=convert_date(deadline_date)+' ('+days_left(deadline_date)+')'
+        
 
-        message='⚡ Добавлено новое задание добавлено с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+deadline
+        message='⚡ Добавлено новое задание с "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'"\n🔥 Дедлайн: '+deadline
         watch_new_task = types.InlineKeyboardMarkup()
         watch_new_task.add(types.InlineKeyboardButton(text='Посмотреть задание 📃', callback_data='watchnewtask2 '+str(lesson_id)))
         
@@ -443,13 +457,16 @@ def finish_adding(user_id):
             #if i[0]==1:
                 try: bot.send_message(      chat_id=i[0], 
                                             text=message, 
-                                            reply_markup=watch_new_task)
+                                            reply_markup=watch_new_task,
+                                            disable_notification=True
+                                        )
                     
                 except: pass
                 
         bot.send_message(   chat_id=chat_id,
                                     text='#task\n'+message, 
-                                    reply_markup=link_markup)
+                                    reply_markup=link_markup,
+                                    disable_notification=True)
                 
 
         del_user_from_adding_hw(user_id)
