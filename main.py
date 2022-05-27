@@ -74,5 +74,5 @@ try:
         
 except Exception as e: 
     var = traceback.format_exc()
-    bot.send_message(admin_id, str(var), parse_mode='Markdown')
+    bot.send_message(admin_id, str(var), parse_mode='None')
     print(var)
