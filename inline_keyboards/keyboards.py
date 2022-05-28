@@ -38,11 +38,12 @@ tagAllConfirm_markup.add(types.InlineKeyboardButton(    text='Да ✅', callbac
                                                         types.InlineKeyboardButton(text='Нет ❌', callback_data='tagall_cancel'))
 
 marks_markup = types.InlineKeyboardMarkup()
-marks_markup.row_width=5
+web_app_info = types.WebAppInfo(url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712')
 marks_markup.add(     
                     types.InlineKeyboardButton( text='Итоговые оценки 4-го семестра 📈', 
-                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712'),        
+                                                web_app=web_app_info),        
     )
+
 
 link_markup=types.InlineKeyboardMarkup()
 link_markup.add(types.InlineKeyboardButton(text='Перейти 🤖', url='https://t.me/zerothree_bot'))
@@ -62,8 +63,6 @@ finish_adding_markup=types.InlineKeyboardMarkup()
 finish_adding_button=types.InlineKeyboardButton(text='Создать 📃', callback_data='finish_adding')
 finish_adding_markup.add(cancel_adding_button, finish_adding_button)
 
-  
-
 
 lessonsTomorrow_markup = types.InlineKeyboardMarkup()
 lessonsTomorrow_markup.add(types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'))
@@ -77,6 +76,10 @@ nextWeek_markup.add(types.InlineKeyboardButton(text='Следущая недел
 
 delete_button=types.InlineKeyboardButton(text='Закрыть ❌', callback_data='delete_button')
 
+
+web_app_keyboard = types.InlineKeyboardMarkup()
+web_app_info = types.WebAppInfo(url='https://github.com/zerothreebot/03bot')
+web_app_keyboard.add(types.InlineKeyboardButton('Исходный код бота', web_app=web_app_info))
 
 hwmenu_markup=types.InlineKeyboardMarkup()
 

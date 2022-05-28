@@ -20,10 +20,13 @@ for i in result:
     surname = i[2]
     group_list_output+=str(group_id)+' - '+name+' '+surname+'\n'
 
+
+
 @bot.message_handler(commands=['start']) 
 async def Command_Marks(message):
     await bot.send_message(   chat_id=message.chat.id, 
-                        text='Приветик. Это персональный бот группы БС-03 который организовывает и регулирует учёбный процесс.\n\nЕсли вы не свой, то работу я вам, конечно-же, показать не могу, но если очень хочется посмотреть - пишите <a href="tg://user?id='+str(admin_id)+'">Админу</a>')
+                        text='Приветик. Это персональный бот группы БС-03 который организовывает и регулирует учёбный процесс.\n\nЕсли вы не свой, то работу я вам, конечно-же, показать не могу, но если очень хочется посмотреть - пишите <a href="tg://user?id='+str(admin_id)+'">Админу</a>',
+                        reply_markup=web_app_keyboard)
 
 @bot.message_handler(commands=['marks'])
 async def Command_Marks(message):
@@ -57,7 +60,6 @@ import aioschedule
 
 async def scheduler():
     while True:
-        print(True)
         await aioschedule.run_pending()
         await asyncio.sleep(checkgmailevery)
 
