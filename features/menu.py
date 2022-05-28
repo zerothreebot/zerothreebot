@@ -84,18 +84,18 @@ async def NameDoesntMatter(query):
     action=query.data.split(' ')[2]
 
     if notification_type=='lesson':
-        column='not_lesson_alert'
+        alert_type='not_lesson_alert'
     elif notification_type=='deadlines':
-        column='not_tasks_undone'
+        alert_type='not_tasks_undone'
     elif notification_type=='newtasks':
-        column='not_tasks_new'
+        alert_type='not_tasks_new'
 
     if action == 'turnoff':
-        update('users', column, False, where_column='id', where_value=user_id)
+        update('users', alert_type, False, where_column='id', where_value=user_id)
         await bot.answer_callback_query(  callback_query_id=query.id, 
                                     text='Вы отключили уведомления 🔕')
     else:
-        update('users', column, True, where_column='id', where_value=user_id)
+        update('users', alert_type, True, where_column='id', where_value=user_id)
         await bot.answer_callback_query(  callback_query_id=query.id, 
                                     text='Теперь вам будут приходит уведомления 🔔')
 
