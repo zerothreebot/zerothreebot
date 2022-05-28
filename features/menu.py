@@ -1,4 +1,3 @@
-from tkinter.tix import COLUMN
 from telebot import types
 
 from settings import bot, chat_id
