@@ -68,7 +68,8 @@ async def main():
     await asyncio.gather(bot.infinity_polling(), scheduler())
 
 
-
+import sys
 if __name__ == '__main__':
+    print (sys.version)
     asyncio.run(main())
         
