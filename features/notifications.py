@@ -31,12 +31,11 @@ async def Left_Showgraf(query):
     result=fetch(table='users', rows="id")
     await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Отправлено 🕊', reply_markup=None)
     for i in result:
-        print(i)
-        if i[0]==admin_id:
-            #try:
+        #if i[0]==admin_id:
+            try:
 
                 await bot.forward_message(chat_id=i[0], from_chat_id=query.message.chat.id, message_id=notification_message_id)
-            #except: pass
+            except: pass
     await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Отправлено 🕊')
     notification_message_id=0
