@@ -64,7 +64,7 @@ async def notification_tasks(days_left, message):
         task_id=i[2]
         for j in users_list:
             notifications=users_list[j] 
-            if str(j) not in done_by and notifications==True and j==admin_id:
+            if str(j) not in done_by and notifications==True:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(task_id)))
                 try:
