@@ -38,10 +38,8 @@ tagAllConfirm_markup.add(types.InlineKeyboardButton(    text='Да ✅', callbac
                                                         types.InlineKeyboardButton(text='Нет ❌', callback_data='tagall_cancel'))
 
 marks_markup = types.InlineKeyboardMarkup()
-web_app_info = types.WebAppInfo(url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712')
-marks_markup.add(     
-                    types.InlineKeyboardButton( text='Итоговые оценки 4-го семестра 📈', 
-                                                web_app=web_app_info),        
+marks_markup.add(types.InlineKeyboardButton( text='Итоговые оценки 4-го семестра 📈', 
+                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712')       
     )
 
 
