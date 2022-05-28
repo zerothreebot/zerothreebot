@@ -32,48 +32,48 @@ class Tagging:
 tagging = Tagging()
 
 @bot.callback_query_handler(lambda query: query.data=='start_tagging')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     tagging.message_id = query.message.message_id
     
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=tagging.message_id, 
                             text=get_tag_list_text('pending'), 
                             reply_markup=tagging_markup)
 
-    bot.pin_chat_message(   chat_id=chat_id, 
+    await bot.pin_chat_message(   chat_id=chat_id, 
                             message_id=tagging.message_id, 
                             disable_notification=True)
 
 
 @bot.callback_query_handler(lambda query: query.data=='show_tagging')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     try:
-        bot.delete_message(     chat_id=chat_id, 
+        await bot.delete_message(     chat_id=chat_id, 
                                 message_id=tagging.message_id)
     except:pass
     tagging.message_id = query.message.message_id
 
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=tagging.message_id, 
                             text=get_tag_list_text('pending'), 
                             reply_markup=tagging_markup)
 
 
 @bot.callback_query_handler(lambda query: query.data=='tag_all')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     if tagging.length!=0 and tagging.message_id!=0:
-            bot.edit_message_text(  chat_id=chat_id, 
+            await bot.edit_message_text(  chat_id=chat_id, 
                                     message_id=query.message.message_id, 
                                     text='Уверен, что хочешь тегнуть всех? 🤔',
                                     reply_markup=tagAllConfirm_markup)
     else: 
-        bot.edit_message_text(      chat_id=chat_id, 
+        await bot.edit_message_text(      chat_id=chat_id, 
                                     message_id=query.message.message_id, 
                                     text='Список пуст 🙃')
 
     
 @bot.message_handler(commands=['tagging'])
-def Command_Tagging(message):
+async def Command_Tagging(message):
     if message.chat.id<0:
         markup = types.InlineKeyboardMarkup()
         if tagging.message_id==0:
@@ -88,11 +88,11 @@ def Command_Tagging(message):
                 markup.add( types.InlineKeyboardButton(text='Показать теггинг 👁', callback_data='show_tagging'))
 
         markup.add(delete_button)
-        bot.send_message(   chat_id=message.chat.id, 
+        await bot.send_message(   chat_id=message.chat.id, 
                             text=output, 
                             reply_markup=markup)
     else:
-        bot.send_message(   chat_id=message.chat.id, 
+        await bot.send_message(   chat_id=message.chat.id, 
                             text='Используй эту команду в чате группы 😅')
 
 
@@ -110,21 +110,21 @@ def get_tag_list_text(tagging_type):
     return output
 
 
-def tagalldef(user_tagged_all_id):
+async def tagalldef(user_tagged_all_id):
     for i in tagging.tag_users:
         if i != user_tagged_all_id:
-            bot.send_message(   chat_id=chat_id, 
+            await bot.send_message(   chat_id=chat_id, 
                                 text='<a href="tg://user?id='+str(i)+'">'+tagging.tag_users[i]+'</a>')
-    tag_list_clear()
+    await tag_list_clear()
 
 
-def tag_list_clear():
+async def tag_list_clear():
     if tagging.message_id!=0:
 
-        bot.unpin_chat_message( chat_id=chat_id, 
+        await bot.unpin_chat_message( chat_id=chat_id, 
                                 message_id=tagging.message_id)
 
-        bot.edit_message_text(  chat_id=chat_id, 
+        await bot.edit_message_text(  chat_id=chat_id, 
                                 message_id=tagging.message_id, 
                                 text=get_tag_list_text('expired'), 
                                 reply_markup=None)
@@ -137,58 +137,58 @@ def tag_list_clear():
 
 
 @bot.callback_query_handler(lambda query: query.data=='addme')
-def Tagging_AddMe(query): 
+async def Tagging_AddMe(query): 
     user_id=query.from_user.id
     first_name=query.from_user.first_name
     if user_id not in tagging.get_list():
         tagging.add_user(user_id, first_name)
 
-        bot.answer_callback_query(  callback_query_id=query.id, 
+        await bot.answer_callback_query(  callback_query_id=query.id, 
                                     text='Добавил тебя в список ✅')
 
-        bot.edit_message_text(      chat_id=chat_id, 
+        await bot.edit_message_text(      chat_id=chat_id, 
                                     message_id=tagging.message_id, 
                                     text=get_tag_list_text('pending'),
                                     reply_markup=tagging_markup)
 
     else: 
-        bot.answer_callback_query(callback_query_id=query.id, 
+        await bot.answer_callback_query(callback_query_id=query.id, 
                                     text='Ты уже в списке 🙄')
 
           
 @bot.callback_query_handler(lambda query: query.data=='delme')
-def Tagging_DelMe(query): 
+async def Tagging_DelMe(query): 
     user_id=query.from_user.id            
     if user_id in tagging.get_list():
             tagging.del_user(user_id)
-            bot.answer_callback_query(  callback_query_id=query.id, 
+            await bot.answer_callback_query(  callback_query_id=query.id, 
                                         text='Убрал тебя из списка ✅')
 
-            bot.edit_message_text(      chat_id=chat_id, 
+            await bot.edit_message_text(      chat_id=chat_id, 
                                         message_id=tagging.message_id, 
                                         text=get_tag_list_text('pending'),
                                         reply_markup=tagging_markup)
     else:
-        bot.answer_callback_query(      callback_query_id=query.id, 
+        await bot.answer_callback_query(      callback_query_id=query.id, 
                                         text='Тебя нет в списке 🙄')
 
 
 @bot.callback_query_handler(lambda query: query.data=='tagall_accept')
-def Tagging_DelMe_Sure(query):   
+async def Tagging_DelMe_Sure(query):   
     user_id=query.from_user.id
-    bot.answer_callback_query(  callback_query_id=query.id, 
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Щас я всех тегну, не парься 😎')              
-    bot.edit_message_text(  chat_id=query.message.chat.id, 
+    await bot.edit_message_text(  chat_id=query.message.chat.id, 
                             message_id=query.message.message_id, 
                             text=query.from_user.first_name+' тегает 🔔')
-    tagalldef(user_id)
+    await tagalldef(user_id)
 
 
 @bot.callback_query_handler(lambda query: query.data=='tagall_cancel')
-def Tagging_DelMe_Cancel(query):
-    bot.answer_callback_query(  callback_query_id=query.id, 
+async def Tagging_DelMe_Cancel(query):
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Аккуратненько в следущий раз 😅')           
-    bot.delete_message( chat_id=query.message.chat.id, 
+    await bot.delete_message( chat_id=query.message.chat.id, 
                         message_id=query.message.message_id)
     
 

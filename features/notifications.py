@@ -1,93 +1,110 @@
 
+from glob import glob
 from telebot import types
-import schedule
-from datetime import datetime
-
-from settings import bot
+import aioschedule
+import datetime 
+from features.lessons import *
+from settings import bot, admin_id
 from database.db import fetch
 
-
+notification_message_id=0
 @bot.message_handler(commands=['sendall']) # Shows how much time till lesson/break ends with timetable button
-def Command_Left(message):
+async def Command_Left(message):
+    global notification_message_id
+    notification_message_id = -1
+    text='Реплайни на это сообщение то, что хочешь выслать всем...'
+    await bot.reply_to(message, text)
+
+@bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0 and notification_message_id==-1) 
+async def All(message):
+    global notification_message_id
     sendall = types.InlineKeyboardMarkup()
     sendall.add(    types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancelsendall'),
                     types.InlineKeyboardButton(text='Отправить всем 🕊️', callback_data='sendall'))
-    text=message.text.replace('/sendall ','')
-    bot.delete_message( chat_id=message.chat.id, 
-                        message_id=message.message_id)
-    bot.send_message(message.chat.id, text, reply_markup=sendall)
+    text='Отправить всем это сообщение?'
+    notification_message_id = message.message_id
+    await bot.reply_to(message, text, reply_markup=sendall)
 
 @bot.callback_query_handler(lambda query: query.data=='sendall')
-def Left_Showgraf(query):
+async def Left_Showgraf(query):
+    global notification_message_id
     result=fetch(table='users', rows="id")
-    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id,reply_markup=None)
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Отправлено 🕊', reply_markup=None)
     for i in result:
-        #if i[0]==admin_id:
-        try:
-            bot.send_message(chat_id=i[0], text=query.message.text)
-        except: pass
-    bot.answer_callback_query(  callback_query_id=query.id, 
+        print(i)
+        if i[0]==admin_id:
+            #try:
+
+                await bot.forward_message(chat_id=i[0], from_chat_id=query.message.chat.id, message_id=notification_message_id)
+            #except: pass
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Отправлено 🕊')
+    notification_message_id=0
     
 
 @bot.callback_query_handler(lambda query: query.data=='cancelsendall')
-def Left_Showgraf(query):
-    bot.answer_callback_query(  callback_query_id=query.id, 
+async def Left_Showgraf(query):
+    global notification_message_id
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Отменено ❌')
-    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+    notification_message_id=0
 
 
-def notification_tasks(days_left, message):
+async def notification_tasks(days_left, message):
     todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
-    users=fetch('users', rows='id')
+    users=fetch('users', rows='id, not_tasks_undone')
     tasks=fetch('tasks', rows='done_by, lesson_id, id', where_column='deadline', where_value="'"+str(todays_date)+"'")
-    
-    users_list=[]
+    print(str(todays_date))
+    users_list={}
     for i in users:
-        users_list.append(i[0])
-        
+        users_list[i[0]]=i[1]   
     for i in tasks:
         done_by=i[0]
         lesson_id=i[1]
         task_id=i[2]
         for j in users_list:
-            #if j==admin_id:
-            if str(j) not in done_by:
+            notifications=users_list[j] 
+            if str(j) not in done_by and notifications==True and j==admin_id:
                 watch_deadline_task = types.InlineKeyboardMarkup()
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(task_id)))
                 try:
-                    bot.send_message(   chat_id=j, 
+                    await bot.send_message(   chat_id=j, 
                                         text='Вы не выполнили задание с '+lessons[lesson_id]['lesson_name']+'\n\n'+message, 
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass
             
-  
 
-def notifications_6hr_before():
-    notification_tasks(1, '💥 Осталось 6 часов, до дня сдачи работы!')
-def notifications_14hr_before():
-    notification_tasks(1, '🔥 До дня сдачи работы осталось 14 часов!')
-def notifications_day_before():
-    notification_tasks(2, '❄ Завтра дедллайн сдачи работы')
-def notifications_2days_before():
-    notification_tasks(3, '🧊 Дедллайн сдачи через 2 дня')
+
+async def notifications_6hr_before():
+    await notification_tasks(1, '💥 Осталось 6 часов, до дня сдачи работы!')
+async def notifications_14hr_before():
+    await notification_tasks(1, '🔥 До дня сдачи работы осталось 14 часов!')
+async def notifications_day_before():
+    await notification_tasks(2, '❄ Завтра дедллайн сдачи работы')
+async def notifications_2days_before():
+    await notification_tasks(3, '🧊 Дедллайн сдачи через 2 дня')
 
 
 from settings import checkgmailevery
 from features.gmail import checker
-schedule.every(checkgmailevery).seconds.do(checker)
-schedule.every().day.at("16:00").do(notifications_6hr_before)
-schedule.every().day.at("08:00").do(notifications_14hr_before)
+aioschedule.every(checkgmailevery).seconds.do(checker)
+aioschedule.every().day.at("16:00").do(notifications_6hr_before)
+aioschedule.every().day.at("08:00").do(notifications_14hr_before)
 
-schedule.every().day.at("11:00").do(notifications_day_before)
-schedule.every().day.at("12:00").do(notifications_2days_before)
+aioschedule.every().day.at("11:00").do(notifications_day_before)
+aioschedule.every().day.at("12:00").do(notifications_2days_before)
 
 from database.week import week
 from features.timetable import *
-def lesson_started(message_text):
-    lessonsToday_markup= types.InlineKeyboardMarkup()
-    lessonsToday_markup.add(types.InlineKeyboardButton(text='Расписание на сегодня', callback_data='prevday'))
+def lesson_started(message_text, markup):
+    
+    if markup==True:
+        lessonsToday_markup= types.InlineKeyboardMarkup()
+        lessonsToday_markup.add(types.InlineKeyboardButton(text='Расписание на сегодня', callback_data='prevday'))
+    else:
+        lessonsToday_markup=None
     users=fetch('users', rows='id, not_lesson_alert')
     k=1
     for i in week[getweek()][getdayofweek()]:
@@ -108,15 +125,15 @@ def lesson_started(message_text):
 #lesson_started()
 
 def lesson_started_prepare():
-    lesson_started('🔔 Пара начнется через 10 минут!')
+    lesson_started('🔔 Пара начнется через 10 минут!', markup=False)
 
 def lesson_started_now():
-    lesson_started('🔔 Началась пара')
+    lesson_started('🔔 Началась пара', markup=True)
     
 lesson_start_prepare=["05:20", "07:15", "09:10", "11:05", "13:00"] 
 for i in lesson_start_prepare:
-    schedule.every().day.at(i).do(lesson_started_prepare)
+    aioschedule.every().day.at(i).do(lesson_started_prepare)
 
 lesson_start=["05:30", "07:25", "09:20", "11:15", "13:10"] 
 for i in lesson_start:
-    schedule.every().day.at(i).do(lesson_started_now)
+    aioschedule.every().day.at(i).do(lesson_started_now)

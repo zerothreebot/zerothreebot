@@ -2,7 +2,7 @@ from datetime import datetime
 from queue import Empty
 from time import gmtime,strftime
 from telebot import types
-import schedule
+import aioschedule
 
 from settings import tz, bot, chat_id
 from database.week import *
@@ -10,23 +10,23 @@ from inline_keyboards.keyboards import *
 from features.lessons import lessons_additional
 
 @bot.message_handler(commands=['today'])
-def Command_Today(message):
+async def Command_Today(message):
     text, markup=output(getdayofweek(),0)
-    bot.send_message(   chat_id=message.chat.id, 
+    await bot.send_message(   chat_id=message.chat.id, 
                         text=text, disable_web_page_preview=True,
                         reply_markup=markup)
 
 @bot.message_handler(commands=['tomorrow'])
-def Command_Tomorrow(message):
+async def Command_Tomorrow(message):
     text, markup=output(getdayofweek()+1,1)
-    bot.send_message(   chat_id=message.chat.id, 
+    await bot.send_message(   chat_id=message.chat.id, 
                         text=text, 
                         disable_web_page_preview=True,
                         reply_markup=markup)
 
 @bot.message_handler(commands=['week'])
-def Command_Week(message):
-    bot.send_message(   chat_id=message.chat.id,
+async def Command_Week(message):
+    await bot.send_message(   chat_id=message.chat.id,
                         text=getcurrentweek(getweek()), 
                         disable_web_page_preview=True, 
                         reply_markup=nextWeek_markup)
@@ -34,35 +34,35 @@ def Command_Week(message):
 
 
 @bot.callback_query_handler(lambda query: query.data=='showgraf')
-def Left_Showgraf(query):
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft()+'\n\n'+Timetable_Output(),reply_markup=hidegraf_markup, parse_mode='HTML')
+async def Left_Showgraf(query):
+        await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft()+'\n\n'+Timetable_Output(),reply_markup=hidegraf_markup, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='hidegraf')
-def Left_Hidegraf(query):
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft(), reply_markup=showgraf_markup, parse_mode='HTML')
+async def Left_Hidegraf(query):
+        await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=gettimeleft(), reply_markup=showgraf_markup, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='nextweek')
-def Week_NextWeek(query):    
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+1), reply_markup=prevweek_markup, disable_web_page_preview=True, parse_mode='HTML')
+async def Week_NextWeek(query):    
+        await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+1), reply_markup=prevweek_markup, disable_web_page_preview=True, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='prevweek')
-def Week_PrevWeek(query):  
-        bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+0), reply_markup=nextweek_markup,disable_web_page_preview=True, parse_mode='HTML')
+async def Week_PrevWeek(query):  
+        await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=getcurrentweek(getweek()+0), reply_markup=nextweek_markup,disable_web_page_preview=True, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='nextday')
-def Day_NextDay(query): 
+async def Day_NextDay(query): 
     text, markup=output(getdayofweek()+1,1)
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
 @bot.callback_query_handler(lambda query: query.data=='prevday')
-def Day_PrevDay(query):
+async def Day_PrevDay(query):
     text, markup=output(getdayofweek(),0)
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=text, reply_markup=markup,disable_web_page_preview=True, parse_mode='HTML')
 
 @bot.callback_query_handler(lambda query: query.data.find('timetable')!=-1)
-def Day_PrevDay(query):
+async def Day_PrevDay(query):
     button_callback_data = query.data.split(' ')[1]
     back_button = types.InlineKeyboardMarkup()
     back_button.add(types.InlineKeyboardButton(text='« Назад', callback_data=button_callback_data))
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=Timetable_Output(), reply_markup=back_button, parse_mode='HTML')
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=Timetable_Output(), reply_markup=back_button, parse_mode='HTML')
 
 @bot.callback_query_handler(lambda query: query.data.find('additional_lessons_info')!=-1)
-def back_to_rozklad(query):
+async def back_to_rozklad(query):
     button_callback_data = query.data.split(' ')[1]
     back_button = types.InlineKeyboardMarkup()
     back_button.add(types.InlineKeyboardButton(text='« Назад', callback_data=button_callback_data))
@@ -87,7 +87,7 @@ def back_to_rozklad(query):
                 output+=', <a href="'+lessons_additional[i]['classroom_link']+'">Класрум</a>'   
             output+=')'
         output+='\n'
-    bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=back_button, disable_web_page_preview=True)
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text=output, reply_markup=back_button, disable_web_page_preview=True)
 
 
 def Timetable_Output():
@@ -144,7 +144,7 @@ def getcurrentweek(tod):
 
 today_users_birthday=[]
 
-def define_birthday_users():
+async def define_birthday_users():
     global today_users_birthday
     today_users_birthday=[]
     todays_date=datetime.date.today()
@@ -152,17 +152,17 @@ def define_birthday_users():
     for i in users:
         user_bd_id = i[0]
         birthdate = i[1]
-        member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
+        member= await bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
         fullname=member.user.first_name
         if member.user.last_name!=None:
             fullname+=' '+member.user.last_name
 
         if todays_date==birthdate:
             today_users_birthday.append({'name':fullname, 'id':user_bd_id})
-define_birthday_users()
 
 
-schedule.every().day.at("01:30").do(define_birthday_users)
+
+aioschedule.every().day.at("01:30").do(define_birthday_users)
 
 def output(tod,whatday):
     rozklad=''

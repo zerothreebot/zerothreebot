@@ -84,24 +84,24 @@ class Email:
         return message_text
 
 from imap_tools import MailBox
-def checker():
-    try:
+async def checker():
+    #try:
         with MailBox(gmail_host).login(username, app_password, 'INBOX') as mailbox:
             for msg in mailbox.fetch(criteria = "UNSEEN"):
 
                 email = Email(msg)
                 if email.attachmentsCounter!=0:
-                    array=bot.send_media_group( chat_id=chat_id, 
+                    array=await bot.send_media_group( chat_id=chat_id, 
                                                 media=email.messageText_WithAttachments)
                     message_id=array[len(array)-1].message_id
-                    bot.pin_chat_message(       chat_id=chat_id, 
+                    await bot.pin_chat_message(       chat_id=chat_id, 
                                                 message_id=message_id)
                     
                 else:
-                    message_id=bot.send_message(    chat_id=chat_id, 
-                                                    text=email.messageText).message_id
-                    bot.pin_chat_message(           chat_id=chat_id, 
+                    message=await bot.send_message(    chat_id=chat_id, text=email.messageText)
+                    message_id=message.message_id
+                    await bot.pin_chat_message(           chat_id=chat_id, 
                                                     message_id=message_id)
-    except:
-        bot.send_message(admin_id, 'Gmail Error', parse_mode='None')
+    #except:
+        #await bot.send_message(admin_id, 'Gmail Error', parse_mode='None')
         

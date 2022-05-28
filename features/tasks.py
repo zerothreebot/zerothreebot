@@ -9,26 +9,26 @@ from features.date import *
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_allhws')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     user_id=query.from_user.id
     chat_id=query.message.chat.id
     message_id=query.message.message_id
     output, tasks_markup=all_tasks_builder(user_id)
 
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text=output,
                             reply_markup=tasks_markup)
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_losthws')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     user_id=query.from_user.id
     chat_id=query.message.chat.id
     message_id=query.message.message_id
     output, tasks_markup=lost_tasks_builder(user_id)
 
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text=output,
                             reply_markup=tasks_markup)
@@ -115,58 +115,58 @@ def all_tasks_builder(user_id):
      
 
 @bot.message_handler(commands=['hw'])
-def actual_tasks(message):
+async def actual_tasks(message):
     if message.chat.id>0:
-        bot.send_message(   chat_id=message.chat.id, 
+        await bot.send_message(   chat_id=message.chat.id, 
                             text='📕 Меню домашних заданий:', 
                             reply_markup=hwmenu_markup) 
-        bot.delete_message( chat_id=message.chat.id, 
+        await bot.delete_message( chat_id=message.chat.id, 
                             message_id=message.message_id)
     else:
-        bot.send_message(   chat_id=message.chat.id, 
+        await bot.send_message(   chat_id=message.chat.id, 
                             text='Эту команду можно использовать только в лс бота 😟', 
                             reply_markup=link_markup) 
 
 @bot.message_handler(commands=['removetask'])
-def remove_task_c(message):
+async def remove_task_c(message):
     if message.from_user.id==admin_id:
         try:
             task_id=int(message.text.split(' ')[1])
             print(task_id)
             remove_task(task_id)
         except:
-            bot.send_message(   chat_id=message.chat.id, 
+            await bot.send_message(   chat_id=message.chat.id, 
                                 text='Такое задание не существует 😟')
         
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_actual')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     user_id=query.from_user.id
     chat_id=query.message.chat.id
     message_id=query.message.message_id
     output, reply_markup = actual_tasks_builder(user_id)
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text=output,
                             reply_markup=reply_markup) 
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_back')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     message_id=query.message.message_id
     chat_id=query.message.chat.id
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text='📕 Меню домашних заданий:',
                             reply_markup=hwmenu_markup) 
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_addhw')
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     chat_id=query.message.chat.id
     message_id=query.message.message_id
-    bot.edit_message_text(  chat_id=chat_id, 
+    await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text='📕 Выбери предмет:',
                             reply_markup=lessons_markup) 
@@ -200,7 +200,7 @@ def findreplymarkup(message, done_by, task_id):
 
     return reply_markup
 
-def SendTaskContent(message, task_id):
+async def SendTaskContent(message, task_id):
     sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, deadline, task, files', where_column='id', where_value=task_id)
     if sql!=None:
         done_by=sql[0]
@@ -216,9 +216,9 @@ def SendTaskContent(message, task_id):
         documentsContainer=CreateDocumentsContainer(files)
 
         if documentsContainer:
-            bot.send_media_group(   chat_id=message.chat.id,
+            await bot.send_media_group(   chat_id=message.chat.id,
                                     media=documentsContainer)
-        bot.send_message(           chat_id=message.chat.id, 
+        await bot.send_message(           chat_id=message.chat.id, 
                                     text=output, 
                                     reply_markup=reply_markup)
         return True
@@ -227,13 +227,13 @@ def SendTaskContent(message, task_id):
 
 
 @bot.callback_query_handler(lambda query: query.data.find('watchnewtask2')!=-1)
-def NameDoesntMatter(query):
-    bot.answer_callback_query(  callback_query_id=query.id, 
+async def NameDoesntMatter(query):
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Опа... Новое задание 😬')
-    bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
+    await bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
     task_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
-    Watch_Task_Process(task_id, user_id, 'actual')
+    await Watch_Task_Process(task_id, user_id, 'actual')
 
 
 def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id): 
@@ -249,7 +249,7 @@ def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mis
     return output
 
 
-def Watch_Task_Process(task_id, user_id, type):
+async def Watch_Task_Process(task_id, user_id, type):
     sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, deadline, task, files', where_column='id', where_value=task_id)
 
     done_by=sql[0]
@@ -284,7 +284,7 @@ def Watch_Task_Process(task_id, user_id, type):
             else:
                 documentsContainer.append(types.InputMediaDocument(i))
             k+=1    
-        attachments_list=bot.send_media_group(  chat_id=user_id, 
+        attachments_list=await bot.send_media_group(  chat_id=user_id, 
                                                 media=documentsContainer)
         mes_ids=''
         for i in range(len(attachments_list)):
@@ -299,24 +299,24 @@ def Watch_Task_Process(task_id, user_id, type):
             task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids+toadd), 
                             types.InlineKeyboardButton(text='✅ Выполнить', callback_data='set_completed '+str(task_id)))
         
-    bot.send_message(   chat_id=user_id,
+    await bot.send_message(   chat_id=user_id,
                         text=output, 
                         reply_markup=task_watch_menu)
 
 
 @bot.callback_query_handler(lambda query: query.data.find('watchtask2')!=-1)
-def NameDoesntMatter(query):
-    bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+async def NameDoesntMatter(query):
+    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     
     task_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
     type=query.data.split(' ')[2]
 
-    Watch_Task_Process(task_id, user_id, type)
+    await Watch_Task_Process(task_id, user_id, type)
 
 
 @bot.callback_query_handler(lambda query: query.data.find('back_to_tasks')!=-1)
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     type=query.data.split(' ')[-1]
     if type=='all':
         user_id=query.from_user.id
@@ -333,16 +333,16 @@ def NameDoesntMatter(query):
         del ids[-1]
         del ids[0]
         for i in ids:
-            bot.delete_message( chat_id=query.message.chat.id, 
+            await bot.delete_message( chat_id=query.message.chat.id, 
                                 message_id=str(i))
-    bot.edit_message_text(      chat_id=query.message.chat.id, 
+    await bot.edit_message_text(      chat_id=query.message.chat.id, 
                                 message_id=query.message.message_id, 
                                 text=output, 
                                 reply_markup=tasks_markup)
 
 
 @bot.callback_query_handler(lambda query: query.data.find('set_completed')!=-1)
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     task_id=query.data.split(' ')[1]
     
     task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=task_id)
@@ -366,17 +366,17 @@ def NameDoesntMatter(query):
             lst.append(str(query.from_user.id))
             update('tasks', 'done_by', list_to_str(lst),'id',task_id)
         try:    
-            bot.edit_message_text(      chat_id=query.message.chat.id, 
+            await bot.edit_message_text(      chat_id=query.message.chat.id, 
                                         message_id=query.message.message_id, 
                                         text=query.message.text, 
                                         reply_markup=task_watch_menu)
-            bot.answer_callback_query(  callback_query_id=query.id, 
+            await bot.answer_callback_query(  callback_query_id=query.id, 
                                         text='Вы отметили это задание выполненым ✅')
         except:pass
         
         
 @bot.callback_query_handler(lambda query: query.data.find('set_uncompleted')!=-1)
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     task_id=query.data.split(' ')[1]
     task=fetch('tasks', fetchone=True, rows='done_by', where_column='id', where_value=task_id)
     if task!=None:
@@ -399,11 +399,11 @@ def NameDoesntMatter(query):
             lst.remove(str(query.from_user.id))
             update('tasks', 'done_by', list_to_str(lst),'id',task_id)
         try:    
-            bot.edit_message_text(      chat_id=query.message.chat.id, 
+            await bot.edit_message_text(      chat_id=query.message.chat.id, 
                                         message_id=query.message.message_id, 
                                         text=query.message.text, 
                                         reply_markup=task_watch_menu)
-            bot.answer_callback_query(  callback_query_id=query.id, 
+            await bot.answer_callback_query(  callback_query_id=query.id, 
                                         text='Вы убрали отметку "Выполнено" с этого задания 🕚')
         except:pass
         
@@ -417,7 +417,7 @@ def create_user_adding_hw(user_id):
 
 
 @bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     user_id=query.from_user.id
     create_user_adding_hw(user_id)
 
@@ -425,11 +425,11 @@ def NameDoesntMatter(query):
     lesson_number=int(query.data.split(' ')[1])
     tasks_by_user[user_id]['lesson_id']=lesson_number
 
-    bot.edit_message_text(  chat_id=query.message.chat.id, 
+    await bot.edit_message_text(  chat_id=query.message.chat.id, 
                             message_id=query.message.message_id, 
                             text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на это сообщение дату дедлайна в виде <code>ДД-ММ-ГГГГ</code>:\n\nЕсли задание долгосрочное, реплайни "долгосрок" ', 
                             reply_markup=cancel_adding_markup)
-def finish_adding(user_id):
+async def finish_adding(user_id):
     if user_id in tasks_by_user:
         if tasks_by_user[user_id]['date']!='долгосрок':
             date_=tasks_by_user[user_id]['date'].split('-')
@@ -463,7 +463,7 @@ def finish_adding(user_id):
                     
                 except: pass
                 
-        bot.send_message(   chat_id=chat_id,
+        await bot.send_message(   chat_id=chat_id,
                                     text='#task\n'+message, 
                                     reply_markup=link_markup,
                                     disable_notification=True)
@@ -479,13 +479,13 @@ def del_user_from_adding_hw(user_id):
 
     
 @bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0) 
-def All(message):
+async def All(message):
     user_id=message.from_user.id
 
     if user_id in tasks_by_user:
-            bot.delete_message( chat_id=message.chat.id,
+            await bot.delete_message( chat_id=message.chat.id,
                                 message_id=message.reply_to_message.message_id)
-            bot.delete_message( chat_id=message.chat.id,
+            await bot.delete_message( chat_id=message.chat.id,
                                 message_id=message.message_id)
 
             action=int(user_current_action[user_id].split(' ')[2])
@@ -518,7 +518,7 @@ def All(message):
                     user_current_action[user_id]='addhw step 3'
                     tasks_by_user[user_id]['date']=text
 
-                    bot.send_message(   chat_id=message.chat.id, 
+                    await bot.send_message(   chat_id=message.chat.id, 
                                         text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n\nРеплайни на это сообщение описание задания', 
                                         reply_markup=cancel_adding_markup)
 
@@ -529,7 +529,7 @@ def All(message):
                         error_message='Дата которую вы ввели находится в далеком будущем 😅'
                     else:
                         error_message='Введен неправильный формат даты 😞'
-                    bot.send_message(   chat_id=message.chat.id, 
+                    await bot.send_message(   chat_id=message.chat.id, 
                                         text=error_message+'\n\nПопробуй ещё раз - формат <code>ДД-ММ-ГГГГ</code>:', 
                                         reply_markup=cancel_adding_markup)
                 
@@ -538,12 +538,12 @@ def All(message):
                 user_current_action[user_id]='addhw step 4'
                 tasks_by_user[user_id]['task']=text
                 tasks_by_user[user_id]['files']=[]
-                bot.send_message(   chat_id=message.chat.id, 
+                await bot.send_message(   chat_id=message.chat.id, 
                                     text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n'+'✍ Задание: '+tasks_by_user[user_id]['task']+'\n\nВышли материалы задания в виде файлов, а затем нажми "Создать"', 
                                     reply_markup=finish_adding_markup)
 
 @bot.message_handler(content_types=['document'])
-def function_name(message):
+async def function_name(message):
     user_id=message.from_user.id
     if user_id in tasks_by_user:
 
@@ -553,25 +553,25 @@ def function_name(message):
             if len(tasks_by_user[user_id]['files'])<6:
                 id=message.document.file_id
                 tasks_by_user[user_id]['files'].append(id)
-                bot.send_message(   chat_id=message.chat.id, 
+                await bot.send_message(   chat_id=message.chat.id, 
                                     text='📃 Документов загружено: '+str(len(tasks_by_user[user_id]['files'])))
             else:
-                bot.send_message(   chat_id=message.chat.id, 
+                await bot.send_message(   chat_id=message.chat.id, 
                                     text='Больше документов загрузить нельзя 😕')
 
 @bot.callback_query_handler(lambda query: query.data==('cancel_adding'))
-def NameDoesntMatter(query):
+async def NameDoesntMatter(query):
     user_id=query.from_user.id
-    bot.delete_message( chat_id=query.message.chat.id, 
+    await bot.delete_message( chat_id=query.message.chat.id, 
                         message_id=query.message.message_id)
     del_user_from_adding_hw(user_id)
 
 @bot.callback_query_handler(lambda query: query.data==('finish_adding'))
-def NameDoesntMatter(query):
-    finish_adding(query.from_user.id)
-    bot.answer_callback_query(  callback_query_id=query.id, 
+async def NameDoesntMatter(query):
+    await finish_adding(query.from_user.id)
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Задание добавлено. Спасибо 🥰')
-    bot.delete_message( chat_id=query.message.chat.id, 
+    await bot.delete_message( chat_id=query.message.chat.id, 
                         message_id=query.message.message_id)
     
 

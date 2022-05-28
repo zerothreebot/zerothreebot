@@ -1,5 +1,5 @@
 from telebot import types
-import schedule
+import aioschedule
 import random
 from datetime import date, timedelta 
 
@@ -7,7 +7,7 @@ from settings import bot, chat_id
 from database.db import fetch
  
 @bot.callback_query_handler(lambda query: query.data.find('plusone')!=-1)
-def bdpl(query):
+async def bdpl(query):
     emojii='🎂'
     count=int(query.data.split(' ')[1])
     count+=1
@@ -15,10 +15,10 @@ def bdpl(query):
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text=emojii+' '+str(count), callback_data='plusone '+str(count)))
     
-    bot.edit_message_reply_markup(  chat_id=query.message.chat.id, 
+    await bot.edit_message_reply_markup(  chat_id=query.message.chat.id, 
                                     message_id=query.message.message_id, 
                                     reply_markup=reply_markup)
-    bot.answer_callback_query(  callback_query_id=query.id, 
+    await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text=emojii)
  
 birthday_quotes=[
@@ -167,6 +167,6 @@ def birthday_3days_before():
 
 
 #schedule.every(10).seconds.do(birthday_1day_before)
-schedule.every().day.at("07:30").do(birthday_today)
-schedule.every().day.at("11:00").do(birthday_1day_before)
-schedule.every().day.at("13:00").do(birthday_3days_before)
+aioschedule.every().day.at("07:30").do(birthday_today)
+aioschedule.every().day.at("11:00").do(birthday_1day_before)
+aioschedule.every().day.at("13:00").do(birthday_3days_before)

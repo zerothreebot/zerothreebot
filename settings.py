@@ -1,16 +1,16 @@
-import telebot
+from telebot.async_telebot import AsyncTeleBot
 import pytz
 import os
 
 #configure bot in your .env file
-version='3.0 - Release Candidate 7'
+version='3.1 - Asynced bot'
 github_link='https://github.com/zerothreebot/03bot'
 
 chat_id=int(os.environ.get('chatid', None))
 #chat_id=393483876
 checkgmailevery = int(os.environ.get("checkgmailevery", None))
 token = os.environ.get('token', None)
-bot = telebot.TeleBot(token, parse_mode='HTML')
+bot = AsyncTeleBot(token, parse_mode='HTML')
 timezone=os.environ.get('timezone', None)
 tz=pytz.timezone(timezone)
 admin_id=393483876
