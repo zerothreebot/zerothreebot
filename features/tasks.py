@@ -35,11 +35,11 @@ async def NameDoesntMatter(query):
 
 
 def lost_tasks_builder(user_id):  
-    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline', order_by='id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline', order_by='deadline, id')
 
 
     losttasks_buttons=[]
-    output='😓 Вот пропущенные вами домашки:\n\n'
+    output='😓 Вот домашки, которые вам надо сделать:\n\n'
     for i in tasks:
         lesson_id=i[0]
         task_id=i[1]

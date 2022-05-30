@@ -81,7 +81,6 @@ web_app_keyboard.add(types.InlineKeyboardButton('Исходный код бот�
 
 hwmenu_markup=types.InlineKeyboardMarkup()
 
-hwmenu_markup.add(  types.InlineKeyboardButton(text='Актуальные домашки ✅🕚', callback_data='hwmenu_actual'))
-hwmenu_markup.add(  types.InlineKeyboardButton(text='Добавить домашку ✍', callback_data='hwmenu_addhw'))
-hwmenu_markup.add(  types.InlineKeyboardButton(text='Пропущенные 😓', callback_data='hwmenu_losthws'),
-                    types.InlineKeyboardButton(text='Все домашки 📃', callback_data='hwmenu_allhws'))
+hwmenu_markup.add(types.InlineKeyboardButton(text='Надо сделать 🕚', callback_data='hwmenu_losthws'))
+hwmenu_markup.add(      types.InlineKeyboardButton(text='Добавить домашку ✍', callback_data='hwmenu_addhw'),
+                        types.InlineKeyboardButton(text='Все домашки 📃', callback_data='hwmenu_allhws'))
