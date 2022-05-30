@@ -16,41 +16,41 @@ def menu_output(chat_id, user_id):
     not_tasks_alert=user[6]
     not_tasks_new=user[7]
     if not user:
-        return 'Оу... Я не знаю кто ты такой... 🤔', None
+        return 'Оу... Я не знаю хто ти такий... 🤔', None
     else:
-        output='🙃 Ты - '+name+' '+surname+'\n'
-        output+='🥇 Твой номер в списке: '+str(group_id)+'\n'
-        output+='📚 Форма обучения: '
+        output='🙃 Ти - '+name+' '+surname+'\n'
+        output+='🥇 Твій індекс у списку групи: '+str(group_id)+'\n'
+        output+='📚 Форма навчання: '
         if contract_student==False:
             output+='Бюджет 💫'+'\n'
         else:
             output+='Контракт 💸'+'\n'
         if email!=None:
-            output+='💌 Почта КПИ: '+email+'\n'
+            output+='💌 Почта КПІ: '+email+'\n'
         if chat_id>0:
             if not_lesson_alert==True:
-                text='Звонок на пару: 🔔'
+                text='Дзвоник на пару: 🔔'
                 callback_data='alert lesson turnoff'
             else:
-                text='Звонок на пару: 🔕'
+                text='Дзвоник на пару: 🔕'
                 callback_data='alert lesson turnon'
             reply_markup = types.InlineKeyboardMarkup()
             reply_markup.add(types.InlineKeyboardButton(text=text, callback_data=callback_data))
 
             if not_tasks_alert==True:
-                text='Дедлайны: 🔔'
+                text='Дедлайни: 🔔'
                 callback_data='alert deadlines turnoff'
             else:
-                text='Дедлайны: 🔕'
+                text='Дедлайни: 🔕'
                 callback_data='alert deadlines turnon'
 
             reply_markup.add(types.InlineKeyboardButton(text=text, callback_data=callback_data))
 
             if not_tasks_new==True:
-                text='Новые задания: 🔔'
+                text='Нові завдання: 🔔'
                 callback_data='alert newtasks turnoff'
             else:
-                text='Новые задания: 🔕'
+                text='Нові завдання: 🔕'
                 callback_data='alert newtasks turnon'
 
             reply_markup.add(types.InlineKeyboardButton(text=text, callback_data=callback_data))
@@ -72,7 +72,7 @@ async def menu(message):
                             message_id=message.message_id)
     else:
         await bot.send_message(   chat_id=message.chat.id, 
-                            text='Эту команду можно использовать только в лс бота 😟', 
+                            text='Цю команду не можна використовувати у чаті 😟', 
                             reply_markup=link_markup) 
 
 
@@ -92,11 +92,11 @@ async def NameDoesntMatter(query):
     if action == 'turnoff':
         update('users', alert_type, False, where_column='id', where_value=user_id)
         await bot.answer_callback_query(  callback_query_id=query.id, 
-                                    text='Вы отключили уведомления 🔕')
+                                    text='Ви відключили повідомлення 🔕')
     else:
         update('users', alert_type, True, where_column='id', where_value=user_id)
         await bot.answer_callback_query(  callback_query_id=query.id, 
-                                    text='Теперь вам будут приходит уведомления 🔔')
+                                    text='Тепер вам будуть приходити повідомлення 🔔')
 
     output, reply_markup = menu_output(query.message.chat.id, user_id)
 

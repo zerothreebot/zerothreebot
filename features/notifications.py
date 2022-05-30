@@ -12,16 +12,16 @@ notification_message_id=0
 async def Command_Left(message):
     global notification_message_id
     notification_message_id = -1
-    text='Реплайни на это сообщение то, что хочешь выслать всем...'
+    text='Реплайни на це повідомлення тe, що хочеш відправити усім...'
     await bot.reply_to(message, text)
 
 @bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0 and notification_message_id==-1) 
 async def All(message):
     global notification_message_id
     sendall = types.InlineKeyboardMarkup()
-    sendall.add(    types.InlineKeyboardButton(text='Отменить ❌', callback_data='cancelsendall'),
-                    types.InlineKeyboardButton(text='Отправить всем 🕊️', callback_data='sendall'))
-    text='Отправить всем это сообщение?'
+    sendall.add(    types.InlineKeyboardButton(text='Скасувати ❌', callback_data='cancelsendall'),
+                    types.InlineKeyboardButton(text='Відправити усім 🕊️', callback_data='sendall'))
+    text='Відправити усім це повідомлення?'
     notification_message_id = message.message_id
     await bot.reply_to(message, text, reply_markup=sendall)
 
@@ -37,7 +37,7 @@ async def Left_Showgraf(query):
                 await bot.forward_message(chat_id=i[0], from_chat_id=query.message.chat.id, message_id=notification_message_id)
             except: pass
     await bot.answer_callback_query(  callback_query_id=query.id, 
-                                text='Отправлено 🕊')
+                                text='Відправлено 🕊')
     notification_message_id=0
     
 
@@ -45,7 +45,7 @@ async def Left_Showgraf(query):
 async def Left_Showgraf(query):
     global notification_message_id
     await bot.answer_callback_query(  callback_query_id=query.id, 
-                                text='Отменено ❌')
+                                text='Скасовано ❌')
     await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     notification_message_id=0
 
@@ -66,10 +66,10 @@ async def notification_tasks(days_left, message):
             notifications=users_list[j] 
             if str(j) not in done_by and notifications==True:
                 watch_deadline_task = types.InlineKeyboardMarkup()
-                watch_deadline_task.add(types.InlineKeyboardButton(text='Посмотреть задание...', callback_data='watchnewtask2 '+str(task_id)))
+                watch_deadline_task.add(types.InlineKeyboardButton(text='Подивитися завдання...', callback_data='watchnewtask2 '+str(task_id)))
                 try:
                     await bot.send_message(   chat_id=j, 
-                                        text='Вы не выполнили задание с '+lessons[lesson_id]['lesson_name']+'\n\n'+message, 
+                                        text='Ви не виконали завдання з '+lessons[lesson_id]['lesson_name']+'\n\n'+message, 
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass
@@ -77,13 +77,13 @@ async def notification_tasks(days_left, message):
 
 
 async def notifications_6hr_before():
-    await notification_tasks(1, '💥 Осталось 6 часов, до дня сдачи работы!')
+    await notification_tasks(1, '💥 Залишилось 6 годин, до дня здачі роботи!')
 async def notifications_14hr_before():
-    await notification_tasks(1, '🔥 До дня сдачи работы осталось 14 часов!')
+    await notification_tasks(1, '🔥 До дня здачі роботи залишилось 14 годин!')
 async def notifications_day_before():
-    await notification_tasks(2, '❄ Завтра дедллайн сдачи работы')
+    await notification_tasks(2, '❄ Завтра дедллайн здачі работи')
 async def notifications_2days_before():
-    await notification_tasks(3, '🧊 Дедллайн сдачи через 2 дня')
+    await notification_tasks(3, '🧊 Дедллайн здачі через 2 дні')
 
 
 from settings import checkgmailevery
@@ -101,14 +101,14 @@ def lesson_started(message_text, markup):
     
     if markup==True:
         lessonsToday_markup= types.InlineKeyboardMarkup()
-        lessonsToday_markup.add(types.InlineKeyboardButton(text='Расписание на сегодня', callback_data='prevday'))
+        lessonsToday_markup.add(types.InlineKeyboardButton(text='Розклад на сьогодні', callback_data='prevday'))
     else:
         lessonsToday_markup=None
     users=fetch('users', rows='id, not_lesson_alert')
     k=1
     for i in week[getweek()][getdayofweek()]:
         print(k, getcurrentlessonnumber(True),'---------', i)
-        if i['lesson']!='-' and i['lesson']!='Отдыхай 😅':
+        if i['lesson']!='-' and i['lesson']!='Відпочивай 😅':
             if k==getcurrentlessonnumber(True):
                 for i in users:
                     user_id=i[0]
@@ -124,10 +124,10 @@ def lesson_started(message_text, markup):
 #lesson_started()
 
 def lesson_started_prepare():
-    lesson_started('🔔 Пара начнется через 10 минут!', markup=False)
+    lesson_started('🔔 Пара почнеться через 10 хвилин!', markup=False)
 
 def lesson_started_now():
-    lesson_started('🔔 Началась пара', markup=True)
+    lesson_started('🔔 Почалась пара', markup=True)
     
 lesson_start_prepare=["05:20", "07:15", "09:10", "11:05", "13:00"] 
 for i in lesson_start_prepare:

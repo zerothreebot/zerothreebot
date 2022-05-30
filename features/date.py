@@ -1,6 +1,6 @@
 from datetime import date
 
-month_list=['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+month_list=['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня']
 
 def convert_date(date, show_year=False):
     output=str(date.day)+' '+month_list[date.month-1]
@@ -22,7 +22,7 @@ def days_left(date_deadline):
         days_left*=-1
 
     if days_left % 100 >= 10 and days_left % 100 <= 20:
-        output+='дней'
+        output+='днів'
     else:
         last_digit=days_left % 10
 
@@ -31,7 +31,7 @@ def days_left(date_deadline):
         elif last_digit==2 or last_digit==3 or last_digit==4:
             output+='дня'
         else:
-            output+='дней'
+            output+='днів'
 
     return output
 

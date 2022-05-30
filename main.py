@@ -25,13 +25,13 @@ for i in result:
 @bot.message_handler(commands=['start']) 
 async def Command_Marks(message):
     await bot.send_message(   chat_id=message.chat.id, 
-                        text='Приветик. Это персональный бот группы БС-03 который организовывает и регулирует учёбный процесс.\n\nЕсли вы не свой, то работу я вам, конечно-же, показать не могу, но если очень хочется посмотреть - пишите <a href="tg://user?id='+str(admin_id)+'">Админу</a>',
+                        text='Привітик) Це персональний бот групи BS-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>',
                         reply_markup=web_app_keyboard)
 
 @bot.message_handler(commands=['marks'])
 async def Command_Marks(message):
     await bot.send_message(   chat_id=message.chat.id,
-                        text='📑 КПИ ФБМИ 122 2022 БС', 
+                        text='📑 КПІ ФБМИ 122 2022 БС', 
                         reply_markup=marks_markup)
 
 @bot.message_handler(commands=['list'])
@@ -65,7 +65,7 @@ async def scheduler():
 
  
 async def main():
-    await bot.send_message(admin_id, '@rozklad_bot LOG: Bot started', disable_notification=True)
+    await bot.send_message(admin_id, '@rozklad_bot LOG: Бот запустився', disable_notification=True)
     await define_birthday_users()
     await asyncio.gather(bot.infinity_polling(), scheduler())
 

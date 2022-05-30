@@ -97,7 +97,7 @@ def Timetable_Output():
     for i in paras:
         text+=i
         if k==currentpara:
-            text+=' - <b><u>СЕЙЧАС</u></b>'
+            text+=' - <b><u>ЗАРАЗ</u></b>'
         text+='\n'
         k+=1
     return text
@@ -116,11 +116,11 @@ def getdayofweek():
 def getcurrentweek(tod):
     if tod==2: tod=0
 
-    if tod==0: weekroz='<i> - Первая неделя</i>'
-    elif tod==1: weekroz='<i> - Вторая неделя</i>'
+    if tod==0: weekroz='<i> - Перший тиждень</i>'
+    elif tod==1: weekroz='<i> - Другий тиждень</i>'
 
-    if getweek()==tod and getdayofweek()!=6: weekroz+=' (Текущая)'
-    elif getweek()==tod and getdayofweek()==6: weekroz+=' (Начинается завтра)'
+    if getweek()==tod and getdayofweek()!=6: weekroz+=' (Поточний)'
+    elif getweek()==tod and getdayofweek()==6: weekroz+=' (Почнеться завтра)'
 
     weeknumber=0
 
@@ -183,13 +183,13 @@ def output(tod,whatday):
     if tod==7: tod=0
     rozklad+='<b>'+weekdays[tod]+'</b>'
     if whatday==0:
-        rozklad+='<i> - Сегодня</i>\n'
+        rozklad+='<i> - Сьогодні</i>\n'
     elif whatday==1:
         rozklad+='<i> - Завтра</i>\n'
     k=1
     additional_lesson_found=False
     for i in week[getweek()][tod]:
-        if i=='Отдыхай 😅':
+        if i=='Відпочивай 😅':
             rozklad+=i+'\n'
             break
         elif i['lesson']!='-':
@@ -202,7 +202,7 @@ def output(tod,whatday):
             if i['link']!='': rozklad+=' - <a href="'+i['link']+'">'+i['where']+'</a>' 
 
             if k==getcurrentlessonnumber(False) and whatday==0:
-                rozklad+=' - <b><u>СЕЙЧАС</u></b>'
+                rozklad+=' - <b><u>ЗАРАЗ</u></b>'
             rozklad+='\n'
         k+=1
     if timeleft!=None and whatday==0:
@@ -211,16 +211,16 @@ def output(tod,whatday):
     markup = types.InlineKeyboardMarkup()
     
     if whatday==0:
-        markup.add(         types.InlineKeyboardButton(text='Расписание завтра »', callback_data='nextday'),
-                            types.InlineKeyboardButton(text='График 📃', callback_data='timetable prevday'))
+        markup.add(         types.InlineKeyboardButton(text='Розклад на завтра »', callback_data='nextday'),
+                            types.InlineKeyboardButton(text='Графік 📃', callback_data='timetable prevday'))
         if additional_lesson_found==True:
-            markup.add(     types.InlineKeyboardButton(text='Ссылки допов 🔗', callback_data='additional_lessons_info prevday'))
+            markup.add(     types.InlineKeyboardButton(text='Дод. предмети 🔗', callback_data='additional_lessons_info prevday'))
 
     elif whatday==1:
-        markup.add(         types.InlineKeyboardButton(text='« Расписание сегодня', callback_data='prevday'),
-                            types.InlineKeyboardButton(text='График 📃', callback_data='timetable nextday'))
+        markup.add(         types.InlineKeyboardButton(text='« Розклад на сьогодні', callback_data='prevday'),
+                            types.InlineKeyboardButton(text='Графік 📃', callback_data='timetable nextday'))
         if additional_lesson_found==True:
-            markup.add(     types.InlineKeyboardButton(text='Ссылки допов 🔗', callback_data='additional_lessons_info nextday'))
+            markup.add(     types.InlineKeyboardButton(text='Дод. предмети 🔗', callback_data='additional_lessons_info nextday'))
 
         
     return rozklad, markup
@@ -246,24 +246,24 @@ def gettimeleft():
     now=datetime.datetime.now(tz)
     nowsec=3600*int(now.strftime("%H"))+60*int(now.strftime("%M"))+int(now.strftime("%S"))
     if nowsec>=25200 and nowsec<30600:
-        timeleft='До начала пары осталось: <b>'+strftime("%H:%M:%S", gmtime(30600-nowsec))+'</b>'
+        timeleft='До початку пари лишилося: <b>'+strftime("%H:%M:%S", gmtime(30600-nowsec))+'</b>'
     elif nowsec>=30600 and nowsec<36300:
-        timeleft='До конца пары осталось: <b>'+strftime("%H:%M:%S", gmtime(36300-nowsec))+'</b>'
+        timeleft='До кінця пари лишилося: <b>'+strftime("%H:%M:%S", gmtime(36300-nowsec))+'</b>'
 
     elif nowsec>=36300 and nowsec<37500:
-        timeleft='До конца перемены осталось: <b>'+strftime("%H:%M:%S", gmtime(37500-nowsec))+'</b>'
+        timeleft='До кінця перерви лишилося: <b>'+strftime("%H:%M:%S", gmtime(37500-nowsec))+'</b>'
     elif nowsec>=37500 and nowsec<43200:
-        timeleft='До конца пары осталось: <b>'+strftime("%H:%M:%S", gmtime(43200-nowsec))+'</b>'
+        timeleft='До кінця пари лишилося: <b>'+strftime("%H:%M:%S", gmtime(43200-nowsec))+'</b>'
 
     elif nowsec>=43200 and nowsec<44400:
-        timeleft='До конца перемены осталось: <b>'+strftime("%H:%M:%S", gmtime(44400-nowsec))+'</b>'
+        timeleft='До кінця перерви лишилося: <b>'+strftime("%H:%M:%S", gmtime(44400-nowsec))+'</b>'
     elif nowsec>=44400 and nowsec<50100:
-        timeleft='До конца пары осталось: <b>'+strftime("%H:%M:%S", gmtime(50100-nowsec))+'</b>'
+        timeleft='До кінця пари лишилося: <b>'+strftime("%H:%M:%S", gmtime(50100-nowsec))+'</b>'
 
     elif nowsec>=50100 and nowsec<51300:
-        timeleft='До конца перемены осталось: <b>'+strftime("%H:%M:%S", gmtime(51300-nowsec))+'</b>'
+        timeleft='До кінця перерви лишилося: <b>'+strftime("%H:%M:%S", gmtime(51300-nowsec))+'</b>'
     elif nowsec>=51300 and nowsec<57000:
-        timeleft='До конца пары осталось: <b>'+strftime("%H:%M:%S", gmtime(57000-nowsec))+'</b>'
+        timeleft='До кінця пари лишилося: <b>'+strftime("%H:%M:%S", gmtime(57000-nowsec))+'</b>'
 
     else:
         return None

@@ -14,7 +14,7 @@ for z in range(0,2):
             if lesson_id==-1:
                 array.append({'lesson':'-', 'type':'', 'where':'', 'link':''})
             elif lesson_id==-2:
-                array.append({'lesson':'Доп. предмет','type':'', 'where':'','link':''})
+                array.append({'lesson':'Дод. предмет','type':'', 'where':'','link':''})
             else:
                 type=j[1]
                 if type == 0 :
@@ -29,7 +29,7 @@ for z in range(0,2):
 
                     if link.find('zoom')!=-1: where='Zoom'
                     elif link.find('meet')!=-1: where='Meet'
-                    else: where='Ссылка'
+                    else: where='Посилання'
                     
                 else: 
                     where=''
@@ -38,7 +38,7 @@ for z in range(0,2):
                 array.append({'lesson':lessons[lesson_id]['lesson_name'], 'type':type_, 'where':where, 'link':link})
         
         week[z].append(array)
-    week[z].append([{'lesson':'Отдыхай 😅', 'type':'', 'where':'', 'link':''}])
+    week[z].append([{'lesson':'Відпочивай 😅', 'type':'', 'where':'', 'link':''}])
     
 
 paras=[     '<i>1 пара</i>  <b>08:30 - 10:05</b>',
@@ -49,11 +49,11 @@ paras=[     '<i>1 пара</i>  <b>08:30 - 10:05</b>',
 
 
 weekdays = {
-    0: 'Понедельник',
-    1: 'Вторник',
-    2: 'Среда',
-    3: 'Четверг',
-    4: 'Пятница',
-    5: 'Суботта',
-    6: 'Воскресенье',
+    0: "Понеділок",
+    1: "Вівторок",
+    2: "Середа",
+    3: "Четвер",
+    4: "П'ятниця",
+    5: "Субота",
+    6: "Неділя",
     }

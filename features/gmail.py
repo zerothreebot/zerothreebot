@@ -79,7 +79,7 @@ class Email:
         
         if len(message_text)>=3500:
             message_text = message_text[:3500]
-            message_text+='...\n\n<i>Это сообщение слишком длинное и не может быть отправлено полностью. Перейдите в Gmail, чтобы прочитать содержимое</i>'
+            message_text+='...\n\n<i>Це повідомлення надто довге і не може бути надіслано повністю. Перейдіть до Gmail, щоб прочитати вміст</i>'
         
         return message_text
 
