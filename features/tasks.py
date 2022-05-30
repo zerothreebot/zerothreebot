@@ -35,7 +35,7 @@ async def NameDoesntMatter(query):
 
 
 def lost_tasks_builder(user_id):  
-    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline', order_by='deadline, id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task', order_by='deadline, id')
 
 
     losttasks_buttons=[]
@@ -45,7 +45,8 @@ def lost_tasks_builder(user_id):
         task_id=i[1]
         task_done_by=i[2]
         deadline=i[3]
-
+        task=i[4]
+        task=task[:task.find('\n')][:10]
         if deadline==datetime.date(2222,1,1):
             deadline='долгосрок'
         else:
@@ -55,7 +56,7 @@ def lost_tasks_builder(user_id):
             if str(user_id) not in task_done_by:
 
                 losttasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' lost'))
-                output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+deadline+'\n'
+                output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <i>'+task+'...</i> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
@@ -75,7 +76,7 @@ def lost_tasks_builder(user_id):
 
 
 def all_tasks_builder(user_id):  
-    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline', order_by='id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task', order_by='id')
 
 
     alltasks_buttons=[]
@@ -85,6 +86,8 @@ def all_tasks_builder(user_id):
         task_id=i[1]
         task_done_by=i[2]
         deadline=i[3]
+        task=i[4]
+        task=task[:task.find('\n')][:10]
         if task_done_by!=None:
             if str(user_id) in task_done_by:
                 toadd='✅'
@@ -99,7 +102,7 @@ def all_tasks_builder(user_id):
             deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
 
         alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' all'))
-        output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+'. Дедлайн: '+deadline+'\n'
+        output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <i>'+task+'...</i> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
@@ -115,7 +118,7 @@ def all_tasks_builder(user_id):
      
 
 @bot.message_handler(commands=['hw'])
-async def actual_tasks(message):
+async def tasks_menu(message):
     if message.chat.id>0:
         await bot.send_message(   chat_id=message.chat.id, 
                             text='📕 Меню домашних заданий:', 
@@ -138,18 +141,6 @@ async def remove_task_c(message):
             await bot.send_message(   chat_id=message.chat.id, 
                                 text='Такое задание не существует 😟')
         
-
-@bot.callback_query_handler(lambda query: query.data=='hwmenu_actual')
-async def NameDoesntMatter(query):
-    user_id=query.from_user.id
-    chat_id=query.message.chat.id
-    message_id=query.message.message_id
-    output, reply_markup = actual_tasks_builder(user_id)
-    reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
-    await bot.edit_message_text(  chat_id=chat_id, 
-                            message_id=message_id, 
-                            text=output,
-                            reply_markup=reply_markup) 
 
 
 @bot.callback_query_handler(lambda query: query.data=='hwmenu_back')
@@ -233,7 +224,7 @@ async def NameDoesntMatter(query):
     await bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
     task_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
-    await Watch_Task_Process(task_id, user_id, 'actual')
+    await Watch_Task_Process(task_id, user_id, 'lost')
 
 
 def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id): 
@@ -324,9 +315,6 @@ async def NameDoesntMatter(query):
     elif type=='lost':
         user_id=query.from_user.id
         output, tasks_markup=lost_tasks_builder(user_id)
-    elif type=='actual':
-        output, tasks_markup = actual_tasks_builder(query.from_user.id)
-        tasks_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
 
     if query.data!='back_to_tasks':
         ids=query.data.split(' ')
@@ -575,40 +563,3 @@ async def NameDoesntMatter(query):
                         message_id=query.message.message_id)
     
 
-def actual_tasks_builder(user_id):
-        tasks=fetch('tasks',rows='lesson_id, deadline, id, done_by', order_by='id')
-        todays_date=date.today()
-        output='📑 Вот актуальные домашние задания:\n\n'
-        
-        lst=[]
-
-        actual_tasks_count=0
-        for i in tasks:
-            deadline=i[1]
-            if i[3]!=None:
-                if str(user_id) in i[3]:
-                    if deadline==date(2222,1,1):
-                        continue
-                    toadd='✅'
-                else:
-                    toadd='🕚'
-            else:
-                toadd='🕚'
-            difference=i[1]-todays_date
-            if difference.days>=0:
-                actual_tasks_count+=1
-                if deadline==datetime.date(2222,1,1):
-                    deadline='долгосрок'
-                else:
-                    deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
-
-                if toadd=='✅':
-                    output+=toadd+' #'+str(i[2])+' - <s><i>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+deadline+'</i></s>\n'
-                else:
-                    output+=toadd+' #'+str(i[2])+' - <b>'+lessons[i[0]]['lesson_name']+'. Дедлайн: '+deadline+'</b>\n'
-                lst.append(types.InlineKeyboardButton(text=toadd+'#'+str(i[2]), callback_data='watchtask2 '+str(i[2])+' actual'))
-
-        columns=5
-        
-        reply_markup=types.InlineKeyboardMarkup(build_menu(lst, columns))
-        return output, reply_markup
