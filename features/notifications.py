@@ -29,7 +29,7 @@ async def All(message):
 async def Left_Showgraf(query):
     global notification_message_id
     result=fetch(table='users', rows="id")
-    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Отправлено 🕊', reply_markup=None)
+    await bot.edit_message_text(chat_id=query.message.chat.id, message_id=query.message.message_id, text='Відправлено 🕊', reply_markup=None)
     for i in result:
         #if i[0]==admin_id:
             try:
@@ -97,7 +97,7 @@ aioschedule.every().day.at("12:00").do(notifications_2days_before)
 
 from database.week import week
 from features.timetable import *
-def lesson_started(message_text, markup):
+async def lesson_started(message_text, markup):
     
     if markup==True:
         lessonsToday_markup= types.InlineKeyboardMarkup()
@@ -107,15 +107,17 @@ def lesson_started(message_text, markup):
     users=fetch('users', rows='id, not_lesson_alert')
     k=1
     for i in week[getweek()][getdayofweek()]:
+        
         print(k, getcurrentlessonnumber(True),'---------', i)
         if i['lesson']!='-' and i['lesson']!='Відпочивай 😅':
+            print(True)
             if k==getcurrentlessonnumber(True):
                 for i in users:
                     user_id=i[0]
                     alert=i[1]
                     
                     if alert==True:
-                        try: bot.send_message(  chat_id=user_id, 
+                        try: await bot.send_message(  chat_id=user_id, 
                                                 text=message_text,
                                                 reply_markup=lessonsToday_markup)
                         except: pass
@@ -123,12 +125,13 @@ def lesson_started(message_text, markup):
         k+=1
 #lesson_started()
 
-def lesson_started_prepare():
-    lesson_started('🔔 Пара почнеться через 10 хвилин!', markup=False)
+async def lesson_started_prepare():
+    await lesson_started('🔔 Пара почнеться через 10 хвилин!', markup=False)
 
-def lesson_started_now():
-    lesson_started('🔔 Почалась пара', markup=True)
+async def lesson_started_now():
+    await lesson_started('🔔 Почалась пара', markup=True)
     
+
 lesson_start_prepare=["05:20", "07:15", "09:10", "11:05", "13:00"] 
 for i in lesson_start_prepare:
     aioschedule.every().day.at(i).do(lesson_started_prepare)

@@ -232,6 +232,7 @@ def getcurrentlessonnumber(offset):
         now=datetime.datetime.now(tz)
     nowsec=3600*int(now.strftime("%H"))+60*int(now.strftime("%M"))+int(now.strftime("%S"))
     paranumber=0
+
     if nowsec>=30600 and nowsec<36300:
        paranumber=1
     elif nowsec>=37500 and nowsec<43200:
@@ -240,6 +241,7 @@ def getcurrentlessonnumber(offset):
        paranumber=3
     elif nowsec>=51300 and nowsec<57000:
        paranumber=4
+
     return paranumber
 
 def gettimeleft():
