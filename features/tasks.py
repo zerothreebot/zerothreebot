@@ -64,6 +64,8 @@ def lost_tasks_builder(user_id):
     columns=7
     tasks_count=len(losttasks_buttons)
     toadd_blanks=columns-tasks_count%columns
+    if toadd_blanks==7:
+        toadd_blanks=0
     if toadd_blanks!=0 and tasks_count!=0:
         for i in range(toadd_blanks):
             losttasks_buttons.append(types.InlineKeyboardButton(text='...', callback_data='blank'))
