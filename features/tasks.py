@@ -50,7 +50,7 @@ def lost_tasks_builder(user_id):
         if deadline==datetime.date(2222,1,1):
             deadline='довгострок'
         else:
-            deadline=convert_date(deadline)+' - '+days_left(deadline)
+            deadline=convert_date(deadline)+' | '+days_left(deadline)
 
         if task_done_by!=None:
             if str(user_id) not in task_done_by:
@@ -101,7 +101,7 @@ def all_tasks_builder(user_id):
         if deadline==datetime.date(2222,1,1):
             deadline='довгострок'
         else:
-            deadline=convert_date(deadline)+' ('+days_left(deadline)+')'
+            deadline=convert_date(deadline)+' | '+days_left(deadline)
 
         alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' all'))
         output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <i>'+task+'...</i> ('+deadline+')\n'
