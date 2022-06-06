@@ -14,7 +14,7 @@ def days_left(date_deadline):
     days_left=days_count.days
 
     if days_left==0:
-        return 'Сегодня 💥'
+        return 'Сьогодні 💥'
 
     output=str(days_left)+' '
 
@@ -29,7 +29,7 @@ def days_left(date_deadline):
         if last_digit==1:
             output+='день'
         elif last_digit==2 or last_digit==3 or last_digit==4:
-            output+='дня'
+            output+='дні'
         else:
             output+='днів'
 

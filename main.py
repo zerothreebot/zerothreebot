@@ -65,7 +65,7 @@ async def scheduler():
 
  
 async def main():
-    await bot.send_message(admin_id, '@rozklad_bot LOG: Бот запустився', disable_notification=True)
+    await bot.send_message(admin_id, '@zerothree_bot LOG: Бот запустився', disable_notification=True)
     await define_birthday_users()
     await asyncio.gather(bot.infinity_polling(), scheduler())
 
