@@ -76,7 +76,7 @@ animations=[
 ]
 
 
-def birthday_today():
+async def birthday_today():
     todays_date=date.today()
     users=fetch('birthdates', rows='id, date')
     for i in users:
@@ -87,12 +87,12 @@ def birthday_today():
             reply_markup = types.InlineKeyboardMarkup()
             reply_markup.add(types.InlineKeyboardButton(text='🎂 0', callback_data='plusone 0'))
 
-            member=bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
+            member= await bot.get_chat_member(chat_id=chat_id, user_id=user_bd_id)
             fullname=member.user.first_name
             if member.user.last_name!=None:
                 fullname+=' '+member.user.last_name
 
-            photo = bot.get_user_profile_photos(user_id=user_bd_id)
+            photo = await bot.get_user_profile_photos(user_id=user_bd_id)
             if photo.total_count!=0:
                 photo_id=photo.photos[0][0].file_id
 
@@ -101,32 +101,31 @@ def birthday_today():
             random_quote=random.choice(birthday_quotes).replace('hyperlink', hyperlink)
             random_animation=random.choice(animations)
 
-            #chat_id=393483876 #DELETE ON DEPLOY
             for j in users:
                 user_id = j[0]
                 if user_id!=user_bd_id:
-                #if user_id==393483876: #DELETE ON DEPLOY 
-                    try: 
-                        if photo.total_count!=0:
-                            bot.send_photo(     chat_id=user_id,
-                                                caption='Сьогодні у '+hyperlink+' день народження 🎉\nПривітайте його зараз ⚡️',
-                                                photo=photo_id)
-                        else:
-                            bot.send_message(   chat_id=user_id,
-                                                text='Сьогодні у '+hyperlink+' день народження 🎉\nПривітайте його зараз ⚡️')
-                    except:pass
+                    #if user_id==393483876: #DELETE ON DEPLOY 
+                        try: 
+                            if photo.total_count!=0:
+                                await bot.send_photo(     chat_id=user_id,
+                                                    caption='Сьогодні у '+hyperlink+' день народження 🎉\nПривітайте його зараз ⚡️',
+                                                    photo=photo_id)
+                            else:
+                                await bot.send_message(   chat_id=user_id,
+                                                    text='Сьогодні у '+hyperlink+' день народження 🎉\nПривітайте його зараз ⚡️')
+                        except:pass
 
-            message_id=bot.send_animation(  chat_id=chat_id,
+            message_animation= await bot.send_animation(  chat_id=chat_id,
                                             animation=random_animation,
                                             caption=random_quote,
-                                            reply_markup=reply_markup).message_id                   
-            bot.send_message(   chat_id=chat_id,
+                                            reply_markup=reply_markup)                 
+            await bot.send_message(   chat_id=chat_id,
                                 text='🎉')
-            bot.pin_chat_message(   chat_id=chat_id,
-                                    message_id=message_id)
+            await bot.pin_chat_message(   chat_id=chat_id,
+                                    message_id=message_animation.message_id)
 
 
-def birthday_prepare(days_left, message):
+async def birthday_prepare(days_left, message):
     todays_date=date.today()+timedelta(days=days_left)
     users=fetch('birthdates', rows='id, date')
 
@@ -141,10 +140,10 @@ def birthday_prepare(days_left, message):
 
         if bd_day_count==todays_day_count and todays_month_count==bd_month_count:
             
-            member=bot.get_chat_member( chat_id=chat_id, 
+            member=await bot.get_chat_member( chat_id=chat_id, 
                                         user_id=user_bd_id)
 
-            fullname=member.user.first_name
+            fullname= member.user.first_name
             if member.user.last_name!=None:
                 fullname+=' '+member.user.last_name
             hyperlink='<a href="tg://user?id='+str(member.user.id)+'">'+fullname+'</a>'
@@ -153,20 +152,20 @@ def birthday_prepare(days_left, message):
             for j in users:
                 user_id = j[0]
                 if user_id!=user_bd_id:
-                #if user_id==393483876: #DELETE ON DEPLOY 
-                    try: 
-                        bot.send_message(   chat_id=user_id,
-                                            text=message+' у '+hyperlink+' день народження 🎉\nНе забудьте привітати ☺️')
-                    except:pass
+                    #if user_id==393483876: #DELETE ON DEPLOY 
+                        try: 
+                            await bot.send_message(   chat_id=user_id,
+                                                text=message+' у '+hyperlink+' день народження 🎉\nНе забудьте привітати ☺️')
+                        except:pass
 
-def birthday_1day_before():
-    birthday_prepare(1,'Завтра')
+async def birthday_1day_before():
+    await birthday_prepare(1,'Завтра')
 
-def birthday_3days_before():
-    birthday_prepare(3,'Через 3 дні')
+async def birthday_3days_before():
+    await birthday_prepare(3,'Через 3 дні')
 
 
-#schedule.every(10).seconds.do(birthday_1day_before)
+#aioschedule.every(10).seconds.do(birthday_today)
 aioschedule.every().day.at("07:30").do(birthday_today)
 aioschedule.every().day.at("11:00").do(birthday_1day_before)
 aioschedule.every().day.at("13:00").do(birthday_3days_before)
