@@ -1,11 +1,16 @@
 
-from glob import glob
 from telebot import types
 import aioschedule
 import datetime 
-from features.lessons import *
-from settings import bot, admin_id
+from settings import bot, admin_id, checkgmailevery
 from database.db import fetch
+from database.week import week
+
+from features.date import convert_date
+from features.gmail import checker
+from features.lessons import *
+from features.timetable import *
+
 
 notification_message_id=0
 @bot.message_handler(commands=['sendall']) # Shows how much time till lesson/break ends with timetable button
@@ -86,8 +91,38 @@ async def notifications_2days_before():
     await notification_tasks(3, '🧊 Дедллайн здачі через 2 дні')
 
 
-from settings import checkgmailevery
-from features.gmail import checker
+async def notification_tasks_event(days_left, message):
+    todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
+    events=fetch('events', rows='id, date, description', where_column='date', where_value="'"+str(todays_date)+"'")
+    print(str(todays_date))
+
+    users=fetch('users', rows='id')
+    users_list=[]
+    for i in users:
+        users_list.append(i[0])
+
+    for i in events:
+        id=i[0]
+        date=i[1]
+        description=i[2]
+        date=convert_date(date)
+        for j in users_list:
+            #if j==admin_id:
+                try:
+                    await bot.send_message(   chat_id=j, 
+                                        text=message+' ('+date+')'+'\n\n<b>'+description+'</b>'
+                                        )
+                except: pass
+
+async def notifications_day_before_event():
+    await notification_tasks_event(1, '💏 Завтра буде захід:')
+async def notifications_2days_before_event():
+    await notification_tasks_event(2, '👨‍🍼 Захід через 2 дні:')
+
+aioschedule.every().day.at("11:00").do(notifications_day_before_event)
+aioschedule.every().day.at("12:00").do(notifications_2days_before_event)
+#aioschedule.every(10).seconds.do(notifications_day_before_event)
+
 aioschedule.every(checkgmailevery).seconds.do(checker)
 aioschedule.every().day.at("16:00").do(notifications_6hr_before)
 aioschedule.every().day.at("08:00").do(notifications_14hr_before)
@@ -95,8 +130,7 @@ aioschedule.every().day.at("08:00").do(notifications_14hr_before)
 aioschedule.every().day.at("11:00").do(notifications_day_before)
 aioschedule.every().day.at("12:00").do(notifications_2days_before)
 
-from database.week import week
-from features.timetable import *
+
 async def lesson_started(message_text, markup):
     
     if markup==True:
