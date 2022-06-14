@@ -2,7 +2,7 @@
 from telebot import types
 import aioschedule
 import datetime 
-from settings import bot, admin_id, checkgmailevery
+from settings import bot, admin_id, checkgmailevery, chat_id
 from database.db import fetch
 from database.week import week
 
@@ -109,10 +109,11 @@ async def notification_tasks_event(days_left, message):
         for j in users_list:
             #if j==admin_id:
                 try:
-                    await bot.send_message(   chat_id=j, 
-                                        text=message+' ('+date+')'+'\n\n<b>'+description+'</b>'
-                                        )
+                    await bot.send_message(   chat_id=j, text=message+' ('+date+')'+'\n\n<b>'+description+'</b>' )
                 except: pass
+                
+        await bot.send_message(   chat_id=chat_id, text=message+' ('+date+')'+'\n\n<b>'+description+'</b>')
+        
 
 async def notifications_day_before_event():
     await notification_tasks_event(1, '💏 Завтра буде захід:')
