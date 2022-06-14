@@ -34,7 +34,7 @@ async def NameDoesntMatter(query):
 
 
 def actual_events_builder():  
-    events=fetch('events',rows='id, date, description', order_by='date, id')
+    events=fetch('events',rows='id, date, description', order_by='date')
     todays_date=dt.today()
 
     actualevents_buttons=[]
@@ -75,7 +75,7 @@ def actual_events_builder():
 
 
 def all_events_builder():  
-    events=fetch('events',rows='id, date, description', order_by='date')
+    events=fetch('events',rows='id, date, description', order_by='date, id')
     todays_date=dt.today()
 
     allevents_buttons=[]
