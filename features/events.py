@@ -145,7 +145,7 @@ async def NameDoesntMatter(query):
     chat_id=query.message.chat.id
     await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
-                            text='📕 Меню заходів:',
+                            text='🧑‍🍼 Меню заходів:',
                             reply_markup=eventmenu_markup) 
 
 
