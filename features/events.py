@@ -53,7 +53,7 @@ def actual_events_builder():
 
         if difference.days>=0:
                 actualevents_buttons.append(types.InlineKeyboardButton(text=str(event_id), callback_data='watchevent2 '+str(event_id)+' actual'))
-                output+='🕚 #'+str(event_id)+' - '+' <b>'+description_short+'</b> ('+date+')\n'
+                output+='🔮 #'+str(event_id)+' - '+' <b>'+description_short+'</b> ('+date+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='eventmenu_back'))
@@ -75,7 +75,7 @@ def actual_events_builder():
 
 
 def all_events_builder():  
-    events=fetch('events',rows='id, date, description', order_by='date, id')
+    events=fetch('events',rows='id, date, description', order_by='date')
     todays_date=dt.today()
 
     allevents_buttons=[]
