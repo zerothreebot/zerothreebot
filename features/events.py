@@ -84,16 +84,19 @@ def all_events_builder():
         event_id=i[0]
         date=i[1]
         difference=i[1]-todays_date
-        description=i[2]
+        description=i[2].replace('\n', ' ')
         if len(description)>45:
             description_short=description[:30]+'...'
         else:
             description_short=description
 
         date=convert_date(date)+' | '+days_left(date)
-
+        if difference.days>=0:
+            toadd='🔮'
+        else:
+            toadd='✅'
         allevents_buttons.append(types.InlineKeyboardButton(text=str(event_id), callback_data='watchevent2 '+str(event_id)+' all'))
-        output+=' #'+str(event_id)+' - '+' <b>'+description_short+'...</b> ('+date+')\n'
+        output+=toadd+' #'+str(event_id)+' - '+' <b>'+description_short+'</b> ('+date+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='eventmenu_back'))
