@@ -193,41 +193,35 @@ async def Watch_event_Process(event_id, user_id, type):
     event_watch_menu = types.InlineKeyboardMarkup()
 
     event_watch_menu.add(types.InlineKeyboardButton(text='« Назад', callback_data='back_to_events'+toadd))
-        
-    await bot.send_message(   chat_id=user_id,
-                        text=output, 
-                        reply_markup=event_watch_menu)
+    return output, event_watch_menu   
+
 
 
 @bot.callback_query_handler(lambda query: query.data.find('watchevent2')!=-1)
 async def NameDoesntMatter(query):
-    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+    
     
     event_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
     type=query.data.split(' ')[2]
 
-    await Watch_event_Process(event_id, user_id, type)
+    text, reply_markup = await Watch_event_Process(event_id, user_id, type)
+    await bot.edit_message_text(    chat_id=query.message.chat.id, 
+                                    message_id=query.message.message_id, 
+                                    text=text,
+                                    reply_markup=reply_markup)
+    
 
 
 @bot.callback_query_handler(lambda query: query.data.find('back_to_events')!=-1)
 async def NameDoesntMatter(query):
     type=query.data.split(' ')[-1]
     if type=='all':
-        user_id=query.from_user.id
         output, events_markup=all_events_builder()
     elif type=='actual':
-        user_id=query.from_user.id
         output, events_markup=actual_events_builder()
 
-    if query.data!='back_to_events':
-        ids=query.data.split(' ')
-        del ids[-1]
-        del ids[0]
-        for i in ids:
-            await bot.delete_message( chat_id=query.message.chat.id, 
-                                message_id=str(i))
-    await bot.edit_message_text(      chat_id=query.message.chat.id, 
+    await bot.edit_message_text(     chat_id=query.message.chat.id, 
                                 message_id=query.message.message_id, 
                                 text=output, 
                                 reply_markup=events_markup)
