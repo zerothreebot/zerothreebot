@@ -43,7 +43,7 @@ def actual_events_builder():
         event_id=i[0]
         date=i[1]
         difference=i[1]-todays_date
-        description=i[2]
+        description=i[2].replace('\n', ' ')
         if len(description)>45:
             description_short=description[:30]+'...'
         else:
