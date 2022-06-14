@@ -104,6 +104,8 @@ def all_events_builder():
     columns=4
     events_count=len(allevents_buttons)
     toadd_blanks=columns-events_count%columns
+    if toadd_blanks==columns:
+        toadd_blanks=0
     if toadd_blanks!=0 and events_count!=0:
         for i in range(toadd_blanks):
             allevents_buttons.append(types.InlineKeyboardButton(text='...', callback_data='blank'))
