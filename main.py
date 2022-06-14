@@ -10,6 +10,7 @@ from features.menu import *
 from features.birthday import *
 from features.tagging import *
 from features.timetable import *
+from features.events import *
 
 
 result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
@@ -44,6 +45,9 @@ async def version_def(message):
     await bot.send_message(   chat_id=message.chat.id, 
                         text=version+"\n"+github_link)
 
+@bot.message_handler(content_types=['animation']) 
+async def version_def(message):
+    print(message)
 
 
     

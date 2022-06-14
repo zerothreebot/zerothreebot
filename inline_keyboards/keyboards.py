@@ -84,3 +84,9 @@ hwmenu_markup=types.InlineKeyboardMarkup()
 hwmenu_markup.add(types.InlineKeyboardButton(text='Треба зробити 🕚', callback_data='hwmenu_losthws'))
 hwmenu_markup.add(      types.InlineKeyboardButton(text='Додати завдання ✍', callback_data='hwmenu_addhw'),
                         types.InlineKeyboardButton(text='Усі завдання 📃', callback_data='hwmenu_allhws'))
+
+eventmenu_markup=types.InlineKeyboardMarkup()
+
+eventmenu_markup.add(types.InlineKeyboardButton(text='Наближчі заходи 👩‍❤️‍💋‍👨', callback_data='eventmenu_actualevents'))
+eventmenu_markup.add(      types.InlineKeyboardButton(text='Додати захід ✍', callback_data='eventmenu_addevent'),
+                        types.InlineKeyboardButton(text='Усі заходи 🧏', callback_data='eventmenu_allevents'))

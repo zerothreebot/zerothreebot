@@ -165,7 +165,7 @@ async def birthday_3days_before():
     await birthday_prepare(3,'Через 3 дні')
 
 
-#aioschedule.every(10).seconds.do(birthday_today)
+#aioschedule.every(15).seconds.do(birthday_today)
 aioschedule.every().day.at("07:30").do(birthday_today)
 aioschedule.every().day.at("11:00").do(birthday_1day_before)
 aioschedule.every().day.at("13:00").do(birthday_3days_before)

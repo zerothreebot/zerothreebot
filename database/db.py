@@ -69,3 +69,6 @@ def add_task(assigned_by, lesson_id, deadline, task, files): #add_task(user_id, 
 def remove_task(task_id): #remove_task(5)
     db_object.execute(f"DELETE FROM tasks WHERE id={task_id}")
     db_connection.commit()
+def remove_event(task_id): #remove_event(5)
+    db_object.execute(f"DELETE FROM events WHERE id={task_id}")
+    db_connection.commit()
