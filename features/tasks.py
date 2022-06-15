@@ -225,7 +225,7 @@ async def SendTaskContent(message, task_id):
 async def NameDoesntMatter(query):
     await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Опа... Нове завдання 😬')
-    await bot.edit_message_reply_markup(chat_id=query.message.chat.id, message_id=query.message.message_id, reply_markup=None)
+    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     task_id=int(query.data.split(' ')[1])
     user_id=query.from_user.id
     await Watch_Task_Process(task_id, user_id, 'lost')
