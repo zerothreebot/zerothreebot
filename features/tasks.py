@@ -125,12 +125,10 @@ async def tasks_menu(message):
         await bot.send_message(   chat_id=message.chat.id, 
                             text='📕 Меню завдань:', 
                             reply_markup=hwmenu_markup) 
-        await bot.delete_message( chat_id=message.chat.id, 
-                            message_id=message.message_id)
     else:
-        await bot.send_message(   chat_id=message.chat.id, 
-                            text='Цю команду не можна використовувати у чатах 😟', 
-                            reply_markup=link_markup) 
+        output, tasks_markup=lost_tasks_builder(message.from_user.id)
+        await bot.reply_to( message=message, 
+                            text=output) 
 
 @bot.message_handler(commands=['removetask'])
 async def remove_task_c(message):
