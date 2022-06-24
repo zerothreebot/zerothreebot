@@ -1,5 +1,5 @@
 from database.db import *
-from features.lessons import lessons
+from database.lessons import lessons
 sql1=fetch('timetable_week_1',rows='para_1, para_2, para_3, para_4, para_5', order_by='day')
 sql2=fetch('timetable_week_2',rows='para_1, para_2, para_3, para_4, para_5', order_by='day')
 sqls=[sql1,sql2]

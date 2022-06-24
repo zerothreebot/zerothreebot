@@ -26,4 +26,3 @@ for i in sql:
 
 
 
-

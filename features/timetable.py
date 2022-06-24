@@ -6,8 +6,39 @@ import aioschedule
 
 from settings import tz, bot, chat_id
 from database.week import *
-from inline_keyboards.keyboards import *
-from features.lessons import lessons_additional
+from database.lessons import lessons_additional
+
+#KEYBOARDS
+hidegraf_markup = types.InlineKeyboardMarkup()
+hidegraf_markup.add(types.InlineKeyboardButton(text='Сховати 🙈', callback_data='hidegraf'))
+
+showgraf_markup = types.InlineKeyboardMarkup()
+showgraf_markup.add(types.InlineKeyboardButton(text='Показати графік 👁', callback_data='showgraf'))
+
+prevweek_markup = types.InlineKeyboardMarkup()
+prevweek_markup.add(types.InlineKeyboardButton(text='« Поточний тиждень', callback_data='prevweek'))
+
+nextweek_markup = types.InlineKeyboardMarkup()
+nextweek_markup.add(types.InlineKeyboardButton(text='Наступний тиждень »', callback_data='nextweek'))
+
+prevday_markup = types.InlineKeyboardMarkup()
+prevday_markup.add(types.InlineKeyboardButton(text='« Розклад на сьогодні', callback_data='prevday'))
+
+nextday_markup = types.InlineKeyboardMarkup()
+nextday_markup.add(types.InlineKeyboardButton(text='Розклад на завтра »', callback_data='nextday'))
+
+lessonsTomorrow_markup = types.InlineKeyboardMarkup()
+lessonsTomorrow_markup.add(types.InlineKeyboardButton(text='Розклад на завтра »', callback_data='nextday'))
+
+lessonsToday_markup= types.InlineKeyboardMarkup()
+lessonsToday_markup.add(types.InlineKeyboardButton(text='« Розклад на сьогодні', callback_data='prevday'))
+
+nextWeek_markup = types.InlineKeyboardMarkup()
+nextWeek_markup.add(types.InlineKeyboardButton(text='Наступний тиждень »', callback_data='nextweek'))
+#KEYBOARDS
+
+
+
 
 @bot.message_handler(commands=['today'])
 async def Command_Today(message):

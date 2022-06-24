@@ -3,12 +3,49 @@ from datetime import date
 
 from settings import bot, chat_id, admin_id
 from database.db import *
-from features.lessons import *
-from inline_keyboards.keyboards import *
+from database.lessons import *
+from tools.menu_builder import build_menu
 from features.date import *
 
+#KEYBOARDS
+taskmenu_markup=types.InlineKeyboardMarkup()
+taskmenu_markup.add(types.InlineKeyboardButton(text='Треба зробити 🕚', callback_data='taskmenu_losttasks'))
+taskmenu_markup.add(      types.InlineKeyboardButton(text='Додати завдання ✍', callback_data='taskmenu_addtask'),
+                        types.InlineKeyboardButton(text='Усі завдання 📃', callback_data='taskmenu_alltasks'))
+link_markup=types.InlineKeyboardMarkup()
+link_markup.add(types.InlineKeyboardButton(text='Перейти 🤖', url='https://t.me/zerothree_bot'))
 
-@bot.callback_query_handler(lambda query: query.data=='hwmenu_allhws')
+cancel_adding_markup=types.InlineKeyboardMarkup()
+cancel_adding_button=types.InlineKeyboardButton(text='Скасувати ❌', callback_data='cancel_adding')
+cancel_adding_markup.add(cancel_adding_button)
+
+finish_adding_markup=types.InlineKeyboardMarkup()
+finish_adding_button=types.InlineKeyboardButton(text='Створити 📃', callback_data='finish_adding')
+finish_adding_markup.add(cancel_adding_button, finish_adding_button)
+#KEYBOARDS
+
+main_buttons=[]
+for i in lessons:
+    main_buttons.append(types.InlineKeyboardButton(text=lessons[i]['lesson_name'], callback_data='addtasklesson '+str(i)))
+footer_buttons=[]
+footer_buttons.append(types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back'))
+lessons_markup=types.InlineKeyboardMarkup(build_menu(main_buttons, 2, footer_buttons=footer_buttons)) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@bot.callback_query_handler(lambda query: query.data=='taskmenu_alltasks')
 async def NameDoesntMatter(query):
     user_id=query.from_user.id
     chat_id=query.message.chat.id
@@ -21,7 +58,7 @@ async def NameDoesntMatter(query):
                             reply_markup=tasks_markup)
 
 
-@bot.callback_query_handler(lambda query: query.data=='hwmenu_losthws')
+@bot.callback_query_handler(lambda query: query.data=='taskmenu_losttasks')
 async def NameDoesntMatter(query):
     user_id=query.from_user.id
     chat_id=query.message.chat.id
@@ -59,7 +96,7 @@ def lost_tasks_builder(user_id):
                 output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <b>'+task+'...</b> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
-    reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
+    reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back'))
 
     columns=7
     tasks_count=len(losttasks_buttons)
@@ -72,7 +109,7 @@ def lost_tasks_builder(user_id):
 
 
     tasks_markup=types.InlineKeyboardMarkup(
-        build_menu(losttasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')])
+        build_menu(losttasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back')])
         )  
     return output, tasks_markup
 
@@ -107,7 +144,7 @@ def all_tasks_builder(user_id):
         output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <b>'+task+'...</b> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
-    reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back'))
+    reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back'))
 
     columns=7
     tasks_count=len(alltasks_buttons)
@@ -115,16 +152,16 @@ def all_tasks_builder(user_id):
     if toadd_blanks!=0 and tasks_count!=0:
         for i in range(toadd_blanks):
             alltasks_buttons.append(types.InlineKeyboardButton(text='...', callback_data='blank'))
-    tasks_markup=types.InlineKeyboardMarkup(build_menu(alltasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='hwmenu_back')]))  
+    tasks_markup=types.InlineKeyboardMarkup(build_menu(alltasks_buttons, columns, footer_buttons=[types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back')]))  
     return output, tasks_markup
      
 
-@bot.message_handler(commands=['hw'])
+@bot.message_handler(commands=['tasks'])
 async def tasks_menu(message):
     if message.chat.id>0:
         await bot.send_message(   chat_id=message.chat.id, 
                             text='📕 Меню завдань:', 
-                            reply_markup=hwmenu_markup) 
+                            reply_markup=taskmenu_markup) 
     else:
         output, tasks_markup=lost_tasks_builder(message.from_user.id)
         await bot.reply_to( message=message, 
@@ -145,17 +182,17 @@ async def remove_task_c(message):
         
 
 
-@bot.callback_query_handler(lambda query: query.data=='hwmenu_back')
+@bot.callback_query_handler(lambda query: query.data=='taskmenu_back')
 async def NameDoesntMatter(query):
     message_id=query.message.message_id
     chat_id=query.message.chat.id
     await bot.edit_message_text(  chat_id=chat_id, 
                             message_id=message_id, 
                             text='📕 Меню завдань:',
-                            reply_markup=hwmenu_markup) 
+                            reply_markup=taskmenu_markup) 
 
 
-@bot.callback_query_handler(lambda query: query.data=='hwmenu_addhw')
+@bot.callback_query_handler(lambda query: query.data=='taskmenu_addtask')
 async def NameDoesntMatter(query):
     chat_id=query.message.chat.id
     message_id=query.message.message_id
@@ -194,17 +231,15 @@ def findreplymarkup(message, done_by, task_id):
     return reply_markup
 
 async def SendTaskContent(message, task_id):
-    sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, deadline, task, files', where_column='id', where_value=task_id)
+    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id,  deadline, task, files', where_column='id', where_value=task_id)
     if sql!=None:
         done_by=sql[0]
-        assigned_by=sql[1]
-        lesson_id=sql[2]
-        assign_date=sql[3]
-        deadline=sql[4]
-        task_mission=sql[5]
-        files=sql[6]
+        lesson_id=sql[1]
+        deadline=sql[2]
+        task_mission=sql[3]
+        files=sql[4]
 
-        output=Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id)
+        output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id)
         reply_markup=findreplymarkup(message, done_by, task_id)
         documentsContainer=CreateDocumentsContainer(files)
 
@@ -229,11 +264,9 @@ async def NameDoesntMatter(query):
     await Watch_Task_Process(task_id, user_id, 'lost')
 
 
-def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id): 
+def Lesson_Output_String(lesson_id,  deadline, task_mission, task_id): 
     output='ID: '+str(task_id)+'\n'
     output+='📕 Предмет: '+lessons[lesson_id]['lesson_name']+'\n'
-    #output+='🙃 Створено: '+assigned_by+'\n'
-    #output+='🕘 Дата створення: '+convert_date(assign_date)+'\n'
     if deadline==datetime.date(2222,1,1):
         output+='🔥 Дедлайн: <b>Це довгострокове завдання.</b>'
     else:
@@ -243,17 +276,15 @@ def Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mis
 
 
 async def Watch_Task_Process(task_id, user_id, type):
-    sql=fetch('tasks', fetchone=True, rows='done_by, assigned_by, lesson_id, assign_date, deadline, task, files', where_column='id', where_value=task_id)
+    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id, deadline, task, files', where_column='id', where_value=task_id)
 
     done_by=sql[0]
-    assigned_by=sql[1]
-    lesson_id=sql[2]
-    assign_date=sql[3]
-    deadline=sql[4]
-    task_mission=sql[5]
-    files=sql[6]
+    lesson_id=sql[1]
+    deadline=sql[2]
+    task_mission=sql[3]
+    files=sql[4]
 
-    output=Lesson_Output_String(assigned_by, lesson_id, assign_date, deadline, task_mission, task_id)
+    output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id)
     toadd=' '+type
     task_watch_menu = types.InlineKeyboardMarkup()
 
@@ -401,17 +432,17 @@ async def NameDoesntMatter(query):
 
 user_current_action={}
 tasks_by_user={}    
-def create_user_adding_hw(user_id):
-    user_current_action[user_id]='addhw step 1'
+def create_user_adding_task(user_id):
+    user_current_action[user_id]='addtask step 1'
     tasks_by_user[user_id]={}
 
 
-@bot.callback_query_handler(lambda query: query.data.find('addHWlesson')!=-1)
+@bot.callback_query_handler(lambda query: query.data.find('addtasklesson')!=-1)
 async def NameDoesntMatter(query):
     user_id=query.from_user.id
-    create_user_adding_hw(user_id)
+    create_user_adding_task(user_id)
 
-    user_current_action[user_id]='addhw step 2'
+    user_current_action[user_id]='addtask step 2'
     lesson_number=int(query.data.split(' ')[1])
     tasks_by_user[user_id]['lesson_id']=lesson_number
 
@@ -460,9 +491,9 @@ async def finish_adding(user_id):
                                     disable_notification=True)
                 
 
-        del_user_from_adding_hw(user_id)
+        del_user_from_adding_task(user_id)
 
-def del_user_from_adding_hw(user_id):
+def del_user_from_adding_task(user_id):
     if user_id in tasks_by_user:
         del tasks_by_user[user_id]
         del user_current_action[user_id]
@@ -506,7 +537,7 @@ async def All(message):
 
                 
                 if fail == None:
-                    user_current_action[user_id]='addhw step 3'
+                    user_current_action[user_id]='addtask step 3'
                     tasks_by_user[user_id]['date']=text
 
                     await bot.send_message(   chat_id=message.chat.id, 
@@ -526,7 +557,7 @@ async def All(message):
                 
             elif action==3:
                 text=message.text
-                user_current_action[user_id]='addhw step 4'
+                user_current_action[user_id]='addtask step 4'
                 tasks_by_user[user_id]['task']=text
                 tasks_by_user[user_id]['files']=[]
                 await bot.send_message(   chat_id=message.chat.id, 
@@ -555,7 +586,7 @@ async def NameDoesntMatter(query):
     user_id=query.from_user.id
     await bot.delete_message( chat_id=query.message.chat.id, 
                         message_id=query.message.message_id)
-    del_user_from_adding_hw(user_id)
+    del_user_from_adding_task(user_id)
 
 @bot.callback_query_handler(lambda query: query.data==('finish_adding'))
 async def NameDoesntMatter(query):

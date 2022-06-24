@@ -8,7 +8,7 @@ from database.week import week
 
 from features.date import convert_date
 from features.gmail import checker
-from features.lessons import *
+from database.lessons import *
 from features.timetable import *
 
 

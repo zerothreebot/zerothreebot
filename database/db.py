@@ -47,10 +47,10 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
     return result
 #fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
 
-def add_task(assigned_by, lesson_id, deadline, task, files): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
-    assign_date=datetime.date.today()
-
-    files=list_to_str(files)
+def add_task(lesson_id, deadline, task, files=None): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
+    if files!=None:
+        files=list_to_str(files)
+    else:files = '{}'
 
     db_object.execute("SELECT id FROM tasks ORDER BY id")
     result = db_object.fetchall()
@@ -60,11 +60,28 @@ def add_task(assigned_by, lesson_id, deadline, task, files): #add_task(user_id, 
     else:
         id=result[len(result)-1][0]+1
 
-    sql = f"INSERT INTO tasks (id, assigned_by, lesson_id, assign_date, deadline, task, files, done_by) VALUES ({id}, {assigned_by}, {lesson_id}, '{assign_date}', '{deadline}', %s, %s, %s)"
-    db_object.execute(sql,(task ,files, '{}'))
+    sql = f"INSERT INTO tasks (id, lesson_id, deadline, task, files, done_by) VALUES ({id}, {lesson_id}, '{deadline}', '{task}' ,'{files}', "+"'{}'"+")"
+    db_object.execute(sql)
     db_connection.commit()
     return id
-#add_task(1231, 2, datetime.date.today(), 'egrerg', ['1','2'])
+#add_task(5, datetime.date.today(), 'TASKTASKTASK')
+
+def add_event(date, description): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
+
+    db_object.execute("SELECT id FROM events ORDER BY id")
+    result = db_object.fetchall()
+    print(result)
+    if result==[]:
+        id=0
+    else:
+        id=result[len(result)-1][0]+1
+
+    sql = "INSERT INTO events (id, date, description) VALUES ({0}, '{1}', '{2}')".format(id, date, description)
+    print(sql)
+    db_object.execute(sql)
+    db_connection.commit()
+    return id
+#add_event(datetime.date.today(), 'sedfwefweferfgqerfgqerqfgergre')
 
 def remove_task(task_id): #remove_task(5)
     db_object.execute(f"DELETE FROM tasks WHERE id={task_id}")

@@ -1,7 +1,6 @@
-from threading import Thread
-import traceback
+import asyncio
+import aioschedule
 
-from inline_keyboards.keyboards import *
 from settings import bot, version, github_link, checkgmailevery, admin_id
 from database.db import *
 
@@ -11,7 +10,7 @@ from features.birthday import *
 from features.tagging import *
 from features.timetable import *
 from features.events import *
-
+from features.tasks import *
 
 result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
 group_list_output=''
@@ -21,22 +20,26 @@ for i in result:
     surname = i[2]
     group_list_output+=str(group_id)+' - '+name+' '+surname+'\n'
 
+#KEYBOARDS
+marks_markup = types.InlineKeyboardMarkup()
+marks_markup.add(types.InlineKeyboardButton( text='Ієрархія оцінок потоку 📈', 
+                                                url='https://docs.google.com/spreadsheets/d/1gQK5b7-YWJlJEwguc3m3oFY4K8nlVSz4rZF4jpvrY4w/edit#gid=200180712'))
+#KEYBOARDS
 
 
 @bot.message_handler(commands=['start']) 
-async def Command_Marks(message):
+async def Start(message):
     await bot.send_message(   chat_id=message.chat.id, 
-                        text='Привітик) Це персональний бот групи BS-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>',
-                        reply_markup=web_app_keyboard)
+                        text='Привітик) Це персональний бот групи BS-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>')
 
 @bot.message_handler(commands=['marks'])
-async def Command_Marks(message):
+async def Output_Marks(message):
     await bot.send_message(   chat_id=message.chat.id,
                         text='📑 КПІ ФБМИ 122 2022 БС', 
                         reply_markup=marks_markup)
 
 @bot.message_handler(commands=['list'])
-async def addhomework(message):
+async def Output_GroupList(message):
     await bot.send_message(   chat_id=message.chat.id, 
                         text=group_list_output)
 
@@ -45,23 +48,17 @@ async def version_def(message):
     await bot.send_message(   chat_id=message.chat.id, 
                         text=version+"\n"+github_link)
 
-@bot.message_handler(content_types=['animation']) 
-async def version_def(message):
+#@bot.message_handler(content_types=['animation']) 
+async def Output_AnimationInfo(message):
     print(message)
 
 
-    
 @bot.callback_query_handler(lambda query: query.data==('delete_button'))
-async def NameDoesntMatter(query):
+async def DeleteMessageButton(query):
     await bot.delete_message( chat_id=query.message.chat.id, 
                         message_id=query.message.message_id)
 
 
-from features.tasks import *
-from threading import Thread
-import traceback
-import asyncio
-import aioschedule
 
 async def scheduler():
     while True:
@@ -77,6 +74,5 @@ async def main():
 
 import sys
 if __name__ == '__main__':
-    print (sys.version)
     asyncio.run(main())
         

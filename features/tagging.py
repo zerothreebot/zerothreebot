@@ -1,9 +1,7 @@
 from telebot import types
-
 from settings import bot, chat_id
-from inline_keyboards.keyboards import tagging_markup, tagAllConfirm_markup, delete_button
 
-
+delete_button=types.InlineKeyboardButton(text='Закрити ❌', callback_data='delete_button')
 class Tagging:
     def __init__(self):
         self.message_id = 0
@@ -30,6 +28,15 @@ class Tagging:
         self.length = 0
 
 tagging = Tagging()
+
+#KEYBOARDS
+tagging_markup = types.InlineKeyboardMarkup()
+tagging_markup.add(types.InlineKeyboardButton(text='🗑 Прибрати мене зі списку', callback_data='delme'), types.InlineKeyboardButton(text='📩 Добавить меня в список', callback_data='addme'))
+
+tagAllConfirm_markup = types.InlineKeyboardMarkup()
+tagAllConfirm_markup.add(types.InlineKeyboardButton(    text='Так ✅', callback_data='tagall_accept'), 
+                                                        types.InlineKeyboardButton(text='Ні ❌', callback_data='tagall_cancel'))
+#KEYBOARDS
 
 @bot.callback_query_handler(lambda query: query.data=='start_tagging')
 async def NameDoesntMatter(query):
