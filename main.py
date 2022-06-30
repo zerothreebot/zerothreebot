@@ -30,7 +30,7 @@ marks_markup.add(types.InlineKeyboardButton( text='Ієрархія оцінок
 @bot.message_handler(commands=['start']) 
 async def Start(message):
     await bot.send_message(   chat_id=message.chat.id, 
-                        text='Привітик) Це персональний бот групи BS-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>')
+                        text='Вітаю) Це персональний бот групи БС-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>')
 
 @bot.message_handler(commands=['marks'])
 async def Output_Marks(message):
