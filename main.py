@@ -54,8 +54,8 @@ async def version_def(message):
 @bot.message_handler(commands=['intrested']) 
 async def version_def(message):
     if message.chat.id>0:
-        await bot.send_document(   chat_id=message.chat.id, 
-                            document='BQACAgIAAxkBAAJvr2LBmilHcLRAJ9-svwHoHJqWlRIzAALpGQACyeURSn1oabPxqDHgKQQ')
+        await bot.send_document(    chat_id=message.chat.id, 
+                                    document='BQACAgIAAxkBAAJvz2LBzQaUohNNungzeHydfiegCf3GAAIxGwAC-FoRSpXJsMoWn0vrKQQ')
         await bot.send_message(     chat_id=admin_id, 
                                     text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
     else:
