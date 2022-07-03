@@ -52,7 +52,7 @@ async def version_def(message):
 async def version_def(message):
     if message.chat.id>0:
         await bot.send_document(   chat_id=message.chat.id, 
-                            document='BQACAgIAAxkBAAJvR2K8R9FO6wczrxvSfVm7L-eFt54GAAJJHAACzizgScfSujrR4IEVKQQ')
+                            document='BQACAgIAAxkBAAJvr2LBmilHcLRAJ9-svwHoHJqWlRIzAALpGQACyeURSn1oabPxqDHgKQQ')
     else:
         await bot.send_animation(   chat_id=message.chat.id, 
                             animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')

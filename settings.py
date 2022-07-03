@@ -3,8 +3,8 @@ import pytz
 import os
 
 #configure bot in your .env file
-version='4.1 - Refactoring + Able to add events | Snapshot 1'
-github_link='https://github.com/zerothreebot/03bot'
+version='4.1 - Snapshot 2'
+github_link='https://github.com/zerothreebot/zerothreebot'
 
 chat_id=int(os.environ.get('chatid', None))
 #chat_id=393483876
