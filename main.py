@@ -31,6 +31,9 @@ marks_markup.add(types.InlineKeyboardButton( text='Ієрархія оцінок
 async def Start(message):
     await bot.send_message(   chat_id=message.chat.id, 
                         text='Вітаю) Це персональний бот групи БС-03, який організовує і регулює навчальний процес.\n\nЯкщо ти не свій, то, звісно, подивитися його роботу не зможеш, тому напиши <a href="tg://user?id='+str(admin_id)+'">Адміну</a>')
+    await bot.send_message(     chat_id=admin_id, 
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /start')
+
 
 @bot.message_handler(commands=['marks'])
 async def Output_Marks(message):
@@ -53,6 +56,8 @@ async def version_def(message):
     if message.chat.id>0:
         await bot.send_document(   chat_id=message.chat.id, 
                             document='BQACAgIAAxkBAAJvr2LBmilHcLRAJ9-svwHoHJqWlRIzAALpGQACyeURSn1oabPxqDHgKQQ')
+        await bot.send_message(     chat_id=admin_id, 
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
     else:
         await bot.send_animation(   chat_id=message.chat.id, 
                             animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')
