@@ -55,12 +55,14 @@ async def version_def(message):
 async def version_def(message):
     if message.chat.id>0:
         await bot.send_document(    chat_id=message.chat.id, 
-                                    document='BQACAgIAAxkBAAJvz2LBzQaUohNNungzeHydfiegCf3GAAIxGwAC-FoRSpXJsMoWn0vrKQQ')
+                                    document='BQACAgIAAxkBAAJv6WLDCdgjsOYjJ6GCtBYQcAKnPFjmAALdGgAC9Y0ZStub9IODL7U_KQQ')
         await bot.send_message(     chat_id=admin_id, 
                                     text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
     else:
         await bot.send_animation(   chat_id=message.chat.id, 
                             animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')
+        await bot.send_message(     chat_id=admin_id, 
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested in group')
 
 
 
