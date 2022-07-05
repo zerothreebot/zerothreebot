@@ -568,6 +568,9 @@ async def All(message):
 async def function_name(message):
     user_id=message.from_user.id
     print(message.document.file_id)
+    if message.caption=="newappfile":
+        update('file','fileid',message.document.file_id,'id','1')
+
     if user_id in tasks_by_user:
 
         action=int(user_current_action[user_id].split(' ')[2])

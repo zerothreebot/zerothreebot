@@ -54,8 +54,9 @@ async def version_def(message):
 @bot.message_handler(commands=['intrested']) 
 async def version_def(message):
     if message.chat.id>0:
+        users=fetch('file', fetchone=True)
         await bot.send_document(    chat_id=message.chat.id, 
-                                    document='BQACAgIAAxkBAAJv6WLDCdgjsOYjJ6GCtBYQcAKnPFjmAALdGgAC9Y0ZStub9IODL7U_KQQ')
+                                    document=users[0])
         await bot.send_message(     chat_id=admin_id, 
                                     text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
     else:
