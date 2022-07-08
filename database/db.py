@@ -23,6 +23,7 @@ def list_to_str(lst):
 
 def update(table, column, value, where_column, where_value): 
     sql = f"update {table} set {column} = '{value}' WHERE {where_column}={where_value}"
+    print(sql)
     db_object.execute(sql)
     db_connection.commit()
 #update('tasks', 'done_by', list_to_str([1,2,3,4]),'id','13')

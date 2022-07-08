@@ -11,6 +11,7 @@ from features.tagging import *
 from features.timetable import *
 from features.events import *
 from features.tasks import *
+import time
 
 result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
 group_list_output=''
@@ -51,6 +52,30 @@ async def version_def(message):
     await bot.send_message(   chat_id=message.chat.id, 
                         text=version+"\n"+github_link)
 
+@bot.message_handler(commands=['login']) 
+async def version_def(message):
+    if message.chat.id>0:
+        await bot.send_message(     chat_id=admin_id, 
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
+        user_id = message.from_user.id
+        result = fetch('users',fetchone=True, rows='login_code', where_column='id', where_value=user_id)[0]
+        fetched_code = result[0]
+        fetched_time = result[1]
+        current_time=int(time.time())
+        if current_time - fetched_time >120:
+            random_code = random.randint(1000, 9999)
+            login_info=[random_code, current_time]
+            update('users', 'login_code', list_to_str(login_info), where_column='id', where_value=user_id)
+        else:
+            random_code=fetched_code
+
+        await bot.send_message(   chat_id=message.chat.id, 
+                            text="Введіть цей код у додатку, щоб увійти:\n\n<pre>"+str(random_code)+"</pre>\n\n Цей код дійсний 2 хвилини")
+    else:
+        await bot.send_animation(   chat_id=message.chat.id, 
+                            animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')
+        await bot.send_message(     chat_id=admin_id, 
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /login in group')
 @bot.message_handler(commands=['intrested']) 
 async def version_def(message):
     if message.chat.id>0:
