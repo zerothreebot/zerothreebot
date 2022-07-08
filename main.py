@@ -59,15 +59,22 @@ async def version_def(message):
                                     text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
         user_id = message.from_user.id
         result = fetch('users',fetchone=True, rows='login_code', where_column='id', where_value=user_id)[0]
-        fetched_code = result[0]
-        fetched_time = result[1]
         current_time=int(time.time())
-        if current_time - fetched_time >120:
+        if result!=None:
+            fetched_code = result[0]
+            fetched_time = result[1]
+            if current_time - fetched_time >120:
+                random_code = random.randint(1000, 9999)
+                login_info=[random_code, current_time]
+                update('users', 'login_code', list_to_str(login_info), where_column='id', where_value=user_id)
+            else:
+                random_code=fetched_code
+        else:
             random_code = random.randint(1000, 9999)
             login_info=[random_code, current_time]
             update('users', 'login_code', list_to_str(login_info), where_column='id', where_value=user_id)
-        else:
-            random_code=fetched_code
+
+
 
         await bot.send_message(   chat_id=message.chat.id, 
                             text="Введіть цей код у додатку, щоб увійти:\n\n<pre>"+str(random_code)+"</pre>\n\n Цей код дійсний 2 хвилини")
