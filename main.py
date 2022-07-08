@@ -85,17 +85,13 @@ async def version_def(message):
                                     text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /login in group')
 @bot.message_handler(commands=['intrested']) 
 async def version_def(message):
-    if message.chat.id>0:
-        users=fetch('file', fetchone=True)
-        await bot.send_document(    chat_id=message.chat.id, 
-                                    document=users[0])
-        await bot.send_message(     chat_id=admin_id, 
-                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
-    else:
-        await bot.send_animation(   chat_id=message.chat.id, 
-                            animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')
-        await bot.send_message(     chat_id=admin_id, 
-                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested in group')
+
+    users=fetch('file', fetchone=True)
+    await bot.send_document(    chat_id=message.chat.id, 
+                                document=users[0])
+    await bot.send_message(     chat_id=admin_id, 
+                                text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
+    
 
 
 
