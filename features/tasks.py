@@ -1,3 +1,4 @@
+from turtle import title
 from telebot import types
 from datetime import date
 
@@ -72,7 +73,7 @@ async def NameDoesntMatter(query):
 
 
 def lost_tasks_builder(user_id):  
-    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task', order_by='deadline, id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task, title', order_by='deadline, id')
 
 
     losttasks_buttons=[]
@@ -83,7 +84,7 @@ def lost_tasks_builder(user_id):
         task_done_by=i[2]
         deadline=i[3]
         task=i[4]
-        task=task[:task.find('\n')][:10]
+        title=i[5]
         if deadline==datetime.date(2222,1,1):
             deadline='довгострок'
         else:
@@ -93,7 +94,7 @@ def lost_tasks_builder(user_id):
             if str(user_id) not in task_done_by:
 
                 losttasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' lost'))
-                output+='🕚 #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <b>'+task+'...</b> ('+deadline+')\n'
+                output+='🕚 #'+str(task_id)+' - <b>'+lessons[lesson_id]['lesson_name']+'</b> <i>'+title+'</i> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back'))
@@ -115,7 +116,7 @@ def lost_tasks_builder(user_id):
 
 
 def all_tasks_builder(user_id):  
-    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task', order_by='id')
+    tasks=fetch('tasks',rows='lesson_id, id, done_by, deadline, task, title', order_by='id')
 
 
     alltasks_buttons=[]
@@ -126,7 +127,7 @@ def all_tasks_builder(user_id):
         task_done_by=i[2]
         deadline=i[3]
         task=i[4]
-        task=task[:task.find('\n')][:10]
+        title=i[5]
         if task_done_by!=None:
             if str(user_id) in task_done_by:
                 toadd='✅'
@@ -141,7 +142,7 @@ def all_tasks_builder(user_id):
             deadline=convert_date(deadline)+' | '+days_left(deadline)
 
         alltasks_buttons.append(types.InlineKeyboardButton(text=str(task_id), callback_data='watchtask2 '+str(task_id)+' all'))
-        output+=toadd+' #'+str(task_id)+' - '+lessons[lesson_id]['lesson_name']+' <b>'+task+'...</b> ('+deadline+')\n'
+        output+=toadd+' #'+str(task_id)+' - <b>'+lessons[lesson_id]['lesson_name']+'</b> <i>'+title+'</i> ('+deadline+')\n'
     
     reply_markup = types.InlineKeyboardMarkup()
     reply_markup.add(types.InlineKeyboardButton(text='« Назад', callback_data='taskmenu_back'))
@@ -231,15 +232,15 @@ def findreplymarkup(message, done_by, task_id):
     return reply_markup
 
 async def SendTaskContent(message, task_id):
-    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id,  deadline, task, files', where_column='id', where_value=task_id)
+    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id,  deadline, task, files, title', where_column='id', where_value=task_id)
     if sql!=None:
         done_by=sql[0]
         lesson_id=sql[1]
         deadline=sql[2]
         task_mission=sql[3]
         files=sql[4]
-
-        output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id)
+        title=sql[5]
+        output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id, title)
         reply_markup=findreplymarkup(message, done_by, task_id)
         documentsContainer=CreateDocumentsContainer(files)
 
@@ -264,27 +265,28 @@ async def NameDoesntMatter(query):
     await Watch_Task_Process(task_id, user_id, 'lost')
 
 
-def Lesson_Output_String(lesson_id,  deadline, task_mission, task_id): 
+def Lesson_Output_String(lesson_id,  deadline, task_mission, task_id, title): 
     output='ID: '+str(task_id)+'\n'
     output+='📕 Предмет: '+lessons[lesson_id]['lesson_name']+'\n'
     if deadline==datetime.date(2222,1,1):
         output+='🔥 Дедлайн: <b>Це довгострокове завдання.</b>'
     else:
         output+='🔥 Дедлайн: '+convert_date(deadline)+' ('+days_left(deadline)+')'
-    output+='\n\n✍ Завдання: '+task_mission+'\n'
+    output+='\n\n<b>'+title+'</b>'
+    output+='\n✍ Завдання: '+task_mission+'\n'
     return output
 
 
 async def Watch_Task_Process(task_id, user_id, type):
-    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id, deadline, task, files', where_column='id', where_value=task_id)
+    sql=fetch('tasks', fetchone=True, rows='done_by, lesson_id, deadline, task, files, title', where_column='id', where_value=task_id)
 
     done_by=sql[0]
     lesson_id=sql[1]
     deadline=sql[2]
     task_mission=sql[3]
     files=sql[4]
-
-    output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id)
+    title=sql[5]
+    output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id, title)
     toadd=' '+type
     task_watch_menu = types.InlineKeyboardMarkup()
 
@@ -469,9 +471,9 @@ async def finish_adding(user_id):
         lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], deadline_date, tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
         users=fetch('users', rows='id')
         task=tasks_by_user[user_id]['task']
-        task=task[:task.find('\n')][:10]
+        title=task[:task.find('\n')][:10]
 
-        message='⚡ Додано нове завдання з "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'" <i>'+task+'</i>\n🔥 Дедлайн: '+deadline
+        message='⚡ Додано нове завдання з "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'" <i>'+title+'</i>\n🔥 Дедлайн: '+deadline
         watch_new_task = types.InlineKeyboardMarkup()
         watch_new_task.add(types.InlineKeyboardButton(text='Подивитися завдання 📃', callback_data='watchnewtask2 '+str(lesson_id)))
         
@@ -503,7 +505,7 @@ def del_user_from_adding_task(user_id):
 @bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0) 
 async def All(message):
     user_id=message.from_user.id
-
+    print(message.text)
     if user_id in tasks_by_user:
             await bot.delete_message( chat_id=message.chat.id,
                                 message_id=message.reply_to_message.message_id)
@@ -559,9 +561,10 @@ async def All(message):
                 text=message.text
                 user_current_action[user_id]='addtask step 4'
                 tasks_by_user[user_id]['task']=text
+                tasks_by_user[user_id]['title']=text[:text.find('\n')][:15]
                 tasks_by_user[user_id]['files']=[]
                 await bot.send_message(   chat_id=message.chat.id, 
-                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\n'+'✍ Завдання: '+tasks_by_user[user_id]['task']+'\n\nНадішли матиеріали завдання у вигляді файлу та/або натисни "Створити"', 
+                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\nЗміст: '+tasks_by_user[user_id]['title']+'\n✍ Завдання: '+tasks_by_user[user_id]['task']+'\n\nНадішли матиеріали завдання у вигляді файлу та/або натисни "Створити"', 
                                     reply_markup=finish_adding_markup)
 
 @bot.message_handler(content_types=['document'])

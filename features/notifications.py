@@ -58,7 +58,7 @@ async def Left_Showgraf(query):
 async def notification_tasks(days_left, message):
     todays_date=datetime.date.today()+datetime.timedelta(days=days_left)
     users=fetch('users', rows='id, not_tasks_undone')
-    tasks=fetch('tasks', rows='done_by, lesson_id, id', where_column='deadline', where_value="'"+str(todays_date)+"'")
+    tasks=fetch('tasks', rows='done_by, lesson_id, id, title', where_column='deadline', where_value="'"+str(todays_date)+"'")
     print(str(todays_date))
     users_list={}
     for i in users:
@@ -67,6 +67,7 @@ async def notification_tasks(days_left, message):
         done_by=i[0]
         lesson_id=i[1]
         task_id=i[2]
+        title=i[3]
         for j in users_list:
             notifications=users_list[j] 
             if str(j) not in done_by and notifications==True:
@@ -74,7 +75,7 @@ async def notification_tasks(days_left, message):
                 watch_deadline_task.add(types.InlineKeyboardButton(text='Подивитися завдання...', callback_data='watchnewtask2 '+str(task_id)))
                 try:
                     await bot.send_message(   chat_id=j, 
-                                        text='Ви не виконали завдання з '+lessons[lesson_id]['lesson_name']+'\n\n'+message, 
+                                        text='Ви не виконали завдання з '+lessons[lesson_id]['lesson_name']+' ('+title+')\n\n'+message, 
                                         reply_markup=watch_deadline_task
                                         )
                 except: pass
