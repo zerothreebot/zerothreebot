@@ -171,7 +171,7 @@ async def lesson_started_now():
 lesson_start_prepare=["05:20", "07:15", "09:10", "11:05", "13:00"] 
 for i in lesson_start_prepare:
     aioschedule.every().day.at(i).do(lesson_started_prepare)
-
+    
 lesson_start=["05:30", "07:25", "09:20", "11:15", "13:10"] 
 for i in lesson_start:
     aioschedule.every().day.at(i).do(lesson_started_now)
