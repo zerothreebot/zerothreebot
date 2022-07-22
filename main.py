@@ -56,7 +56,7 @@ async def version_def(message):
 async def version_def(message):
     if message.chat.id>0:
         await bot.send_message(     chat_id=admin_id, 
-                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /intrested')
+                                    text='<a href="tg://user?id='+str(message.from_user.id)+'">'+message.from_user.first_name+'</a> /login')
         user_id = message.from_user.id
         result = fetch('users',fetchone=True, rows='login_code', where_column='id', where_value=user_id)[0]
         current_time=int(time.time())
