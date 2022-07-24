@@ -1,4 +1,7 @@
 
+from math import fabs
+import re
+from attr import has
 from telebot import types
 from datetime import date
 
@@ -20,9 +23,9 @@ cancel_adding_markup=types.InlineKeyboardMarkup()
 cancel_adding_button=types.InlineKeyboardButton(text='Скасувати ❌', callback_data='cancel_adding')
 cancel_adding_markup.add(cancel_adding_button)
 
-finish_adding_markup=types.InlineKeyboardMarkup()
-finish_adding_button=types.InlineKeyboardButton(text='Створити 📃', callback_data='finish_adding')
-finish_adding_markup.add(cancel_adding_button, finish_adding_button)
+finish_adding_task_markup=types.InlineKeyboardMarkup()
+finish_adding_task_button=types.InlineKeyboardButton(text='Створити 📃', callback_data='finish_adding_task')
+finish_adding_task_markup.add(cancel_adding_button, finish_adding_task_button)
 #KEYBOARDS
 
 main_buttons=[]
@@ -255,14 +258,22 @@ async def SendTaskContent(message, task_id):
         return False   
 
 
-@bot.callback_query_handler(lambda query: query.data.find('watchnewtask2')!=-1)
-async def NameDoesntMatter(query):
-    await bot.answer_callback_query(  callback_query_id=query.id, 
-                                text='Опа... Нове завдання 😬')
-    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
-    task_id=int(query.data.split(' ')[1])
-    user_id=query.from_user.id
-    await Watch_Task_Process(task_id, user_id, 'lost')
+#@bot.callback_query_handler(lambda query: query.data.find('watchnewtask2')!=-1)
+#async def NameDoesntMatter(query):
+#    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+#    task_id=int(query.data.split(' ')[1])
+#    user_id=query.from_user.id
+#    output, task_watch_menu, hasFiles = await Watch_Task_Process(task_id, user_id, 'lost')
+#    if hasFiles:
+#        await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+#        await bot.send_message(     chat_id=user_id,
+#                                    text=output, 
+#                                    reply_markup=task_watch_menu)
+#    else:
+#        await bot.edit_message_text(   chat_id=user_id,
+#                                        message_id=query.message.message_id,
+#                                        text=output, 
+#                                        reply_markup=task_watch_menu)
 
 
 def Lesson_Output_String(lesson_id,  deadline, task_mission, task_id, title): 
@@ -289,11 +300,12 @@ async def Watch_Task_Process(task_id, user_id, type):
     output=Lesson_Output_String(lesson_id,  deadline, task_mission, task_id, title)
     toadd=' '+type
     task_watch_menu = types.InlineKeyboardMarkup()
-
+    hasFiles=False
     if done_by==None:
         done_by=[]
     
     if len(files)==0:
+        hasFiles=False
         if str(user_id) in done_by:
             task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'+toadd), 
                                 types.InlineKeyboardButton(text='🕚 Позначити невиконаним', callback_data='set_uncompleted '+str(task_id)))
@@ -301,6 +313,7 @@ async def Watch_Task_Process(task_id, user_id, type):
             task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks'+toadd), 
                                 types.InlineKeyboardButton(text='✅ Виконати', callback_data='set_completed '+str(task_id)))
     else:
+        hasFiles=True
         documentsContainer=[]
         k=0
         attachmentsCounter=len(files)
@@ -325,20 +338,30 @@ async def Watch_Task_Process(task_id, user_id, type):
             task_watch_menu.add(   types.InlineKeyboardButton(text='« Назад', callback_data='back_to_tasks '+mes_ids+toadd), 
                             types.InlineKeyboardButton(text='✅ Виконати', callback_data='set_completed '+str(task_id)))
         
-    await bot.send_message(   chat_id=user_id,
-                        text=output, 
-                        reply_markup=task_watch_menu)
+
+    return output, task_watch_menu, hasFiles
 
 
 @bot.callback_query_handler(lambda query: query.data.find('watchtask2')!=-1)
 async def NameDoesntMatter(query):
-    await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
     
-    task_id=int(query.data.split(' ')[1])
+    intent = query.data.split(' ')
+    task_id=int(intent[1])
     user_id=query.from_user.id
-    type=query.data.split(' ')[2]
+    type=intent[2]
 
-    await Watch_Task_Process(task_id, user_id, type)
+    output, task_watch_menu, hasFiles = await Watch_Task_Process(task_id, user_id, type)
+    if hasFiles:
+        await bot.delete_message(chat_id=query.message.chat.id, message_id=query.message.message_id)
+        await bot.send_message(     chat_id=user_id,
+                                    text=output, 
+                                    reply_markup=task_watch_menu)
+    else:
+        await bot.edit_message_text(   chat_id=user_id,
+                                        message_id=query.message.message_id,
+                                        text=output, 
+                                        reply_markup=task_watch_menu)
+        
 
 
 @bot.callback_query_handler(lambda query: query.data.find('back_to_tasks')!=-1)
@@ -452,7 +475,7 @@ async def NameDoesntMatter(query):
                             message_id=query.message.message_id, 
                             text='📕 Предмет: '+lessons[lesson_number]['lesson_name']+'\n\nРеплайни на це повідомлення дату дедлайна у виді <code>ДД-ММ-ГГГГ</code>:\n\nЯкщо завдання довгострокове, реплайни "довгострок" ', 
                             reply_markup=cancel_adding_markup)
-async def finish_adding(user_id):
+async def finish_adding_task(user_id):
     if user_id in tasks_by_user:
         if tasks_by_user[user_id]['date']!='довгострок':
             date_=tasks_by_user[user_id]['date'].split('-')
@@ -468,17 +491,17 @@ async def finish_adding(user_id):
             deadline_date=datetime.date(year, month, day)
             deadline='довгострок'
         
-        lesson_id = add_task(user_id, tasks_by_user[user_id]['lesson_id'], deadline_date, tasks_by_user[user_id]['task'], tasks_by_user[user_id]['files'])
+        lesson_id = add_task(tasks_by_user[user_id]['lesson_id'], deadline_date, tasks_by_user[user_id]['task'], tasks_by_user[user_id]['title'], tasks_by_user[user_id]['files'])
         users=fetch('users', rows='id')
         task=tasks_by_user[user_id]['task']
         title=task[:task.find('\n')][:10]
 
         message='⚡ Додано нове завдання з "'+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'" <i>'+title+'</i>\n🔥 Дедлайн: '+deadline
         watch_new_task = types.InlineKeyboardMarkup()
-        watch_new_task.add(types.InlineKeyboardButton(text='Подивитися завдання 📃', callback_data='watchnewtask2 '+str(lesson_id)))
+        watch_new_task.add(types.InlineKeyboardButton(text='Подивитися завдання 📃', callback_data='watchtask2 '+str(lesson_id)+' lost'))
         
         for i in users:
-            #if i[0]==1:
+            if i[0]==393483876:
                 try: await bot.send_message(      chat_id=i[0], 
                                             text=message, 
                                             reply_markup=watch_new_task,
@@ -487,10 +510,10 @@ async def finish_adding(user_id):
                     
                 except: pass
                 
-        await bot.send_message(   chat_id=chat_id,
-                                    text='#task\n'+message, 
-                                    reply_markup=link_markup,
-                                    disable_notification=True)
+        #await bot.send_message(   chat_id=chat_id,
+        #                            text='#task\n'+message, 
+        #                            reply_markup=link_markup,
+        #                            disable_notification=True)
                 
 
         del_user_from_adding_task(user_id)
@@ -503,7 +526,7 @@ def del_user_from_adding_task(user_id):
 
     
 @bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0) 
-async def All(message):
+async def Allergerg(message):
     user_id=message.from_user.id
     print(message.text)
     if user_id in tasks_by_user:
@@ -564,8 +587,8 @@ async def All(message):
                 tasks_by_user[user_id]['title']=text[:text.find('\n')][:15]
                 tasks_by_user[user_id]['files']=[]
                 await bot.send_message(   chat_id=message.chat.id, 
-                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\nЗміст: '+tasks_by_user[user_id]['title']+'\n✍ Завдання: '+tasks_by_user[user_id]['task']+'\n\nНадішли матиеріали завдання у вигляді файлу та/або натисни "Створити"', 
-                                    reply_markup=finish_adding_markup)
+                                    text='📕 Предмет: '+lessons[tasks_by_user[user_id]['lesson_id']]['lesson_name']+'\n'+'🔥 Дедлайн: '+tasks_by_user[user_id]['date']+'\nЗміст: '+tasks_by_user[user_id]['title']+'\n✍ Завдання: '+tasks_by_user[user_id]['task']+'\n\nНадішли матеріали завдання у вигляді файлу та/або натисни "Створити"', 
+                                    reply_markup=finish_adding_task_markup)
 
 @bot.message_handler(content_types=['document'])
 async def function_name(message):
@@ -595,9 +618,9 @@ async def NameDoesntMatter(query):
                         message_id=query.message.message_id)
     del_user_from_adding_task(user_id)
 
-@bot.callback_query_handler(lambda query: query.data==('finish_adding'))
+@bot.callback_query_handler(lambda query: query.data==('finish_adding_task'))
 async def NameDoesntMatter(query):
-    await finish_adding(query.from_user.id)
+    await finish_adding_task(query.from_user.id)
     await bot.answer_callback_query(  callback_query_id=query.id, 
                                 text='Завдання додано. Дякую 🥰')
     await bot.delete_message( chat_id=query.message.chat.id, 

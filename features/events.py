@@ -291,7 +291,7 @@ async def NameDoesntMatter(query):
                             text='Реплайни на це повідомлення дату заходу у виді <code>ДД-ММ-ГГГГ</code>:', 
                             reply_markup=cancel_adding_markup)
        
-@bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0) 
+#@bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0) 
 async def All(message):
     user_id=message.from_user.id
 

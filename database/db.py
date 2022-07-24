@@ -48,7 +48,7 @@ def fetch(table, rows=None, fetchone=False, order_by=None, where_column=None, wh
     return result
 #fetch('users',rows='name, surname', fetchone=True, where_column='id', where_value=393483876)
 
-def add_task(lesson_id, deadline, task, files=None): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
+def add_task(lesson_id, deadline, title, task, files=None): #add_task(user_id, 2, datetime.date.today(), 'egrerg', 'sedfwefweferfgqerfgqerqfgergre')
     if files!=None:
         files=list_to_str(files)
     else:files = '{}'
@@ -61,7 +61,7 @@ def add_task(lesson_id, deadline, task, files=None): #add_task(user_id, 2, datet
     else:
         id=result[len(result)-1][0]+1
 
-    sql = f"INSERT INTO tasks (id, lesson_id, deadline, task, files, done_by) VALUES ({id}, {lesson_id}, '{deadline}', '{task}' ,'{files}', "+"'{}'"+")"
+    sql = f"INSERT INTO tasks (id, lesson_id, deadline, task, title, files, done_by) VALUES ({id}, {lesson_id}, '{deadline}', '{task}' ,'{title}' ,'{files}', "+"'{}'"+")"
     db_object.execute(sql)
     db_connection.commit()
     return id

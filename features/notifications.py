@@ -20,7 +20,7 @@ async def Command_Left(message):
     text='Реплайни на це повідомлення тe, що хочеш відправити усім...'
     await bot.reply_to(message, text)
 
-@bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0 and notification_message_id==-1) 
+#@bot.message_handler(func=lambda message: message.reply_to_message!=None and message.chat.id>0 and notification_message_id==-1) 
 async def All(message):
     global notification_message_id
     sendall = types.InlineKeyboardMarkup()
