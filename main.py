@@ -79,7 +79,7 @@ async def version_def(message):
 
 
         await bot.send_message(   chat_id=message.chat.id, 
-                            text="Введіть цей код у додатку, щоб увійти:\n\n<pre>"+str(random_code)+"</pre>\n\n Цей код дійсний 2 хвилини")
+                            text="Введіть цей код у додатку, щоб увійти:\n\n<pre>"+str(random_code)+"</pre>\n\nВін буде дійсний 2 хвилини")
     else:
         await bot.send_animation(   chat_id=message.chat.id, 
                             animation='CgACAgQAAxkBAAJvJ2K8RrWjXvpj9sWrbC3ykUNMLEYKAALDAgACJXbkU3Uz-_bKGVLCKQQ')
