@@ -15,11 +15,13 @@ import time
 
 result=fetch(table='users', rows="group_id, name, surname", order_by='group_id')
 group_list_output=''
+group_list_output_studkur=''
 for i in result:
     group_id = i[0]
     name = i[1]
     surname = i[2]
-    group_list_output+=str(group_id)+' - '+name+' '+surname+'\n'
+    if group_id>0:
+        group_list_output+=str(group_id)+'. '+name+' '+surname+'\n'
 
 #KEYBOARDS
 marks_markup = types.InlineKeyboardMarkup()
